@@ -1,0 +1,21 @@
+<div id="daily" class="row">
+	<h1>日常审核&管理</h1>
+	<div class="big-eye col-xs-6 block">
+		<header>
+			<i class="fa fa-eye"></i>
+			<span>大眼睛位</span>
+			<span class="edit">修改</span>
+		</header>
+		<div class="content">
+			<carousel interval="5000" no-wrap="false">
+				<slide ng-repeat="slide in slides" active="slide.active">
+				<img ng-src="{{slide.image}}" style="margin:auto;">
+					<div class="carousel-caption">
+						<h4>Slide {{$index}}</h4>
+						<p>{{slide.text}}</p>
+					</div>
+				</slide>
+			</carousel>
+		</div>
+	</div>
+</div>

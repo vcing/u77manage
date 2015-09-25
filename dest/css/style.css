@@ -1,0 +1,21 @@
+@charset "UTF-8";
+/**
+ * common
+ */
+/**
+ * base 
+ * 
+ */
+html, body {
+  background: #f9f9f9;
+  width: 100%;
+  height: 100%;
+  font-family: '微软雅黑'; }
+  html #u77manage, body #u77manage {
+    background: url(/img/base-loading.gif);
+    background-repeat-y: no-repeat;
+    background-size: auto;
+    background-position: center center;
+    width: 100%;
+    min-height: 300px;
+    height: 100%; }
