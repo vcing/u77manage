@@ -314,7 +314,7 @@ function _init() {
       var screenSizes = $.AdminLTE.options.screenSizes;
 
       //Enable sidebar toggle
-      $(toggleBtn).on('click', function (e) {
+      $(document).on('click',toggleBtn, function (e) {
         e.preventDefault();
 
         //Enable sidebar push menu
@@ -335,7 +335,7 @@ function _init() {
         }
       });
 
-      $(".content-wrapper").click(function () {
+      $(document).on('click','.content-wrapper',function () {
         //Enable hide menu when clicking on the content-wrapper on small screens
         if ($(window).width() <= (screenSizes.sm - 1) && $("body").hasClass("sidebar-open")) {
           $("body").removeClass('sidebar-open');

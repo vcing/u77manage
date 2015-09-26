@@ -1,3 +1,11 @@
+app.directive('mainSidebar',function(){
+	return {
+		restrict:'A',
+		templateUrl:'/base/sidebar.html',
+		replace:true,
+	};
+});
+
 app.directive('navHeader',function(){
 	return {
 		restrict:'A',

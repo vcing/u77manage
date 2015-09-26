@@ -1,0 +1,9 @@
+<div id='slider'>
+	<ul id='slider-ul'>
+		<li ng-repeat="slide in list" data-title="{{slide.text}}"><a href="{{slide.url}}" target='_blank'><img class="img-responsive" ng-src="{{slide.image}}"></a></li>
+	</ul>
+	<div id='slider-title-cover'></div>
+	<div id='slider-title'>
+		<a href="{{list[0].url}}">{{list[0].text}}</a>
+	</div>
+</div>

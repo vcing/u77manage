@@ -9,7 +9,7 @@
 	<!-- Header Navbar: style can be found in header.less -->
 	<nav class="navbar navbar-static-top" role="navigation">
 		<!-- Sidebar toggle button-->
-		<a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+		<a class="sidebar-toggle" data-toggle="offcanvas" role="button">
 			<span class="sr-only">Toggle navigation</span>
 		</a>
 		<!-- Navbar Right Menu -->
@@ -40,9 +40,44 @@
 					<div nav-task-list></div>
 				</li>
 				<!-- User Account: style can be found in dropdown.less -->
-				<li class="dropdown user user-menu"></li>
+				<li class="dropdown user user-menu">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+						<img src="http://img.u77.com/avatar/3d/6b/1.jpg!avatar" class="user-image" alt="User Image">
+						<span class="hidden-xs">U77店长</span>
+					</a>
+					<ul class="dropdown-menu">
+						<li class="user-header">
+							<img src="http://img.u77.com/avatar/3d/6b/1.jpg" class="img-circle" alt="User Image">
+							<p>
+								U77店长
+								<small>呵呵呵呵呵</small>
+							</p>
+						</li>
+						<li class="user-body">
+							<div class="col-xs-4 text-center">
+								<a href="#">Followers</a>
+							</div>
+							<div class="col-xs-4 text-center">
+								<a href="#">Sales</a>
+							</div>
+							<div class="col-xs-4 text-center">
+								<a href="#">Friends</a>
+							</div>
+						</li>
+						<li class="user-footer">
+							<div class="pull-left">
+								<a href="#" class="btn btn-default btn-flat">Profile</a>
+							</div>
+							<div class="pull-right">
+								<a href="#" class="btn btn-default btn-flat">Sign out</a>
+							</div>
+						</li>
+					</ul>	
+				</li>
 				<!-- Control Sidebar Toggle Button -->
-				<li></li>
+				<li>
+					<a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
+				</li>
 			</ul>
 		</div>
 	</nav>
