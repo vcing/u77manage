@@ -22,11 +22,26 @@ html, body {
     min-height: 300px;
     height: 100%; }
 
-.game-block .box-footer .row .btns {
+.widget-user.game-block .bg {
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 5px;
+  border-radius: 5px; }
+
+.widget-user.game-block .widget-user-image {
+  top: 90px;
+  margin-left: -30px; }
+  .widget-user.game-block .widget-user-image .img-circle {
+    width: 60px; }
+
+.widget-user.game-block .widget-user-username a,
+.widget-user.game-block .widget-user-desc a {
+  color: #fff; }
+
+.widget-user.game-block .box-footer .row .btns {
   padding-right: 5px; }
-  .game-block .box-footer .row .btns .description-block {
+  .widget-user.game-block .box-footer .row .btns .description-block {
     overflow: hidden; }
-    .game-block .box-footer .row .btns .description-block .btn {
+    .widget-user.game-block .box-footer .row .btns .description-block .btn {
       float: left;
       width: 46%;
       margin: 2%;
@@ -34,7 +49,7 @@ html, body {
       padding: 0;
       height: 25px; }
 
-.game-block .box-footer .row .status .description-block {
+.widget-user.game-block .box-footer .row .status .description-block {
   color: #fff !important;
   border-radius: 50%;
   width: 60px;
@@ -42,25 +57,25 @@ html, body {
   margin: 10px auto;
   margin-bottom: 0;
   padding: 8px; }
-  .game-block .box-footer .row .status .description-block .fa {
+  .widget-user.game-block .box-footer .row .status .description-block .fa {
     font-size: 25px; }
-  .game-block .box-footer .row .status .description-block .text {
+  .widget-user.game-block .box-footer .row .status .description-block .text {
     margin-top: 5px;
     font-size: 13px; }
 
-.game-block .box-footer .row .status .description-block.unaudited {
+.widget-user.game-block .box-footer .row .status .description-block.unaudited {
   background-color: #dd4b39 !important; }
 
-.game-block .box-footer .row .status .description-block.send-back {
+.widget-user.game-block .box-footer .row .status .description-block.send-back {
   background-color: #001f3f !important; }
 
-.game-block .box-footer .row .status .description-block.publish {
+.widget-user.game-block .box-footer .row .status .description-block.publish {
   background-color: #00a65a !important; }
 
-.game-block .box-footer .row .status .description-block.unpublish {
+.widget-user.game-block .box-footer .row .status .description-block.unpublish {
   background-color: #f39c12 !important; }
 
-.game-block .box-footer .row .time {
+.widget-user.game-block .box-footer .row .time {
   margin-top: 20px; }
 
 /**

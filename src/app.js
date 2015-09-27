@@ -5,6 +5,8 @@
 
 var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch']);
 var BasePath = 'http://dev.u77.com/admin/';
+var Path = 'http://dev.u77.com';
+var AvatarPath = 'http://img.u77.com/avatar/';
 app.config(['$stateProvider','$urlRouterProvider',
 	function($stateProvider,$urlRouterProvider){
 
@@ -66,9 +68,15 @@ app.config(['$stateProvider','$urlRouterProvider',
 
 		// $urlRouterProvider.when("", "/dashboard");
 		// $urlRouterProvider.otherwise('/dashboard');
+
+		// 时间本地化
+		moment.locale('zh-cn');
 	}]);
 
 app.run(['$rootScope','$state',
 	function($rootScope,$state){
 		$rootScope.loading = true;
+		$rootScope.BasePath = BasePath;
+		$rootScope.Path = Path;
+		$rootScope.AvatarPath = AvatarPath;
 	}])
