@@ -3,7 +3,7 @@
  * 
  */
 
-var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch']);
+var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch','infinite-scroll']);
 var BasePath = 'http://dev.u77.com/admin/';
 var Path = 'http://dev.u77.com';
 var AvatarPath = 'http://img.u77.com/avatar/';
@@ -29,15 +29,15 @@ app.config(['$stateProvider','$urlRouterProvider',
 					}
 				}
 			})
-			.state('base.daily',{
-				url:'/daily',
-				views:{
-					'content':{
-						templateUrl:'daily/big-eye.html',
-						controller:'BigEyeCtrl'
-					}
-				}
-			})
+			// .state('base.daily',{
+			// 	url:'/daily',
+			// 	views:{
+			// 		'content':{
+			// 			templateUrl:'daily/big-eye.html',
+			// 			controller:'BigEyeCtrl'
+			// 		}
+			// 	}
+			// })
 			.state('base.dailyBigEye',{
 				url:'/daily-big-eye',
 				views:{
@@ -62,6 +62,15 @@ app.config(['$stateProvider','$urlRouterProvider',
 					'content':{
 						templateUrl:'daily/report-examine.html',
 						controller:'ReportExamineCtrl'
+					}
+				}
+			})
+			.state('base.gameList',{
+				url:'/game-list',
+				views:{
+					'content':{
+						templateUrl:'game/game-lists.html',
+						controller:'GameListCtrl'
 					}
 				}
 			})

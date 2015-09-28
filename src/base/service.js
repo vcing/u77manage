@@ -59,17 +59,11 @@ app.service('GameService',['$q',
 					deffered.resolve(JSON.parse(data));
 				});
 				return deffered.promise;
-			}
-		}
-	}]);
-
-app.service('GameListService',['$q',
-	function($q){
-		return {
+			},
 			// type 类型 1-web 2-pc 3-手机 4-收费 5-ios 6-android 7-I&A 8原创游戏
 			// status 状态 99已发布 1未发布 0未审核 3退稿
 			// search_type key-关键词 id-id
-			promise:function(options){
+			list:function(options){
 				var deffered = $q.defer();
 				$.post(BasePath+'api/get_game_list',options,function(data){
 					deffered.resolve(JSON.parse(data));

@@ -17,15 +17,15 @@ app.service('DailyReportService',['$http','$q','ReportListInfoService',
 		}
 	}]);
 
-app.service('DailyGameVilidService',['$http','$q','GameListService',
-	function($http,$q,GameListService){
+app.service('DailyGameVilidService',['$http','$q','GameService',
+	function($http,$q,GameService){
 		return {
 			promise:function(){
 				var deffered = $q.defer();
 				var options = {
 					status:0
 				}
-				GameListService.promise(options).then(function(data){
+				GameService.list(options).then(function(data){
 					deffered.resolve(data);
 				});
 				return deffered.promise;

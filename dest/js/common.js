@@ -3,7 +3,7 @@
  * 
  */
 
-var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch']);
+var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch','infinite-scroll']);
 var BasePath = 'http://dev.u77.com/admin/';
 var Path = 'http://dev.u77.com';
 var AvatarPath = 'http://img.u77.com/avatar/';
@@ -29,15 +29,15 @@ app.config(['$stateProvider','$urlRouterProvider',
 					}
 				}
 			})
-			.state('base.daily',{
-				url:'/daily',
-				views:{
-					'content':{
-						templateUrl:'daily/big-eye.html',
-						controller:'BigEyeCtrl'
-					}
-				}
-			})
+			// .state('base.daily',{
+			// 	url:'/daily',
+			// 	views:{
+			// 		'content':{
+			// 			templateUrl:'daily/big-eye.html',
+			// 			controller:'BigEyeCtrl'
+			// 		}
+			// 	}
+			// })
 			.state('base.dailyBigEye',{
 				url:'/daily-big-eye',
 				views:{
@@ -62,6 +62,15 @@ app.config(['$stateProvider','$urlRouterProvider',
 					'content':{
 						templateUrl:'daily/report-examine.html',
 						controller:'ReportExamineCtrl'
+					}
+				}
+			})
+			.state('base.gameList',{
+				url:'/game-list',
+				views:{
+					'content':{
+						templateUrl:'game/game-lists.html',
+						controller:'GameListCtrl'
 					}
 				}
 			})
@@ -276,17 +285,11 @@ app.service('GameService',['$q',
 					deffered.resolve(JSON.parse(data));
 				});
 				return deffered.promise;
-			}
-		}
-	}]);
-
-app.service('GameListService',['$q',
-	function($q){
-		return {
+			},
 			// type 类型 1-web 2-pc 3-手机 4-收费 5-ios 6-android 7-I&A 8原创游戏
 			// status 状态 99已发布 1未发布 0未审核 3退稿
 			// search_type key-关键词 id-id
-			promise:function(options){
+			list:function(options){
 				var deffered = $q.defer();
 				$.post(BasePath+'api/get_game_list',options,function(data){
 					deffered.resolve(JSON.parse(data));
@@ -400,6 +403,10 @@ app.service('ReportListInfoService',['$q','CommentService','UserService','PostSe
 		}
 		
 	}]);
+app.controller('DashboardCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+
+	}]);
 app.controller('BigEyeCtrl',['$scope','$rootScope',
 	function($scope,$rootScope){
 		$scope.list = [];
@@ -476,15 +483,15 @@ app.service('DailyReportService',['$http','$q','ReportListInfoService',
 		}
 	}]);
 
-app.service('DailyGameVilidService',['$http','$q','GameListService',
-	function($http,$q,GameListService){
+app.service('DailyGameVilidService',['$http','$q','GameService',
+	function($http,$q,GameService){
 		return {
 			promise:function(){
 				var deffered = $q.defer();
 				var options = {
 					status:0
 				}
-				GameListService.promise(options).then(function(data){
+				GameService.list(options).then(function(data){
 					deffered.resolve(data);
 				});
 				return deffered.promise;
@@ -494,13 +501,16 @@ app.service('DailyGameVilidService',['$http','$q','GameListService',
 
 
 
-app.controller('DashboardCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
-
-	}]);
 app.controller('SingleGameCtrl',['$scope','$rootScope',
 	function($scope,$rootScope){
 
+	}]);
+
+app.controller('GameListCtrl',['$scope','$rootScope','GameService',
+	function($scope,$rootScope,GameService){
+		GameService.list().then(function(list){
+			$scope.gameList = list.list;
+		});	
 	}]);
 app.directive('gameList',function(){
 	return {
@@ -518,3 +528,11 @@ app.directive('gameListBlock',function(){
 		controller:'SingleGameCtrl'
 	}
 });
+// app.service('GameListService',['GameService',
+// 	function(GameService){
+// 		return {
+// 			get:function(index,count,success){
+// 				console.log(index+count+success);
+// 			}
+// 		}
+// 	}]);
