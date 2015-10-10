@@ -3,50 +3,50 @@
 	<div class="widget-user-header bg-black" style="background: url('{{game.image}}');background-size: 100% 100%;">
 		<div class="bg">
 			<h3 class="widget-user-username"><a href="{{Path + '/game/' + game.id + '?debug=preview'}}" ng-bind="game.title" target="_blank"></a></h3>
-			<h5 class="widget-user-desc"><a href="{{Path + '/user/' + game.userid}}" ng-bind="game.nickname" target="_blank"></a></h5>
+			<h5 class="widget-user-desc"><a href="{{Path + '/user/' + game.userid}}" ng-bind="game.user.nickname" target="_blank"></a></h5>
 		</div>
 	</div>
 	<div class="widget-user-image">
-		<img class="img-circle" ng-src="{{AvatarPath+game.avatar}}" alt="User Avatar">
+		<img class="img-circle" ng-src="{{AvatarPath+game.user.avatar}}" alt="User Avatar">
 	</div>
 	<div class="box-footer">
 		<div class="row">
 			<div class="col-xs-4 border-right btns">
 				<div class="description-block">
-					<button class="btn btn-primary">编辑</button>
+					<button class="btn btn-primary" ui-sref="base.gameEdit({id:game.id})">编辑</button>
 					<button class="btn btn-danger">退稿</button>
 					<button class="btn btn-success">相关</button>
 					<button class="btn btn-warning">公告</button>
 				</div><!-- /.description-block -->
 			</div><!-- /.col -->
 			<div class="col-xs-4 border-right status" ng-if="game.status == 0">
-				<div class="description-block unaudited">
+				<div class="description-block unaudited" ui-sref="base.gameEdit({id:game.id})">
 					<i class="icon fa fa-warning"></i>
 					<h5 class="text">未审核</h5>
 				</div><!-- /.description-block -->
 			</div><!-- /.col -->
 			<div class="col-xs-4 border-right status" ng-if="game.status == 99">
-				<div class="description-block publish">
+				<div class="description-block publish" ui-sref="base.gameEdit({id:game.id})">
 					<i class="icon fa fa-check"></i>
 					<h5 class="text">已发布</h5>
 				</div><!-- /.description-block -->
 			</div><!-- /.col -->
 			<div class="col-xs-4 border-right status" ng-if="game.status == 1">
-				<div class="description-block unpublish">
+				<div class="description-block unpublish" ui-sref="base.gameEdit({id:game.id})">
 					<i class="icon fa fa-circle-o"></i>
 					<h5 class="text">未发布</h5>
 				</div><!-- /.description-block -->
 			</div><!-- /.col -->
 			<div class="col-xs-4 border-right status" ng-if="game.status == 3">
-				<div class="description-block send-back">
+				<div class="description-block send-back" ui-sref="base.gameEdit({id:game.id})">
 					<i class="icon fa fa-close"></i>
 					<h5 class="text">退稿</h5>
 				</div><!-- /.description-block -->
 			</div><!-- /.col -->
-			<div class="col-xs-4">
+			<div class="col-xs-4" style="padding:0">
 				<div class="description-block time">
-					<span class="description-text" ng-bind="game.create_at | onlyDate"></span>
-					<span class="description-text" ng-bind="game.create_at | onlyTime"></span>
+					<span class="description-text" ng-bind="game.create_at.split(' ')[0]"></span><br>
+					<span class="description-text" ng-bind="game.create_at.split(' ')[1]"></span>
 				</div><!-- /.description-block -->
 			</div><!-- /.col -->
 		</div><!-- /.row -->

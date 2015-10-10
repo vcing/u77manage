@@ -1,87 +1,37 @@
-app.service('UserService',['$q',
+app.service('ReportService',['$q',
 	function($q){
 		return {
-			promise:function(id){
+			list:function(type){
+				var data = {};
 				var deffered = $q.defer();
-				$.get(BasePath+'api/get_user?id='+id,function(data){
-					deffered.resolve(JSON.parse(data));
-				});
-				return deffered.promise;
-			}
-		}
-	}]);
-
-app.service('CommentService',['$q',
-	function($q){
-		return {
-			promise:function(id){
-				var deffered = $q.defer();
-				$.get(BasePath+'api/get_comment?id='+id,function(data){
-					deffered.resolve(JSON.parse(data));
-				});
-				return deffered.promise;
-			}
-		}
-	}]);
-
-app.service('PostService',['$q',
-	function($q){
-		return {
-			promise:function(id){
-				var deffered = $q.defer();
-				$.get(BasePath+'api/get_comment?id='+id,function(data){
-					deffered.resolve(JSON.parse(data));
-				});
-				return deffered.promise;
-			}
-		}
-	}]);
-
-app.service('VideoService',['$q',
-	function($q){
-		return {
-			promise:function(id){
-				var deffered = $q.defer();
-				$.get(BasePath+'api/get_video?id='+id,function(data){
-					deffered.resolve(JSON.parse(data));
-				});
-				return deffered.promise;
-			}
-		}
-	}]);
-
-app.service('GameService',['$q',
-	function($q){
-		return {
-			promise:function(id){
-				var deffered = $q.defer();
-				$.get(BasePath+'api/get_game?id='+id,function(data){
+				type = type ? type : null;
+				if(type)data.type = type;
+				$.get(ManagePath+'report/list',data,function(data){
 					deffered.resolve(JSON.parse(data));
 				});
 				return deffered.promise;
 			},
-			// type 类型 1-web 2-pc 3-手机 4-收费 5-ios 6-android 7-I&A 8原创游戏
-			// status 状态 99已发布 1未发布 0未审核 3退稿
-			// search_type key-关键词 id-id
-			list:function(options){
+			ignore:function(id){
 				var deffered = $q.defer();
-				$.post(BasePath+'api/get_game_list',options,function(data){
-					deffered.resolve(JSON.parse(data));
+				$.get(ManagePath+'report/ignore/'+id,function(data){
+					if(data != 1){
+						deffered.resolve(false);
+					}else{
+						deffered.resolve(true);
+					}
 				});
 				return deffered.promise;
-			}
-		}
-	}]);
-
-app.service('GameRecService',['$q',
-	function($q){
-		return {
-			promise:function(id){
-				var deffered = $q.defer();
-				$.get(BasePath+'api/get_gamerec?id='+id,function(data){
-					deffered.resolve(JSON.parse(data));
+			},
+			accept:function(id){
+				$.get(ManagePath+'report/accept'+id,function(data){
+					var deffered = $q.defer();
+					if(data != 1){
+						deffered.resolve(false);
+					}else{
+						deffered.resolve(true);
+					}
+					return deffered.promise;
 				});
-				return deffered.promise;
 			}
 		}
 	}]);

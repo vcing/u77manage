@@ -1,40 +1,41 @@
 <div class="box box-widget">
 	<div class="box-header with-border">
 		<div class="user-block">
-			<img class="img-circle" ng-src="{{AvatarPath+report.reported_user.avatar}}" alt="user image">
-			<span class="username"><a href="{{Path + '/user/'+report.reported_user.userid}}" target="_blank" ng-bind="report.reported_user.nickname"></a></span>
-			<span class="description"><a ng-href="{{Path+'/user/'+report.reporter.userid}}" target="_blank" ng-bind="report.reporter.nickname"></a> 举报于 <span>{{report.create_at | fromNow}}</span></span>
+			<img class="img-circle" ng-src="{{AvatarPath+report.content.user.avatar}}" alt="user image">
+			<span class="username"><a href="{{Path + '/user/'+report.content.user.userid}}" target="_blank" ng-bind="report.content.user.nickname"></a></span>
+			<span class="description"><a ng-href="{{Path+'/user/'+report.user.userid}}" target="_blank" ng-bind="report.user.nickname"></a> 举报于 <span>{{report.create_at | fromNow}}</span></span>
 		</div><!-- /.user-block -->
 		<div class="box-tools">
-			<button class="btn btn-box-tool" data-toggle="tooltip" title="" data-original-title="Mark as read"><i class="fa fa-circle-o"></i></button>
+			<!-- <button class="btn btn-box-tool" data-toggle="tooltip" title="" data-original-title="Mark as read"><i class="fa fa-circle-o"></i></button> -->
 			<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-			<button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+			<button class="btn btn-box-tool" data-widget="remove" ng-click="ignore(report)"><i class="fa fa-times"></i></button>
 		</div><!-- /.box-tools -->
 	</div><!-- /.box-header -->
 	<div class="box-body">
 		<!-- post text -->
-		<a class="btn btn-block btn-social btn-twitter" href="{{Path + '/comment/' + report.report_content.id + '#comment'}}" target="_blank" ng-if="report.t_type == 1">
+		<a class="btn btn-block btn-social btn-twitter" href="{{Path + '/comment/' + report.content.id + '#comment'}}" target="_blank" ng-if="report.t_type == 1">
 			<i class="fa fa-commenting-o"></i> 评论
 		</a>
-		<a class="btn btn-block btn-social btn-dropbox" href="{{Path + '/post/' + report.report_content.id}}" target="_blank" ng-if="report.t_type == 2">
+		<a class="btn btn-block btn-social btn-dropbox" href="{{Path + '/post/' + report.content.id}}" target="_blank" ng-if="report.t_type == 2">
 			<i class="fa fa-newspaper-o"></i> 精华
 		</a>
-		<a class="btn btn-block btn-social btn-facebook" href="{{Path + '/game/' + report.report_content.id}}" target="_blank" ng-if="report.t_type == 4">
+		<a class="btn btn-block btn-social btn-facebook" href="{{Path + '/game/' + report.content.tid}}" target="_blank" ng-if="report.t_type == 4">
 			<i class="fa fa-thumbs-o-up"></i> 推荐
 		</a>
-		<div style="height: 200px;overflow: auto;" ng-bind-html="report.content | to_trusted"></div>
+		<div style="height: 200px;overflow: auto;" ng-bind-html="report.content.content | to_trusted" ng-if="report.t_type != 1"></div>
+		<div style="height: 200px;overflow: auto;" ng-bind-html="report.content.content.content | to_trusted" ng-if="report.t_type == 1"></div>
 		<div class="attachment-block clearfix">
-			<img class="attachment-img" ng-src="{{report.report_game.image}}" alt="attachment image" style="width:100px;height:57px">
+			<img class="attachment-img" ng-src="{{report.content.game.image}}" alt="attachment image" style="width:100px;height:57px">
 			<div class="attachment-pushed">
-				<h4 class="attachment-heading"><a href="{{Path+'/game/'+report.report_game.id}}" target="_blank" ng-bind="report.report_game.title" style="display: inline-block;text-overflow: ellipsis;overflow: hidden;white-space: nowrap;max-width: 100%;"></a></h4>
+				<h4 class="attachment-heading"><a href="{{Path+'/game/'+report.content.game.id}}" target="_blank" ng-bind="report.content.game.title" style="display: inline-block;text-overflow: ellipsis;overflow: hidden;white-space: nowrap;max-width: 100%;"></a></h4>
 				<div class="attachment-text">
-					首次推荐于<br><span>{{report.report_game.create_at | time}}</span>
+					首次推荐于<br><span>{{report.content.game.create_at | time}}</span>
 				</div><!-- /.attachment-text -->
 			</div><!-- /.attachment-pushed -->
 		</div>
 		<!-- deal buttons -->
-		<button class="btn btn-warning btn-xs"><i class="fa fa-times"></i> 无视</button>
-		<button class="btn btn-info btn-xs"><i class="fa fa-check"></i> 删除</button>
-		<span class="pull-right text-muted" ng-bind="report.report_content.create_at | time"></span>
+		<button class="btn btn-warning btn-xs" ng-click="ignore(report)"><i class="fa fa-times"></i> 无视</button>
+		<button class="btn btn-info btn-xs" ng-click="accept(report)"><i class="fa fa-check"></i> 删除</button>
+		<span class="pull-right text-muted" ng-bind="report.content.create_at | time"></span>
 	</div><!-- /.box-body -->
 </div>

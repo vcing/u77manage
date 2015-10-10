@@ -1,5 +1,14 @@
 <div>
-<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" ng-repeat="report in reportList">
-	<div report-list-block="report"></div>
-</div>
+	<div class="col-xs-12" style="padding:0">
+		<div class="btn-group col-xs-12 col-sm-6 col-lg-4" style="margin:10px 0">
+			<button type="button" class="btn btn-default col-xs-2" ng-class="{undefined:'disabled'}[report_type]" ng-click="change_type()">全部</button>
+			<button type="button" class="btn btn-primary col-xs-2" ng-class="{'comment':'disabled'}[report_type]" ng-click="change_type('comment')">评论</button>
+			<button type="button" class="btn btn-success col-xs-2" ng-class="{'gamerec':'disabled'}[report_type]" ng-click="change_type('gamerec')">推荐</button>
+			<button type="button" class="btn btn-info col-xs-2"    ng-class="{'post':'disabled'}[report_type]" ng-click="change_type('post')">精华</button>
+			<button type="button" class="btn btn-warning col-xs-2" ng-class="{'video':'disabled'}[report_type]" ng-click="change_type('video')">视频</button>
+		</div>
+	</div>
+	<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" ng-repeat="report in reportList" ng-if="!report.hide">
+		<div report-list-block="report"></div>
+	</div>
 </div>

@@ -1,4 +1,72 @@
 <div>
+	<div class="col-xs-12" style="margin:15px 0">
+		<div class="btn-group" style="margin:0 10px 10px 0;float:left">
+			<button type="button" class="btn btn-primary btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+				<span ng-if="!options.type && options.type != 0">全部类型</span>
+				<span ng-if="options.type == 1">Web</span>
+				<span ng-if="options.type == 2">PC</span>
+				<span ng-if="options.type == 3">手机游戏</span>
+				<span ng-if="options.type == 4">收费游戏</span>
+				<span ng-if="options.type == 5">IOS</span>
+				<span ng-if="options.type == 6">Android</span>
+				<span ng-if="options.type == 7">I & A</span>
+				<span ng-if="options.type == 8">原创游戏</span>
+				<span class="caret"></span>
+				<span class="sr-only">Toggle Dropdown</span>
+			</button>
+			<ul class="dropdown-menu" role="menu">
+				<li><a ng-click="change_type()">全部</a></li>
+				<li><a ng-click="change_type(1)">WEB</a></li>
+				<li><a ng-click="change_type(2)">PC</a></li>
+				<li><a ng-click="change_type(3)">手机</a></li>
+				<li><a ng-click="change_type(4)">收费游戏</a></li>
+				<li><a ng-click="change_type(5)">IOS</a></li>
+				<li><a ng-click="change_type(6)">android</a></li>
+				<li><a ng-click="change_type(7)">I & A</a></li>
+				<li><a ng-click="change_type(8)">原创游戏</a></li>
+			</ul>
+		</div>
+		<div class="btn-group" style="margin:0 10px 10px 0;float:left">
+			<button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+				<span ng-if="!options.status && options.status != 0">全部状态</span>
+				<span ng-if="options.status == 99">已发布</span>
+				<span ng-if="options.status == 1">未发布</span>
+				<span ng-if="options.status == 0">未审核</span>
+				<span ng-if="options.status == 3">退稿</span>
+				<span class="caret"></span>
+				<span class="sr-only">Toggle Dropdown</span>
+			</button>
+			<ul class="dropdown-menu" role="menu">
+				<li><a ng-click="change_status()">全部状态</a></li>
+				<li><a ng-click="change_status(99)">已发布</a></li>
+				<li><a ng-click="change_status(1)">未发布</a></li>
+				<li><a ng-click="change_status(0)">未审核</a></li>
+				<li><a ng-click="change_status(3)">退稿</a></li>
+			</ul>
+		</div>
+		<div class="input-group" style="margin:0 10px 10px 0;float:left;width:200px">
+			<div class="input-group-btn">
+				<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
+					<span ng-if="options.search_type == 'id' || !options.search_type">ID查询</span>
+					<span ng-if="options.search_type == 'key'">关键词查询</span>
+					<span class="fa fa-caret-down"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<li><a ng-click="change_search_type('id')">ID查询</a></li>
+					<li><a ng-click="change_search_type('key')">关键词查询</a></li>
+				</ul>
+			</div><!-- /btn-group -->
+			<input type="text" class="form-control" ng-model="options.keywords" ng-keyup="game_search($event)">
+		</div>
+		<div class="form-group" style="margin: 0 10px 10px 0;float:left;width:150px;">
+			<div class="input-group">
+				<div class="input-group-addon">
+					<i class="fa fa-calendar"></i>
+				</div>
+				<input type="text" class="form-control" data-inputmask="'alias': 'yyyy-mm-dd'" data-mask="" ng-keyup="game_search($event)" ng-model="options.create_at">
+			</div><!-- /.input group -->
+		</div>
+	</div>
 	<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" ng-repeat="game in gameList">
 		<div game-list-block></div>
 	</div>

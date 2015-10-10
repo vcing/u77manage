@@ -40,18 +40,21 @@ app.controller('BigEyeCtrl',['$scope','$rootScope',
 		},3000)
 	}]);
 
-app.controller('GameExamineCtrl',['$scope','$rootScope','DailyGameVilidService',
-	function($scope,$rootScope,DailyGameVilidService){
-		DailyGameVilidService.promise().then(function(data){
+app.controller('GameExamineCtrl',['$scope','$rootScope','GameService',
+	function($scope,$rootScope,GameService){
+		$scope.options = {
+			status:0
+		}
+		GameService.list($scope.options).then(function(data){
 			console.log(data);
-			$scope.gameList = data.list;
+			$scope.gameList = data.data;
 		});
 	}]);
 
-app.controller('ReportExamineCtrl',['$scope','$rootScope','DailyReportService',
-	function($scope,$rootScope,DailyReportService){
-		DailyReportService.promise().then(function(data){
-			$scope.reportList = data;
+app.controller('ReportExamineCtrl',['$scope','$rootScope','ReportService',
+	function($scope,$rootScope,ReportService){
+		ReportService.list().then(function(data){
+			$scope.reportList = data.data;
 		});
-		
+
 	}]);

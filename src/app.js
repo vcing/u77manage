@@ -7,6 +7,7 @@ var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch','infi
 var BasePath = 'http://dev.u77.com/admin/';
 var Path = 'http://dev.u77.com';
 var AvatarPath = 'http://img.u77.com/avatar/';
+var ManagePath = 'http://manage.u77.com/'
 app.config(['$stateProvider','$urlRouterProvider',
 	function($stateProvider,$urlRouterProvider){
 
@@ -74,6 +75,15 @@ app.config(['$stateProvider','$urlRouterProvider',
 					}
 				}
 			})
+			.state('base.gameEdit',{
+				url:'/game-edit/:id',
+				views:{
+					'content':{
+						templateUrl:'game/game-edit.html',
+						controller:'GameEditCtrl'
+					}
+				}
+			})
 
 		// $urlRouterProvider.when("", "/dashboard");
 		// $urlRouterProvider.otherwise('/dashboard');
@@ -88,4 +98,12 @@ app.run(['$rootScope','$state',
 		$rootScope.BasePath = BasePath;
 		$rootScope.Path = Path;
 		$rootScope.AvatarPath = AvatarPath;
+		$rootScope.ManagePath = ManagePath;
 	}])
+
+
+
+
+
+
+// ---------------------------------------------------------------------------------------------

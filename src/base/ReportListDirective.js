@@ -3,6 +3,7 @@ app.directive('reportList',function(){
 		restrict:'A',
 		templateUrl:'/base/report-list.html',
 		replace:true,
+		controller:'ListReportCtrl'
 	};
 })
 

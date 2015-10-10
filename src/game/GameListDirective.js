@@ -3,6 +3,10 @@ app.directive('gameList',function(){
 		restrict:'A',
 		templateUrl:'/game/game-list.html',
 		replace:true,
+		controller:'ListGameCtrl',
+		link:function(){
+			$("[data-mask]").inputmask();
+		}
 	};
 });
 

@@ -7,6 +7,7 @@ var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch','infi
 var BasePath = 'http://dev.u77.com/admin/';
 var Path = 'http://dev.u77.com';
 var AvatarPath = 'http://img.u77.com/avatar/';
+var ManagePath = 'http://manage.u77.com/'
 app.config(['$stateProvider','$urlRouterProvider',
 	function($stateProvider,$urlRouterProvider){
 
@@ -74,6 +75,15 @@ app.config(['$stateProvider','$urlRouterProvider',
 					}
 				}
 			})
+			.state('base.gameEdit',{
+				url:'/game-edit/:id',
+				views:{
+					'content':{
+						templateUrl:'game/game-edit.html',
+						controller:'GameEditCtrl'
+					}
+				}
+			})
 
 		// $urlRouterProvider.when("", "/dashboard");
 		// $urlRouterProvider.otherwise('/dashboard');
@@ -88,15 +98,52 @@ app.run(['$rootScope','$state',
 		$rootScope.BasePath = BasePath;
 		$rootScope.Path = Path;
 		$rootScope.AvatarPath = AvatarPath;
+		$rootScope.ManagePath = ManagePath;
 	}])
+
+
+
+
+
+
+// ---------------------------------------------------------------------------------------------
+
 app.controller('BaseCtrl',['$scope','$rootScope',
 	function($scope,$rootScope){
 
 	}]);
 
-app.controller('SingleReportCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
-		
+app.controller('SingleReportCtrl',['$scope','$rootScope','ReportService',
+	function($scope,$rootScope,ReportService){
+		$scope.ignore = function(report){
+			ReportService.ignore(report.id).then(function(done){
+				if(done){
+					report.hide = true;
+				}else{
+					alert('操作失败,请重试.');
+				}
+			});
+		}
+
+		$scope.accept = function(report){
+			ReportService.accept(report.id).then(function(done){
+				if(done){
+					report.hide = true;
+				}else{
+					alert('操作失败,请重试.');
+				}
+			});
+		}
+	}]);
+
+app.controller('ListReportCtrl',['$scope','$rootScope','ReportService',
+	function($scope,$rootScope,ReportService){
+		$scope.change_type = function(type){
+			$scope.report_type = type;
+			ReportService.list(type).then(function(data){
+				$scope.reportList = data.data;
+			});
+		}		
 	}]);
 app.directive('mainSidebar',function(){
 	return {
@@ -149,6 +196,55 @@ app.directive('navTaskList',function(){
 		// }
 	};
 });
+
+app.directive('upload',function(){
+	return function($scope,element,attrs){
+		var type = attrs['type'] ? attrs['type'] : 'game';
+		var file_type = attrs['file-type'] ? attrs['file-type'] : 'image';
+		var bucket = file_type == 'image' ? 'u77img' : 'u77file';
+		var options = {
+			type:type,
+			file_type:file_type
+		}
+		var prefix = file_type == 'image' ? 'img' : 'file';
+		var params;
+
+		$.get(ManagePath+'api/upload',options,function(data){
+			params = JSON.parse(data);
+
+			var _uploader = WebUploader.create({
+				auto:true,
+				swf:"/plugins/webuploader/Uploader.swf",
+				server:"http://v0.api.upyun.com/"+bucket,
+				pick:element,
+				accept:{
+					title:'Images',
+					extensions:'jpg,jpeg,png',
+					mimeTypes:'image/*'
+				},
+				formData:params
+			});
+
+			_uploader.on('uploadSuccess', function(file,response){
+				var _scope = attrs['fill'].split('.');
+				switch(_scope.length){
+					case 1:
+						$scope[_scope[0]] = 'http://'+prefix+'.u77.com'+response.url;break;
+					case 2:
+						$scope[_scope[0]][_scope[1]] = 'http://'+prefix+'.u77.com'+response.url;break;
+					case 3:
+						$scope[_scope[0]][_scope[1]][_scope[2]] = 'http://'+prefix+'.u77.com'+response.url;break;
+					case 4:
+						$scope[_scope[0]][_scope[1]][_scope[2]][_scope[3]] = 'http://'+prefix+'.u77.com'+response.url;break;
+				}
+				
+			});
+		});
+
+		
+		
+	}
+})
 app.filter(  
     'to_trusted', ['$sce', function ($sce) {  
         return function (text) {  
@@ -213,6 +309,7 @@ app.directive('reportList',function(){
 		restrict:'A',
 		templateUrl:'/base/report-list.html',
 		replace:true,
+		controller:'ListReportCtrl'
 	};
 })
 
@@ -224,90 +321,40 @@ app.directive('reportListBlock',function(){
 		controller:'SingleReportCtrl'
 	}
 })
-app.service('UserService',['$q',
+app.service('ReportService',['$q',
 	function($q){
 		return {
-			promise:function(id){
+			list:function(type){
+				var data = {};
 				var deffered = $q.defer();
-				$.get(BasePath+'api/get_user?id='+id,function(data){
-					deffered.resolve(JSON.parse(data));
-				});
-				return deffered.promise;
-			}
-		}
-	}]);
-
-app.service('CommentService',['$q',
-	function($q){
-		return {
-			promise:function(id){
-				var deffered = $q.defer();
-				$.get(BasePath+'api/get_comment?id='+id,function(data){
-					deffered.resolve(JSON.parse(data));
-				});
-				return deffered.promise;
-			}
-		}
-	}]);
-
-app.service('PostService',['$q',
-	function($q){
-		return {
-			promise:function(id){
-				var deffered = $q.defer();
-				$.get(BasePath+'api/get_comment?id='+id,function(data){
-					deffered.resolve(JSON.parse(data));
-				});
-				return deffered.promise;
-			}
-		}
-	}]);
-
-app.service('VideoService',['$q',
-	function($q){
-		return {
-			promise:function(id){
-				var deffered = $q.defer();
-				$.get(BasePath+'api/get_video?id='+id,function(data){
-					deffered.resolve(JSON.parse(data));
-				});
-				return deffered.promise;
-			}
-		}
-	}]);
-
-app.service('GameService',['$q',
-	function($q){
-		return {
-			promise:function(id){
-				var deffered = $q.defer();
-				$.get(BasePath+'api/get_game?id='+id,function(data){
+				type = type ? type : null;
+				if(type)data.type = type;
+				$.get(ManagePath+'report/list',data,function(data){
 					deffered.resolve(JSON.parse(data));
 				});
 				return deffered.promise;
 			},
-			// type 类型 1-web 2-pc 3-手机 4-收费 5-ios 6-android 7-I&A 8原创游戏
-			// status 状态 99已发布 1未发布 0未审核 3退稿
-			// search_type key-关键词 id-id
-			list:function(options){
+			ignore:function(id){
 				var deffered = $q.defer();
-				$.post(BasePath+'api/get_game_list',options,function(data){
-					deffered.resolve(JSON.parse(data));
+				$.get(ManagePath+'report/ignore/'+id,function(data){
+					if(data != 1){
+						deffered.resolve(false);
+					}else{
+						deffered.resolve(true);
+					}
 				});
 				return deffered.promise;
-			}
-		}
-	}]);
-
-app.service('GameRecService',['$q',
-	function($q){
-		return {
-			promise:function(id){
-				var deffered = $q.defer();
-				$.get(BasePath+'api/get_gamerec?id='+id,function(data){
-					deffered.resolve(JSON.parse(data));
+			},
+			accept:function(id){
+				$.get(ManagePath+'report/accept'+id,function(data){
+					var deffered = $q.defer();
+					if(data != 1){
+						deffered.resolve(false);
+					}else{
+						deffered.resolve(true);
+					}
+					return deffered.promise;
 				});
-				return deffered.promise;
 			}
 		}
 	}]);
@@ -403,10 +450,6 @@ app.service('ReportListInfoService',['$q','CommentService','UserService','PostSe
 		}
 		
 	}]);
-app.controller('DashboardCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
-
-	}]);
 app.controller('BigEyeCtrl',['$scope','$rootScope',
 	function($scope,$rootScope){
 		$scope.list = [];
@@ -449,39 +492,28 @@ app.controller('BigEyeCtrl',['$scope','$rootScope',
 		},3000)
 	}]);
 
-app.controller('GameExamineCtrl',['$scope','$rootScope','DailyGameVilidService',
-	function($scope,$rootScope,DailyGameVilidService){
-		DailyGameVilidService.promise().then(function(data){
+app.controller('GameExamineCtrl',['$scope','$rootScope','GameService',
+	function($scope,$rootScope,GameService){
+		$scope.options = {
+			status:0
+		}
+		GameService.list($scope.options).then(function(data){
 			console.log(data);
-			$scope.gameList = data.list;
+			$scope.gameList = data.data;
 		});
 	}]);
 
-app.controller('ReportExamineCtrl',['$scope','$rootScope','DailyReportService',
-	function($scope,$rootScope,DailyReportService){
-		DailyReportService.promise().then(function(data){
-			$scope.reportList = data;
+app.controller('ReportExamineCtrl',['$scope','$rootScope','ReportService',
+	function($scope,$rootScope,ReportService){
+		ReportService.list().then(function(data){
+			$scope.reportList = data.data;
 		});
-		
+
 	}]);
 // const T_TYPE_COMMENT = 1;			// comment
 // const T_TYPE_POST = 2;				// post
 // const T_TYPE_VIDEO = 3;				// video
 // const T_TYPE_GAMEREC = 4;			// game rec
-app.service('DailyReportService',['$http','$q','ReportListInfoService',
-	function($http,$q,ReportListInfoService){
-		return {
-			promise:function(id){
-				var deffered = $q.defer();
-				$http.get(BasePath+'api/daily_report_list').success(function(data){
-					ReportListInfoService.list(data.list).then(function(data){
-						deffered.resolve(data);
-					});
-				});
-				return deffered.promise;
-			}
-		}
-	}]);
 
 app.service('DailyGameVilidService',['$http','$q','GameService',
 	function($http,$q,GameService){
@@ -500,23 +532,73 @@ app.service('DailyGameVilidService',['$http','$q','GameService',
 	}]);
 
 
+app.controller('DashboardCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
 
+	}]);
 app.controller('SingleGameCtrl',['$scope','$rootScope',
 	function($scope,$rootScope){
 
 	}]);
 
+app.controller('ListGameCtrl',['$scope','$rootScope','GameService',
+	function($scope,$rootScope,GameService){
+		$scope.options.search_type = 'id';
+		$scope.change_type = function(type){
+			$scope.options.type = type;
+			query();
+		}
+
+		$scope.change_status = function(status){
+			$scope.options.status = status;
+			query();
+		}
+
+		$scope.change_search_type = function(type){
+			$scope.options.search_type = type;
+		}
+
+		$scope.game_search = function(e){
+			var keycode = window.event?e.keyCode:e.which;
+			if(keycode == 13){
+				query();
+			}
+		}
+
+		function query(){
+			GameService.list($scope.options).then(function(data){
+				$scope.gameList = data.data;
+			});
+		}
+	}]);
+
 app.controller('GameListCtrl',['$scope','$rootScope','GameService',
 	function($scope,$rootScope,GameService){
-		GameService.list().then(function(list){
-			$scope.gameList = list.list;
+		$scope.options = {};
+		GameService.list().then(function(data){
+			$scope.gameList = data.data;
 		});	
+	}]);
+
+app.controller('GameEditCtrl',['$scope','$rootScope','GameService','$stateParams',
+	function($scope,$rootScope,GameService,$stateParams){
+		if(!$stateParams.id || $stateParams == 0){
+			// new game
+			
+		}else{
+			// edit game
+
+		}
 	}]);
 app.directive('gameList',function(){
 	return {
 		restrict:'A',
 		templateUrl:'/game/game-list.html',
 		replace:true,
+		controller:'ListGameCtrl',
+		link:function(){
+			$("[data-mask]").inputmask();
+		}
 	};
 });
 
@@ -528,11 +610,25 @@ app.directive('gameListBlock',function(){
 		controller:'SingleGameCtrl'
 	}
 });
-// app.service('GameListService',['GameService',
-// 	function(GameService){
-// 		return {
-// 			get:function(index,count,success){
-// 				console.log(index+count+success);
-// 			}
-// 		}
-// 	}]);
+app.service('GameService',['$q',
+	function($q){
+		return {
+			promise:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'game/info/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			// type 类型 1-web 2-pc 3-手机 4-收费 5-ios 6-android 7-I&A 8原创游戏
+			// status 状态 99已发布 1未发布 0未审核 3退稿
+			// search_type key-关键词 id-id
+			list:function(options){
+				var deffered = $q.defer();
+				$.get(ManagePath+'game/list',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			}
+		}
+	}]);
