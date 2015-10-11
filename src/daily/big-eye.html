@@ -8,12 +8,14 @@
 		<li class="active">大眼睛位</li>
 	</ol>
 </section>
-<section id="big-eye" class="content">
+<section id="big-eye" class="content" ng-if="list.length != 0">
 	<div class="row">
 		<div class="col-xs-12">
 			<div class="box box-primary">
 				<div class="body">
 					<div class="slider">
+						<a class="arrow-left" ng-click="left()"><i class="fa fa-angle-left"></i></a>
+						<a class="arrow-right" ng-click="right()"><i class="fa fa-angle-right"></i></a>
 						<div class="item" ng-repeat="slide in list" ng-show="slideControl == $index">
 							<a ng-href="slide.url" target="_blank">
 								<img class="img-responsive" ng-src="{{slide.image}}">
@@ -58,7 +60,7 @@
 							</tr>
 						</tbody>
 					</table>
-					<button type="submit" class="btn btn-danger submit">提交</button>
+					<button type="submit" class="btn btn-danger submit" ng-click="submit()">提交</button>
 				</div>
 			</div>
 		</div>

@@ -1,13 +1,10 @@
 app.controller('BigEyeCtrl',['$scope','$rootScope',
 	function($scope,$rootScope){
 		$scope.list = [];
-		for (var i = 6; i >= 0; i--) {
-			$scope.list.push({
-				image:"/img/big-eye-test.jpg",
-				text:'介绍',
-				url:'#'
-			});	
-		};
+
+		$.get(ManagePath+'sliders',function(data){
+			$scope.list = JSON.parse(data);
+		});
 
 		$scope.up = function(index){
 			if(index <= 0){
@@ -25,6 +22,20 @@ app.controller('BigEyeCtrl',['$scope','$rootScope',
 			var _temp = $scope.list[index + 1];
 			$scope.list[index + 1] = $scope.list[index];
 			$scope.list[index] = _temp;
+		}
+
+		$scope.left = function(){
+			$scope.slideControl = $scope.slideControl <= 0 ? $scope.list.length - 1 : $scope.slideControl - 1;
+		}
+
+		$scope.right = function(){
+			$scope.slideControl = $scope.slideControl >= $scope.list.length - 1 ? 0 : $scope.slideControl + 1;
+		}
+
+		$scope.submit = function(){
+			$.post(ManagePath+'sliders',{sliders:$scope.list},function(data){
+				console.log(data);
+			});
 		}
 
 		$scope.slideControl = 0;

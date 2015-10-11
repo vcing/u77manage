@@ -111,3 +111,19 @@ html, body {
   margin: 2% auto;
   display: block;
   font-size: 16px; }
+
+#big-eye .arrow-left {
+  font-size: -webkit-xxx-large;
+  position: absolute;
+  z-index: 1;
+  top: 30%;
+  left: 1%;
+  cursor: pointer; }
+
+#big-eye .arrow-right {
+  font-size: -webkit-xxx-large;
+  position: absolute;
+  z-index: 1;
+  top: 30%;
+  right: 1%;
+  cursor: pointer; }

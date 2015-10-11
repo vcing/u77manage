@@ -185,6 +185,24 @@ html,body{
 	    display: block;
 	    font-size: 16px;
 	}
+
+	.arrow-left{
+		font-size: -webkit-xxx-large;
+	    position: absolute;
+	    z-index: 1;
+	    top: 30%;
+	    left: 1%;
+	    cursor: pointer;
+	}
+
+	.arrow-right{
+		font-size: -webkit-xxx-large;
+	    position: absolute;
+	    z-index: 1;
+	    top: 30%;
+	    right: 1%;
+	    cursor: pointer;
+	}
 }
 
 
