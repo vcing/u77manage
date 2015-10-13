@@ -3,7 +3,7 @@
  * 
  */
 
-var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch','infinite-scroll']);
+var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch','infinite-scroll','ngFileUpload']);
 var BasePath = 'http://dev.u77.com/admin/';
 var Path = 'http://dev.u77.com';
 var AvatarPath = 'http://img.u77.com/avatar/';
@@ -84,6 +84,15 @@ app.config(['$stateProvider','$urlRouterProvider',
 					}
 				}
 			})
+			.state('base.gameNew',{
+				url:'/game-new',
+				views:{
+					'content':{
+						templateUrl:'game/game-edit.html',
+						controller:'GameNewCtrl'
+					}
+				}
+			})
 
 		// $urlRouterProvider.when("", "/dashboard");
 		// $urlRouterProvider.otherwise('/dashboard');
@@ -102,7 +111,23 @@ app.run(['$rootScope','$state',
 	}])
 
 
-
+// app.config(function($provide){
+//     $provide.decorator('taOptions', ['taRegisterTool', '$delegate', function(taRegisterTool, taOptions){
+//         // $delegate is the taOptions we are decorating
+//         // register the tool with textAngular
+//         var imageLink = 'http://img.u77.com/game/2015/10/xwjqcdsjgvdds04j.jpg';
+//         taRegisterTool('imageUpload', {
+//             iconclass: "fa fa-cloud-upload red",
+//             action: function(){
+//                 this.$editor().wrapSelection('forecolor', 'red');
+//                 // this.$editor().wrapSelection('insertImage', imageLink, true);
+//             }
+//         });
+//         // add the button to the default toolbar definition
+//         taOptions.toolbar[1].push('colourRed');
+//         return taOptions;
+//     }]);
+// });
 
 
 

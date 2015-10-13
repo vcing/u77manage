@@ -37,93 +37,148 @@ app.service('ReportService',['$q',
 	}]);
 
 
-// 举报列表
-app.service('ReportListInfoService',['$q','CommentService','UserService','PostService','VideoService','GameService','GameRecService',
-	function($q,CommentService,UserService,PostService,VideoService,GameService,GameRecService){
+// 文件上传服务
+app.service('UploadService',['Upload','$q',
+	function(Upload,$q){
+
 		return {
-			list:function(list){
+			file:function(){
 				var deffered = $q.defer();
-				var allDone = [];
-				list.forEach(function(report){
-					var _deffered = $q.defer();
-					var reporterPromise = UserService.promise(report.userid)
-					var gamePromise;
-					var reportedUserPromise;
-					switch(report.t_type){
-						case '1':
-							var gameDeffered = $q.defer();
-							var userDeffered = $q.defer();
-							CommentService.promise(report.tid).then(function(data){
-								report.report_content = data;
-								UserService.promise(data.userid).then(function(user){
-									userDeffered.resolve(user);
-								});
-								GameService.promise(data.tid).then(function(game){
-									gameDeffered.resolve(game);
-								});
-							});
-							reportedUserPromise = userDeffered.promise;
-							gamePromise = gameDeffered.promise;
-							break;
-						case '2':
-							var gameDeffered = $q.defer();
-							var userDeffered = $q.defer();
-							PostService.promise(report.tid).then(function(data){
-								report.report_content = data;
-								UserService.promise(data.userid).then(function(user){
-									userDeffered.resolve(user);
-								});
-								GameService.promise(data.tid).then(function(game){
-									gameDeffered.resolve(game);
-								});
-							});
-							reportedUserPromise = userDeffered.promise;
-							gamePromise = gameDeffered.promise;
-							break;
-						case '3':
-							var gameDeffered = $q.defer();
-							var userDeffered = $q.defer();
-							VideoService.promise(report.tid).then(function(data){
-								report.report_content = data;
-								UserService.promise(data.userid).then(function(user){
-									userDeffered.resolve(user);
-								});
-								GameService.promise(data.tid).then(function(game){
-									gameDeffered.resolve(game);
-								});
-							});
-							reportedUserPromise = userDeffered.promise;
-							gamePromise = gameDeffered.promise;
-							break;
-						case '4':
-							var gameDeffered = $q.defer();
-							var userDeffered = $q.defer();
-							GameRecService.promise(report.tid).then(function(game){
-								report.report_content = game;
-								UserService.promise(game.userid).then(function(user){
-									userDeffered.resolve(user);
-								});
-								gameDeffered.resolve(game);
-							});
-							reportedUserPromise = userDeffered.promise;
-							gamePromise = gameDeffered.promise;
-							break;
+				var type = 'file';
+				var file_type = 'file';
+				var bucket = 'u77file';
+
+				var options = {
+					type:type,
+					file_type:file_type
+				}
+
+				$.get(ManagePath+'api/upload',options,function(params){
+					params = JSON.parse(params);
+					var fn = function(file,finalCb,progressCb){
+						if(!file)return;
+						params.file = file;
+						Upload.upload({
+				            url: "http://v0.api.upyun.com/"+bucket,
+				            data: params
+				        }).then(function (resp) {
+				        	if(resp.data && resp.data.url)resp.data.url = "http://"+file_type+".u77.com"+resp.data.url;
+				            if(finalCb)finalCb(resp);
+				        }, function (resp) {
+				        	if(resp.data && resp.data.url)resp.data.url = "http://"+file_type+".u77.com"+resp.data.url;
+				            if(finalCb)finalCb(resp);
+				        }, function (evt) {
+				            evt.percentage = parseInt(100.0 * evt.loaded / evt.total);
+				            if(progressCb)progressCb(evt);
+				        });
 					}
-
-					$q.all([reporterPromise,gamePromise,reportedUserPromise]).then(function(arr){
-						report.reporter = arr[0];
-						report.report_game = arr[1];
-						report.reported_user = arr[2];
-						_deffered.resolve();
-					});
-					allDone.push(_deffered.promise);
+					deffered.resolve(fn);
 				});
+				return deffered.promise;
+			},
+			image:function(){
+				var deffered = $q.defer();
+				var type = 'game';
+				var file_type = 'image';
+				var prefix = 'img';
+				var bucket = 'u77img';
 
-				$q.all(allDone).then(function(){
-					deffered.resolve(list);
+				var options = {
+					type:type,
+					file_type:file_type
+				}
+
+				$.get(ManagePath+'api/upload',options,function(params){
+					params = JSON.parse(params);
+					var fn = function(file,finalCb,progressCb){
+						if(!file)return;
+						params.file = file;
+						Upload.upload({
+				            url: "http://v0.api.upyun.com/"+bucket,
+				            data: params
+				        }).then(function (resp) {
+				        	if(resp.data && resp.data.url)resp.data.url = "http://"+prefix+".u77.com"+resp.data.url;
+				            if(finalCb)finalCb(resp);
+				        }, function (resp) {
+				        	if(resp.data && resp.data.url)resp.data.url = "http://"+prefix+".u77.com"+resp.data.url;
+				            if(finalCb)finalCb(resp);
+				        }, function (evt) {
+				            evt.percentage = parseInt(100.0 * evt.loaded / evt.total);
+				            if(progressCb)progressCb(evt);
+				        });
+					}
+					deffered.resolve(fn);
+				});
+				return deffered.promise;
+			},
+			post:function(){
+				var deffered = $q.defer();
+				var type = 'post';
+				var file_type = 'image';
+				var prefix = 'img';
+				var bucket = 'u77img';
+
+				var options = {
+					type:type,
+					file_type:file_type
+				}
+
+				$.get(ManagePath+'api/upload',options,function(params){
+					params = JSON.parse(params);
+					var fn = function(file,finalCb,progressCb){
+						if(!file)return;
+						params.file = file;
+						Upload.upload({
+				            url: "http://v0.api.upyun.com/"+bucket,
+				            data: params
+				        }).then(function (resp) {
+				        	if(resp.data && resp.data.url)resp.data.url = "http://"+prefix+".u77.com"+resp.data.url;
+				            if(finalCb)finalCb(resp);
+				        }, function (resp) {
+				        	if(resp.data && resp.data.url)resp.data.url = "http://"+prefix+".u77.com"+resp.data.url;
+				            if(finalCb)finalCb(resp);
+				        }, function (evt) {
+				            evt.percentage = parseInt(100.0 * evt.loaded / evt.total);
+				            if(progressCb)progressCb(evt);
+				        });
+					}
+					deffered.resolve(fn);
+				});
+				return deffered.promise;
+			},
+			other:function(){
+				var deffered = $q.defer();
+				var type = 'other';
+				var file_type = 'file';
+				var bucket = 'u77file';
+
+				var options = {
+					type:type,
+					file_type:file_type
+				}
+
+				$.get(ManagePath+'api/upload',options,function(params){
+					params = JSON.parse(params);
+					var fn = function(file,finalCb,progressCb){
+						if(!file)return;
+						params.file = file;
+						Upload.upload({
+				            url: "http://v0.api.upyun.com/"+bucket,
+				            data: params
+				        }).then(function (resp) {
+				        	if(resp.data && resp.data.url)resp.data.url = "http://"+file_type+".u77.com"+resp.data.url;
+				            if(finalCb)finalCb(resp);
+				        }, function (resp) {
+				        	if(resp.data && resp.data.url)resp.data.url += "http://"+file_type
+				            if(finalCb)finalCb(resp);
+				        }, function (evt) {
+				            evt.percentage = parseInt(100.0 * evt.loaded / evt.total);
+				            if(progressCb)progressCb(evt);
+				        });
+					}
+					deffered.resolve(fn);
 				});
 				return deffered.promise;
 			}
 		}
-		
 	}]);

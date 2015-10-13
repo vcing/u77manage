@@ -3,7 +3,7 @@
  * 
  */
 
-var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch','infinite-scroll']);
+var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch','infinite-scroll','ngFileUpload']);
 var BasePath = 'http://dev.u77.com/admin/';
 var Path = 'http://dev.u77.com';
 var AvatarPath = 'http://img.u77.com/avatar/';
@@ -84,6 +84,15 @@ app.config(['$stateProvider','$urlRouterProvider',
 					}
 				}
 			})
+			.state('base.gameNew',{
+				url:'/game-new',
+				views:{
+					'content':{
+						templateUrl:'game/game-edit.html',
+						controller:'GameNewCtrl'
+					}
+				}
+			})
 
 		// $urlRouterProvider.when("", "/dashboard");
 		// $urlRouterProvider.otherwise('/dashboard');
@@ -102,7 +111,23 @@ app.run(['$rootScope','$state',
 	}])
 
 
-
+// app.config(function($provide){
+//     $provide.decorator('taOptions', ['taRegisterTool', '$delegate', function(taRegisterTool, taOptions){
+//         // $delegate is the taOptions we are decorating
+//         // register the tool with textAngular
+//         var imageLink = 'http://img.u77.com/game/2015/10/xwjqcdsjgvdds04j.jpg';
+//         taRegisterTool('imageUpload', {
+//             iconclass: "fa fa-cloud-upload red",
+//             action: function(){
+//                 this.$editor().wrapSelection('forecolor', 'red');
+//                 // this.$editor().wrapSelection('insertImage', imageLink, true);
+//             }
+//         });
+//         // add the button to the default toolbar definition
+//         taOptions.toolbar[1].push('colourRed');
+//         return taOptions;
+//     }]);
+// });
 
 
 
@@ -198,53 +223,51 @@ app.directive('navTaskList',function(){
 });
 
 app.directive('upload',function(){
-	return function($scope,element,attrs){
-		var type = attrs['type'] ? attrs['type'] : 'game';
-		var file_type = attrs['file-type'] ? attrs['file-type'] : 'image';
-		var bucket = file_type == 'image' ? 'u77img' : 'u77file';
-		var options = {
-			type:type,
-			file_type:file_type
+	return {
+		restrict:'A',
+		scope:{
+			type:'=upload',
+			file_type:'=uploadFileType',
+			fill:'=uploadFill',
+			progress:'=uploadProgress'
+		},
+		link:function($scope,element,attrs){
+			var type = attrs['type'] ? attrs['type'] : 'game';
+			var file_type = attrs['file-type'] ? attrs['file-type'] : 'image';
+			var bucket = file_type == 'image' ? 'u77img' : 'u77file';
+			var options = {
+				type:type,
+				file_type:file_type
+			}
+			var prefix = file_type == 'image' ? 'img' : 'file';
+			var params;
+
+			$.get(ManagePath+'api/upload',options,function(data){
+				params = JSON.parse(data);
+				var _uploader = WebUploader.create({
+					auto:true,
+					swf:"/plugins/webuploader/Uploader.swf",
+					server:"http://v0.api.upyun.com/"+bucket,
+					pick:element,
+					accept:{
+						title:'Images',
+						extensions:'jpg,jpeg,png',
+						mimeTypes:'image/*'
+					},
+					formData:params
+				});
+
+				_uploader.on('uploadSuccess', function(file,response){
+					$scope.fill = 'http://'+prefix+'.u77.com'+response.url;
+				});
+
+				_uploader.on('uploadProgress', function(file,percentage){
+					$scope.progress = percentage;
+				});
+			});
 		}
-		var prefix = file_type == 'image' ? 'img' : 'file';
-		var params;
-
-		$.get(ManagePath+'api/upload',options,function(data){
-			params = JSON.parse(data);
-
-			var _uploader = WebUploader.create({
-				auto:true,
-				swf:"/plugins/webuploader/Uploader.swf",
-				server:"http://v0.api.upyun.com/"+bucket,
-				pick:element,
-				accept:{
-					title:'Images',
-					extensions:'jpg,jpeg,png',
-					mimeTypes:'image/*'
-				},
-				formData:params
-			});
-
-			_uploader.on('uploadSuccess', function(file,response){
-				var _scope = attrs['fill'].split('.');
-				switch(_scope.length){
-					case 1:
-						$scope[_scope[0]] = 'http://'+prefix+'.u77.com'+response.url;break;
-					case 2:
-						$scope[_scope[0]][_scope[1]] = 'http://'+prefix+'.u77.com'+response.url;break;
-					case 3:
-						$scope[_scope[0]][_scope[1]][_scope[2]] = 'http://'+prefix+'.u77.com'+response.url;break;
-					case 4:
-						$scope[_scope[0]][_scope[1]][_scope[2]][_scope[3]] = 'http://'+prefix+'.u77.com'+response.url;break;
-				}
-				
-			});
-		});
-
-		
-		
 	}
-})
+});
 app.filter(  
     'to_trusted', ['$sce', function ($sce) {  
         return function (text) {  
@@ -360,98 +383,153 @@ app.service('ReportService',['$q',
 	}]);
 
 
-// 举报列表
-app.service('ReportListInfoService',['$q','CommentService','UserService','PostService','VideoService','GameService','GameRecService',
-	function($q,CommentService,UserService,PostService,VideoService,GameService,GameRecService){
+// 文件上传服务
+app.service('UploadService',['Upload','$q',
+	function(Upload,$q){
+
 		return {
-			list:function(list){
+			file:function(){
 				var deffered = $q.defer();
-				var allDone = [];
-				list.forEach(function(report){
-					var _deffered = $q.defer();
-					var reporterPromise = UserService.promise(report.userid)
-					var gamePromise;
-					var reportedUserPromise;
-					switch(report.t_type){
-						case '1':
-							var gameDeffered = $q.defer();
-							var userDeffered = $q.defer();
-							CommentService.promise(report.tid).then(function(data){
-								report.report_content = data;
-								UserService.promise(data.userid).then(function(user){
-									userDeffered.resolve(user);
-								});
-								GameService.promise(data.tid).then(function(game){
-									gameDeffered.resolve(game);
-								});
-							});
-							reportedUserPromise = userDeffered.promise;
-							gamePromise = gameDeffered.promise;
-							break;
-						case '2':
-							var gameDeffered = $q.defer();
-							var userDeffered = $q.defer();
-							PostService.promise(report.tid).then(function(data){
-								report.report_content = data;
-								UserService.promise(data.userid).then(function(user){
-									userDeffered.resolve(user);
-								});
-								GameService.promise(data.tid).then(function(game){
-									gameDeffered.resolve(game);
-								});
-							});
-							reportedUserPromise = userDeffered.promise;
-							gamePromise = gameDeffered.promise;
-							break;
-						case '3':
-							var gameDeffered = $q.defer();
-							var userDeffered = $q.defer();
-							VideoService.promise(report.tid).then(function(data){
-								report.report_content = data;
-								UserService.promise(data.userid).then(function(user){
-									userDeffered.resolve(user);
-								});
-								GameService.promise(data.tid).then(function(game){
-									gameDeffered.resolve(game);
-								});
-							});
-							reportedUserPromise = userDeffered.promise;
-							gamePromise = gameDeffered.promise;
-							break;
-						case '4':
-							var gameDeffered = $q.defer();
-							var userDeffered = $q.defer();
-							GameRecService.promise(report.tid).then(function(game){
-								report.report_content = game;
-								UserService.promise(game.userid).then(function(user){
-									userDeffered.resolve(user);
-								});
-								gameDeffered.resolve(game);
-							});
-							reportedUserPromise = userDeffered.promise;
-							gamePromise = gameDeffered.promise;
-							break;
+				var type = 'file';
+				var file_type = 'file';
+				var bucket = 'u77file';
+
+				var options = {
+					type:type,
+					file_type:file_type
+				}
+
+				$.get(ManagePath+'api/upload',options,function(params){
+					params = JSON.parse(params);
+					var fn = function(file,finalCb,progressCb){
+						if(!file)return;
+						params.file = file;
+						Upload.upload({
+				            url: "http://v0.api.upyun.com/"+bucket,
+				            data: params
+				        }).then(function (resp) {
+				        	if(resp.data && resp.data.url)resp.data.url = "http://"+file_type+".u77.com"+resp.data.url;
+				            if(finalCb)finalCb(resp);
+				        }, function (resp) {
+				        	if(resp.data && resp.data.url)resp.data.url = "http://"+file_type+".u77.com"+resp.data.url;
+				            if(finalCb)finalCb(resp);
+				        }, function (evt) {
+				            evt.percentage = parseInt(100.0 * evt.loaded / evt.total);
+				            if(progressCb)progressCb(evt);
+				        });
 					}
-
-					$q.all([reporterPromise,gamePromise,reportedUserPromise]).then(function(arr){
-						report.reporter = arr[0];
-						report.report_game = arr[1];
-						report.reported_user = arr[2];
-						_deffered.resolve();
-					});
-					allDone.push(_deffered.promise);
+					deffered.resolve(fn);
 				});
+				return deffered.promise;
+			},
+			image:function(){
+				var deffered = $q.defer();
+				var type = 'game';
+				var file_type = 'image';
+				var prefix = 'img';
+				var bucket = 'u77img';
 
-				$q.all(allDone).then(function(){
-					deffered.resolve(list);
+				var options = {
+					type:type,
+					file_type:file_type
+				}
+
+				$.get(ManagePath+'api/upload',options,function(params){
+					params = JSON.parse(params);
+					var fn = function(file,finalCb,progressCb){
+						if(!file)return;
+						params.file = file;
+						Upload.upload({
+				            url: "http://v0.api.upyun.com/"+bucket,
+				            data: params
+				        }).then(function (resp) {
+				        	if(resp.data && resp.data.url)resp.data.url = "http://"+prefix+".u77.com"+resp.data.url;
+				            if(finalCb)finalCb(resp);
+				        }, function (resp) {
+				        	if(resp.data && resp.data.url)resp.data.url = "http://"+prefix+".u77.com"+resp.data.url;
+				            if(finalCb)finalCb(resp);
+				        }, function (evt) {
+				            evt.percentage = parseInt(100.0 * evt.loaded / evt.total);
+				            if(progressCb)progressCb(evt);
+				        });
+					}
+					deffered.resolve(fn);
+				});
+				return deffered.promise;
+			},
+			post:function(){
+				var deffered = $q.defer();
+				var type = 'post';
+				var file_type = 'image';
+				var prefix = 'img';
+				var bucket = 'u77img';
+
+				var options = {
+					type:type,
+					file_type:file_type
+				}
+
+				$.get(ManagePath+'api/upload',options,function(params){
+					params = JSON.parse(params);
+					var fn = function(file,finalCb,progressCb){
+						if(!file)return;
+						params.file = file;
+						Upload.upload({
+				            url: "http://v0.api.upyun.com/"+bucket,
+				            data: params
+				        }).then(function (resp) {
+				        	if(resp.data && resp.data.url)resp.data.url = "http://"+prefix+".u77.com"+resp.data.url;
+				            if(finalCb)finalCb(resp);
+				        }, function (resp) {
+				        	if(resp.data && resp.data.url)resp.data.url = "http://"+prefix+".u77.com"+resp.data.url;
+				            if(finalCb)finalCb(resp);
+				        }, function (evt) {
+				            evt.percentage = parseInt(100.0 * evt.loaded / evt.total);
+				            if(progressCb)progressCb(evt);
+				        });
+					}
+					deffered.resolve(fn);
+				});
+				return deffered.promise;
+			},
+			other:function(){
+				var deffered = $q.defer();
+				var type = 'other';
+				var file_type = 'file';
+				var bucket = 'u77file';
+
+				var options = {
+					type:type,
+					file_type:file_type
+				}
+
+				$.get(ManagePath+'api/upload',options,function(params){
+					params = JSON.parse(params);
+					var fn = function(file,finalCb,progressCb){
+						if(!file)return;
+						params.file = file;
+						Upload.upload({
+				            url: "http://v0.api.upyun.com/"+bucket,
+				            data: params
+				        }).then(function (resp) {
+				        	if(resp.data && resp.data.url)resp.data.url = "http://"+file_type+".u77.com"+resp.data.url;
+				            if(finalCb)finalCb(resp);
+				        }, function (resp) {
+				        	if(resp.data && resp.data.url)resp.data.url += "http://"+file_type
+				            if(finalCb)finalCb(resp);
+				        }, function (evt) {
+				            evt.percentage = parseInt(100.0 * evt.loaded / evt.total);
+				            if(progressCb)progressCb(evt);
+				        });
+					}
+					deffered.resolve(fn);
 				});
 				return deffered.promise;
 			}
 		}
-		
 	}]);
-app.controller('BigEyeCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
+app.controller('BigEyeCtrl',['$scope','$rootScope','UploadService',
+	function($scope,$rootScope,UploadService){
 		$scope.list = [];
 
 		$.get(ManagePath+'sliders',function(data){
@@ -486,9 +564,26 @@ app.controller('BigEyeCtrl',['$scope','$rootScope',
 
 		$scope.submit = function(){
 			$.post(ManagePath+'sliders',{sliders:$scope.list},function(data){
-				console.log(data);
+				if(data != 0){
+					alert('保存成功');
+				}
 			});
 		}
+
+		UploadService.image().then(function(fn){
+			$scope.upload = function($file,slide){
+				fn($file,function(resp){
+					if(resp.status == 200 && resp.statusText == 'OK'){
+						slide.image = resp.data.url;
+					}else{
+						alert('上传失败,请重试');
+					}
+					slide.percentage = null
+				},function(evt){
+					slide.percentage = evt.percentage;
+				});
+			}
+		});
 
 		$scope.slideControl = 0;
 		setInterval(function(){
@@ -509,7 +604,6 @@ app.controller('GameExamineCtrl',['$scope','$rootScope','GameService',
 			status:0
 		}
 		GameService.list($scope.options).then(function(data){
-			console.log(data);
 			$scope.gameList = data.data;
 		});
 	}]);
@@ -591,14 +685,148 @@ app.controller('GameListCtrl',['$scope','$rootScope','GameService',
 		});	
 	}]);
 
-app.controller('GameEditCtrl',['$scope','$rootScope','GameService','$stateParams',
-	function($scope,$rootScope,GameService,$stateParams){
+app.controller('GameNewCtrl',['$scope','$rootScope','GameService','UploadService',
+	function($scope,$rootScope,GameService,UploadService){
+		$scope.game_types = [
+			{id:1,label:'web'},
+			{id:2,label:'PC'},
+			{id:3,label:'手机'},
+			{id:4,label:'收费'},
+			{id:5,label:'iOS'},
+			{id:6,label:'Android'},
+			{id:7,label:'I & A'},
+			{id:8,label:'原创游戏'}
+		];
+
+		$scope.url_types = [
+			{id:1,label:'swf'},
+			{id:2,label:'unity3D'},
+			{id:3,label:'iframe'},
+			{id:4,label:'站外链接'}
+		];
+
+		$scope.game = {};
+
+		UploadService.file().then(function(fn){
+			$scope.uploadFile = function($file){
+				fn($file,function(resp){
+					if(resp.status == 200 && resp.statusText == 'OK'){
+						$scope.game.content.upyun_url = resp.data.url;
+					}else{
+						alert('上传失败,请重试.');
+					}
+					$scope.filePercentage = null;
+				},function(evt){
+					$scope.filePercentage = evt.percentage;
+				});
+			}
+		});
+
+		UploadService.image().then(function(fn){
+			$scope.uploadImage = function($file){
+				fn($file,function(resp){
+					if(resp.status == 200 && resp.statusText == 'OK'){
+						$scope.game.image = resp.data.url;
+					}else{
+						alert('上传失败,请重试.');
+					}
+					$scope.imagePercentage = null;
+				},function(evt){
+					$scope.imagePercentage = evt.percentage;
+				});
+			}
+		});		
+
+		$scope.$watch('game_type',function(){
+			if($scope.game_type)$scope.game.type = $scope.game_type.id;
+		});
+
+		$scope.$watch('url_type',function(){
+			if($scope.url_type)$scope.game.content.url_type = $scope.url_type.id;
+		});
+
+		$scope.submit = function(){
+			$.post(ManagePath+'/game/create',$scope.game,function(data){
+				// TODO
+			});
+		}
+	}]);
+
+app.controller('GameEditCtrl',['$scope','$rootScope','GameService','$stateParams','UploadService',
+	function($scope,$rootScope,GameService,$stateParams,UploadService){
+		$scope.game_types = [
+			{id:1,label:'web'},
+			{id:2,label:'PC'},
+			{id:3,label:'手机'},
+			{id:4,label:'收费'},
+			{id:5,label:'iOS'},
+			{id:6,label:'Android'},
+			{id:7,label:'I & A'},
+			{id:8,label:'原创游戏'}
+		];
+
+		$scope.url_types = [
+			{id:1,label:'swf'},
+			{id:2,label:'unity3D'},
+			{id:3,label:'iframe'},
+			{id:4,label:'站外链接'}
+		];
+
 		if(!$stateParams.id || $stateParams == 0){
 			// new game
 			
 		}else{
 			// edit game
+			GameService.promise($stateParams.id).then(function(data){
+				console.log(data);
+				$scope.game = data;
+				$scope.game_type = $scope.game_types[$scope.game.type-1];
+				$scope.url_type = $scope.url_types[$scope.game.content.url_type-1];
+			});
+		}
 
+		UploadService.file().then(function(fn){
+			$scope.uploadFile = function($file){
+				fn($file,function(resp){
+					if(resp.status == 200 && resp.statusText == 'OK'){
+						$scope.game.content.upyun_url = resp.data.url;
+					}else{
+						alert('上传失败,请重试.');
+					}
+					$scope.filePercentage = null;
+				},function(evt){
+					$scope.filePercentage = evt.percentage;
+				});
+			}
+		});
+
+		UploadService.image().then(function(fn){
+			$scope.uploadImage = function($file){
+				fn($file,function(resp){
+					if(resp.status == 200 && resp.statusText == 'OK'){
+						$scope.game.image = resp.data.url;
+					}else{
+						alert('上传失败,请重试.');
+					}
+					$scope.imagePercentage = null;
+				},function(evt){
+					$scope.imagePercentage = evt.percentage;
+				});
+			}
+		});		
+
+		$scope.$watch('game_type',function(){
+			if($scope.game_type)$scope.game.type = $scope.game_type.id;
+		});
+
+		$scope.$watch('url_type',function(){
+			if($scope.url_type)$scope.game.content.url_type = $scope.url_type.id;
+		});
+
+		$scope.submit = function(){
+			$.post(ManagePath+'/game/update',$scope.game,function(data){
+				// TODO
+			});
 		}
 	}]);
 app.directive('gameList',function(){

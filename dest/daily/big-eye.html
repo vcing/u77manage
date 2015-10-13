@@ -17,7 +17,7 @@
 						<a class="arrow-left" ng-click="left()"><i class="fa fa-angle-left"></i></a>
 						<a class="arrow-right" ng-click="right()"><i class="fa fa-angle-right"></i></a>
 						<div class="item" ng-repeat="slide in list" ng-show="slideControl == $index">
-							<a ng-href="slide.url" target="_blank">
+							<a ng-href="{{slide.url}}" target="_blank">
 								<img class="img-responsive" ng-src="{{slide.image}}">
 								<span class="text">{{$index+1}}. {{slide.text}}</span>
 							</a>
@@ -42,8 +42,9 @@
 								<th>链接</th>
 								<th>上传图片</th>
 								<th>排序</th>
+								<th style="display:none" colspan="4">上传进度</th>
 							</tr>
-							<tr ng-repeat="slide in list">
+							<tr ng-repeat="slide in list" ng-class="{true:'uploading'}[slide.percentage && slide.percentage != undefined]">
 								<th>
 									<input class="form-control" ng-model="slide.text"></input>
 								</th>
@@ -51,11 +52,18 @@
 									<input class="form-control"  ng-model="slide.url"></input>
 								</th>
 								<th>
-									<button class="btn btn-primary" upload type="bigeye" file-type="image" fill="slide.image">上传图片</button>
+									<button class="btn btn-primary" ngf-select="upload($file,slide)" ng-disabeld="!upload">上传图片</button>
 								</th>
 								<th>
 									<button class="btn" ng-click="up($index)"><i class="fa fa-caret-up"></i></button>
 									<button class="btn" ng-click="down($index)"><i class="fa fa-caret-down"></i></button>
+								</th>
+								<th colspan="4" class="progress">
+									<div class="progress active">
+										<div class="progress-bar progress-bar-primary progress-bar-striped" role="progressbar" aria-valuenow="{{slide.percentage}}" aria-valuemin="0" aria-valuemax="100" style="width: {{slide.percentage}}%">
+											<span class="sr-only">{{slide.percentage}}% Complete</span>
+										</div>
+									</div>
 								</th>
 							</tr>
 						</tbody>
@@ -65,4 +73,7 @@
 			</div>
 		</div>
 	</div>
+</section>
+<section id="loading" class="content" ng-if="list.length == 0">
+	<img class="img-responsive" src="/img/base-loading.gif">
 </section>

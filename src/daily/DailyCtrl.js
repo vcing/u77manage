@@ -1,5 +1,5 @@
-app.controller('BigEyeCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
+app.controller('BigEyeCtrl',['$scope','$rootScope','UploadService',
+	function($scope,$rootScope,UploadService){
 		$scope.list = [];
 
 		$.get(ManagePath+'sliders',function(data){
@@ -34,9 +34,26 @@ app.controller('BigEyeCtrl',['$scope','$rootScope',
 
 		$scope.submit = function(){
 			$.post(ManagePath+'sliders',{sliders:$scope.list},function(data){
-				console.log(data);
+				if(data != 0){
+					alert('保存成功');
+				}
 			});
 		}
+
+		UploadService.image().then(function(fn){
+			$scope.upload = function($file,slide){
+				fn($file,function(resp){
+					if(resp.status == 200 && resp.statusText == 'OK'){
+						slide.image = resp.data.url;
+					}else{
+						alert('上传失败,请重试');
+					}
+					slide.percentage = null
+				},function(evt){
+					slide.percentage = evt.percentage;
+				});
+			}
+		});
 
 		$scope.slideControl = 0;
 		setInterval(function(){
@@ -57,7 +74,6 @@ app.controller('GameExamineCtrl',['$scope','$rootScope','GameService',
 			status:0
 		}
 		GameService.list($scope.options).then(function(data){
-			console.log(data);
 			$scope.gameList = data.data;
 		});
 	}]);
