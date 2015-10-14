@@ -45,8 +45,8 @@
 			</div><!-- /.col -->
 			<div class="col-xs-4" style="padding:0">
 				<div class="description-block time">
-					<span class="description-text" ng-bind="game.create_at.split(' ')[0]"></span><br>
-					<span class="description-text" ng-bind="game.create_at.split(' ')[1]"></span>
+					<span class="description-text" ng-bind="game.create_at | onlyDate"></span><br>
+					<span class="description-text" ng-bind="game.create_at | onlyTime"></span>
 				</div><!-- /.description-block -->
 			</div><!-- /.col -->
 		</div><!-- /.row -->

@@ -12,7 +12,7 @@
 	<div class="row">
 		<!-- <div game-list></div> -->
 		<div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-0">
-			<div class="box box-info">
+			<div class="box box-primary">
 				<div class="box-header with-border">
 					<h3 class="box-title">参数</h3>
 				</div>
@@ -29,6 +29,10 @@
 						<div class="form-group">
 							<label>游戏标题(外文)</label>
 							<input type="text" class="form-control" ng-model="game.title_en">
+						</div>
+						<div class="form-group">
+							<label>用户userid</label>
+							<input type="text" class="form-control" ng-model="game.userid">
 						</div>
 						<div class="form-group">
 							<label>游戏链接</label>
@@ -71,6 +75,15 @@
 							<input type="text" class="form-control" ng-model="game.content.down2">
 						</div>
 						<div class="form-group">
+							<label>发布时间</label>
+							<div class="input-group">
+								<div class="input-group-addon">
+									<i class="fa fa-calendar"></i>
+								</div>
+								<input type="text" class="form-control" data-inputmask="'alias': 'datetime'" data-mask ng-model="game.update_at">
+							</div>
+						</div>
+						<div class="form-group">
 							<label style="width:100%">发布状态</label>
 							<a class="btn" ng-class="{true:'btn-success'}[game.status == 99]" ng-click="game.status=99">已发布</a>
 							<a class="btn" ng-class="{true:'btn-warning'}[game.status == 1]" ng-click="game.status=1">未发布</a>
@@ -81,21 +94,12 @@
 							<a class="btn" ng-class="{true:'btn-success'}[game.isvote == 1]" ng-click="game.isvote=1">YES</a>
 							<a class="btn" ng-class="{true:'btn-danger'}[game.isvote == 0]" ng-click="game.isvote=0">NO</a>
 						</div>
-						<div class="form-group">
-							<label>发布时间</label>
-							<div class="input-group">
-								<div class="input-group-addon">
-									<i class="fa fa-calendar"></i>
-								</div>
-								<input type="text" class="form-control" data-inputmask="'alias': 'datetime'" data-mask ng-model="game.update_at">
-							</div>
-						</div>
 					</form>
 				</div>
 			</div>
 		</div>
 		<div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-0">
-			<div class="box box-info">
+			<div class="box box-primary">
 				<div class="box-header with-border">
 					<h3 class="box-title">文本</h3>
 				</div>
@@ -103,7 +107,7 @@
 					<form role="form" name="game_text">
 						<div class="form-group">
 							<label>封面</label>
-							<img class="img-responsive" ng-src="{{game.image}}" ngf-select="uploadImage($file)" ng-disabled="imagePercentage" style="display:block;margin: 0 auto;max-height:250px">
+							<img class="img-responsive" ng-src="{{game.image || 'https://placeholdit.imgix.net/~text?txtsize=60&txt=%E5%B0%81%E9%9D%A2%E5%9B%BE%E7%89%87&w=440&h=250'}}" ngf-select="uploadImage($file)" ng-disabled="imagePercentage" style="display:block;margin: 0 auto;max-height:250px">
 							<div class="progress active" style="margin-top:5px" ng-show="imagePercentage">
 								<div class="progress-bar progress-bar-primary progress-bar-striped" role="progressbar" aria-valuenow="{{imagePercentage}}" aria-valuemin="0" aria-valuemax="100" style="width: {{imagePercentage}}%">
 									<span class="sr-only">{{imagePercentage}}% Complete</span>
@@ -111,22 +115,26 @@
 							</div>
 						</div>
 						<div class="form-group">
-							<label>用户userid</label>
-							<input type="text" class="form-control" ng-model="game.userid">
-						</div>
-						<div class="form-group">
 							<label>内容</label>
-							<textarea class="form-control" rows="10" ng-model="game.content.content"></textarea>
+							<textarea class="form-control" rows="4" ng-model="game.content.content"></textarea>
 						</div>
 						<div class="form-group">
 							<label>操作</label>
-							<textarea class="form-control" rows="6" ng-model="game.content.operation"></textarea>
+							<textarea class="form-control" rows="3" ng-model="game.content.operation"></textarea>
 						</div>
 						<div class="form-group">
 							<label>汉化成员</label>
 							<textarea class="form-control" rows="3" ng-model="game.content.chinesize"></textarea>
 						</div>
 					</form>
+				</div>
+			</div>
+			<div class="box box-primary">
+				<div class="box-header with-border">
+					<h3 class="box-title">标签</h3>
+				</div>
+				<div class="box-body">
+					<div tags-list="game.content.tags_cache"></div>
 				</div>
 			</div>
 		</div>
