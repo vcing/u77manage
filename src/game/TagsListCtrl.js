@@ -1,5 +1,5 @@
-app.controller('TagsListCtrl',['$scope',
-	function($scope){
+app.controller('TagsListCtrl',['$scope','TagService',
+	function($scope,TagService){
 		$scope.tagList = [{
 			label:'语言',
 			tags:[]
@@ -33,8 +33,6 @@ app.controller('TagsListCtrl',['$scope',
 				support:1,
 				tagid:tag.id
 			});
-			console.log(tag);
-			console.log($scope.selectedList);
 
 			$scope.tagsCacheList = JSON.stringify($scope.selectedList);
 
@@ -56,7 +54,6 @@ app.controller('TagsListCtrl',['$scope',
 			angular.forEach($scope.tagList,function(type){
 				angular.forEach(type.tags,function(_tag){
 					if(_tag.id == tag.tagid){
-						console.log(_tag);
 						_tag.disable = null;
 					}	
 				})
@@ -69,19 +66,15 @@ app.controller('TagsListCtrl',['$scope',
 			$scope.currentTab = index;
 		}
 
-		$.get(ManagePath+'tag/list',function(data){
+		TagService.all().then(function(data){
 			data = JSON.parse(data);
-			$scope.$apply(function(){
-				angular.forEach(data,function(data,index){
+			angular.forEach(data,function(data,index){
 
-					angular.forEach($scope.selectedList,function(tag){
-						if(data.id == tag.tagid)data.disable = true;
-					});
-
-					$scope.tagList[data.type - 1].tags.push(data);
+				angular.forEach($scope.selectedList,function(tag){
+					if(data.id == tag.tagid)data.disable = true;
 				});
+
+				$scope.tagList[data.type - 1].tags.push(data);
 			});
-
-
 		});
 	}]);

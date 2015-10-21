@@ -93,6 +93,15 @@ app.config(['$stateProvider','$urlRouterProvider',
 					}
 				}
 			})
+			.state('base.tag',{
+				url:'/tag',
+				views:{
+					'content':{
+						templateUrl:'game/tag.html',
+						controller:'TagCtrl'
+					}
+				}
+			})
 
 		// $urlRouterProvider.when("", "/dashboard");
 		// $urlRouterProvider.otherwise('/dashboard');

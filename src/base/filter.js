@@ -18,6 +18,12 @@ app.filter('time',[function(){
 	}
 }])
 
+app.filter('dateTime',[function(){
+  return function(unix){
+    return moment.unix(parseInt(unix)).format("YY/MM/DD H:mm:ss");
+  }
+}])
+
 app.filter('onlyDate',[function(){
 	return function(unix){
 		return moment.unix(parseInt(unix)).format("YY-MM-DD");

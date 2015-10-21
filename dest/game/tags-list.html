@@ -3,7 +3,7 @@
 		<li ng-repeat="type in tagList" ng-class="{true:'active'}[currentTab == $index]" ng-click="changeTab($index)">
 			<a ng-bind="type.label"></a>
 		</li>
-		<li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li>
+		<li class="pull-right"><a ui-sref="base.tag" class="text-muted"><i class="fa fa-gear"></i></a></li>
 	</ul>
 	<div class="tab-content">
 		<div class="tab-pane"  ng-class="{true:'active'}[currentTab == $index]" ng-repeat="type in tagList">

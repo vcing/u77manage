@@ -20,3 +20,44 @@ app.service('GameService',['$q',
 			}
 		}
 	}]);
+
+app.service('TagService',['$q',
+	function($q){
+		return {
+			promise:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'tag/info'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			list:function(options){
+				var deffered = $q.defer();
+				$.get(ManagePath+'tag/list',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			all:function(){
+				var deffered = $q.defer();
+				$.get(ManagePath+'tag/all',function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			update:function(tag){
+				var deffered = $q.defer();
+				$.post(ManagePath+'tag/update',tag,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			delete_tag:function(tag){
+				var deffered = $q.defer();
+				$.get(ManagePath+'tag/delete',tag,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			}
+		}
+	}]);

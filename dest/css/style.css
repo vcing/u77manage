@@ -35,6 +35,9 @@ html, body {
     min-height: 300px;
     height: 100%; }
 
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6, a, span, div, section, i, li, input, p {
+  font-family: '微软雅黑'; }
+
 .widget-user.game-block .bg {
   background-color: rgba(0, 0, 0, 0.6);
   padding: 5px;

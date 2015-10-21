@@ -96,3 +96,23 @@ app.directive('upload',function(){
 		}
 	}
 });
+
+app.directive('navPager',function(){
+	return {
+		restrict:'A',
+		templateUrl:'/base/pager.html',
+		scope:{
+			data:'=navPager',
+			pageChange:'=pageChange'
+		},
+		controller:function($scope){
+			
+		},
+		link:function($scope,element,attrs){
+			$scope.pageChanged = function() {
+				$scope.pageChange($scope.data.current_page);
+				 $('body,html').animate({ scrollTop: 0 }, 500);
+			};
+		}
+	}
+})

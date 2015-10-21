@@ -93,6 +93,15 @@ app.config(['$stateProvider','$urlRouterProvider',
 					}
 				}
 			})
+			.state('base.tag',{
+				url:'/tag',
+				views:{
+					'content':{
+						templateUrl:'game/tag.html',
+						controller:'TagCtrl'
+					}
+				}
+			})
 
 		// $urlRouterProvider.when("", "/dashboard");
 		// $urlRouterProvider.otherwise('/dashboard');
@@ -268,6 +277,26 @@ app.directive('upload',function(){
 		}
 	}
 });
+
+app.directive('navPager',function(){
+	return {
+		restrict:'A',
+		templateUrl:'/base/pager.html',
+		scope:{
+			data:'=navPager',
+			pageChange:'=pageChange'
+		},
+		controller:function($scope){
+			
+		},
+		link:function($scope,element,attrs){
+			$scope.pageChanged = function() {
+				$scope.pageChange($scope.data.current_page);
+				 $('body,html').animate({ scrollTop: 0 }, 500);
+			};
+		}
+	}
+})
 app.filter(  
     'to_trusted', ['$sce', function ($sce) {  
         return function (text) {  
@@ -286,6 +315,12 @@ app.filter('time',[function(){
 	return function(unix){
 		return moment.unix(parseInt(unix)).format("YY年MM月DD日 H:mm");
 	}
+}])
+
+app.filter('dateTime',[function(){
+  return function(unix){
+    return moment.unix(parseInt(unix)).format("YY/MM/DD H:mm:ss");
+  }
 }])
 
 app.filter('onlyDate',[function(){
@@ -528,6 +563,10 @@ app.service('UploadService',['Upload','$q',
 			}
 		}
 	}]);
+app.controller('DashboardCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+
+	}]);
 app.controller('BigEyeCtrl',['$scope','$rootScope','UploadService',
 	function($scope,$rootScope,UploadService){
 		$scope.list = [];
@@ -666,23 +705,34 @@ app.controller('ListGameCtrl',['$scope','$rootScope','GameService',
 			}
 		}
 
-		function query(){
-			GameService.list($scope.options).then(function(data){
-				$scope.gameList = data.data;
-			});
+		function query(page){
+			if(page){
+				var _options = _.clone($scope.options);
+				_options.page = page;
+				GameService.list(_options).then(function(data){
+					$scope.gameList = data;
+				});	
+			}else{
+				GameService.list($scope.options).then(function(data){
+					$scope.gameList = data;
+				});	
+			}
 		}
+
+		$scope.pageChange = query;
+
 	}]);
 
 app.controller('GameListCtrl',['$scope','$rootScope','GameService',
 	function($scope,$rootScope,GameService){
 		$scope.options = {};
 		GameService.list().then(function(data){
-			$scope.gameList = data.data;
+			$scope.gameList = data;
 		});	
 	}]);
 
-app.controller('GameNewCtrl',['$scope','$rootScope','GameService','UploadService',
-	function($scope,$rootScope,GameService,UploadService){
+app.controller('GameNewCtrl',['$scope','$rootScope','GameService','UploadService','$state',
+	function($scope,$rootScope,GameService,UploadService,$state){
 		$scope.game_types = [
 			{id:1,label:'web'},
 			{id:2,label:'PC'},
@@ -742,14 +792,15 @@ app.controller('GameNewCtrl',['$scope','$rootScope','GameService','UploadService
 		});
 
 		$scope.submit = function(){
+			$scope.game.update_at = moment($scope.game.update_at,"YYYY/MM/DD H:mm:SS").unix();
 			$.post(ManagePath+'/game/create',$scope.game,function(data){
-				// TODO
+				$state.go('base.gameEdit',{id:data});
 			});
 		}
 	}]);
 
-app.controller('GameEditCtrl',['$scope','$rootScope','GameService','$stateParams','UploadService',
-	function($scope,$rootScope,GameService,$stateParams,UploadService){
+app.controller('GameEditCtrl',['$scope','$rootScope','GameService','$stateParams','UploadService','$state',
+	function($scope,$rootScope,GameService,$stateParams,UploadService,$state){
 		$scope.game_types = [
 			{id:1,label:'web'},
 			{id:2,label:'PC'},
@@ -774,7 +825,7 @@ app.controller('GameEditCtrl',['$scope','$rootScope','GameService','$stateParams
 		}else{
 			// edit game
 			GameService.promise($stateParams.id).then(function(data){
-				console.log(data);
+				data.update_at = moment.unix(parseInt(data.update_at)).format("YYYY/MM/DD H:mm:SS");
 				$scope.game = data;
 				$scope.game_type = $scope.game_types[$scope.game.type-1];
 				$scope.url_type = $scope.url_types[$scope.game.content.url_type-1];
@@ -820,9 +871,80 @@ app.controller('GameEditCtrl',['$scope','$rootScope','GameService','$stateParams
 		});
 
 		$scope.submit = function(){
+			$scope.game.update_at = moment($scope.game.update_at,"YYYY/MM/DD H:mm:SS").unix();
 			$.post(ManagePath+'/game/update',$scope.game,function(data){
-				// TODO
+				$state.go('base.gameList');
 			});
+		}
+	}]);
+
+app.controller('TagCtrl',['$scope','$rootScope','TagService',
+	function($scope,$rootScope,TagService){
+		$scope.options = {};
+		$scope.options.search_type = 'key';
+
+		TagService.list().then(function(data){
+			$scope.tagList = data;
+		});
+
+		$scope.change_type = function(id){
+			$scope.options.type = id;
+			query();
+		}
+
+		$scope.change_search_type = function(type){
+			$scope.options.search_type = type;
+		}
+
+		function query(page){
+			if(page){
+				var _options = _.clone($scope.options);
+				_options.page = page;
+				TagService.list(_options).then(function(data){
+					$scope.tagList = data;
+				});	
+			}else{
+				TagService.list($scope.options).then(function(data){
+					$scope.tagList = data;
+				});	
+			}
+		}
+
+		$scope.types = [{
+			id:1,
+			label:'语言版本',
+		},{
+			id:2,
+			label:'游戏类型',
+		},{
+			id:3,
+			label:'玩法操作',
+		},{
+			id:4,
+			label:'体验感受',
+		},{
+			id:5,
+			label:'题材风格',
+		},{
+			id:0,
+			label:'其他',
+		}];
+
+		$scope.pageChange = query;
+
+		$scope.tag_search = function(e){
+			var keycode = window.event?e.keyCode:e.which;
+			if(keycode == 13){
+				query();
+			}
+		}
+
+		$scope.submit = function(tag){
+			console.log(tag);
+		}
+
+		$scope.delete_tag = function(tag){
+			console.log(tag);
 		}
 	}]);
 app.directive('gameList',function(){
@@ -867,6 +989,47 @@ app.service('GameService',['$q',
 			}
 		}
 	}]);
+
+app.service('TagService',['$q',
+	function($q){
+		return {
+			promise:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'tag/info'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			list:function(options){
+				var deffered = $q.defer();
+				$.get(ManagePath+'tag/list',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			all:function(){
+				var deffered = $q.defer();
+				$.get(ManagePath+'tag/all',function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			update:function(tag){
+				var deffered = $q.defer();
+				$.post(ManagePath+'tag/update',tag,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			delete_tag:function(tag){
+				var deffered = $q.defer();
+				$.get(ManagePath+'tag/delete',tag,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			}
+		}
+	}]);
 app.directive('tagsList',function(){
 	return {
 		restrict:'A',
@@ -878,8 +1041,8 @@ app.directive('tagsList',function(){
 		controller:'TagsListCtrl'
 	}
 });
-app.controller('TagsListCtrl',['$scope',
-	function($scope){
+app.controller('TagsListCtrl',['$scope','TagService',
+	function($scope,TagService){
 		$scope.tagList = [{
 			label:'语言',
 			tags:[]
@@ -913,8 +1076,6 @@ app.controller('TagsListCtrl',['$scope',
 				support:1,
 				tagid:tag.id
 			});
-			console.log(tag);
-			console.log($scope.selectedList);
 
 			$scope.tagsCacheList = JSON.stringify($scope.selectedList);
 
@@ -936,7 +1097,6 @@ app.controller('TagsListCtrl',['$scope',
 			angular.forEach($scope.tagList,function(type){
 				angular.forEach(type.tags,function(_tag){
 					if(_tag.id == tag.tagid){
-						console.log(_tag);
 						_tag.disable = null;
 					}	
 				})
@@ -949,23 +1109,15 @@ app.controller('TagsListCtrl',['$scope',
 			$scope.currentTab = index;
 		}
 
-		$.get(ManagePath+'tag/list',function(data){
+		TagService.all().then(function(data){
 			data = JSON.parse(data);
-			$scope.$apply(function(){
-				angular.forEach(data,function(data,index){
+			angular.forEach(data,function(data,index){
 
-					angular.forEach($scope.selectedList,function(tag){
-						if(data.id == tag.tagid)data.disable = true;
-					});
-
-					$scope.tagList[data.type - 1].tags.push(data);
+				angular.forEach($scope.selectedList,function(tag){
+					if(data.id == tag.tagid)data.disable = true;
 				});
+
+				$scope.tagList[data.type - 1].tags.push(data);
 			});
-
-
 		});
-	}]);
-app.controller('DashboardCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
-
 	}]);
