@@ -54,7 +54,7 @@ app.service('TagService',['$q',
 			},
 			delete_tag:function(tag){
 				var deffered = $q.defer();
-				$.get(ManagePath+'tag/delete',tag,function(data){
+				$.get(ManagePath+'tag/delete/'+tag.id,function(data){
 					deffered.resolve(data);
 				});
 				return deffered.promise;

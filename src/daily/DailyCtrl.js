@@ -74,7 +74,7 @@ app.controller('GameExamineCtrl',['$scope','$rootScope','GameService',
 			status:0
 		}
 		GameService.list($scope.options).then(function(data){
-			$scope.gameList = data.data;
+			$scope.gameList = data;
 		});
 	}]);
 

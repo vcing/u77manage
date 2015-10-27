@@ -1,0 +1,88 @@
+<section class="content-header">
+	<h1>
+		图片
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+		<li>游戏</li>
+		<li class="active">图片</li>
+	</ol>
+</section>
+<section class="content">
+	<div class="row">
+		<div class="col-xs-12" style="margin:15px 0">
+			<div class="btn-group" style="margin:0 10px 10px 0;float:left">
+				<button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+					<span ng-if="!options.status && options.status != 0">全部状态</span>
+					<span ng-if="options.status == 99">已发布</span>
+					<span ng-if="options.status == 1">未发布</span>
+					<span ng-if="options.status == 0">未审核</span>
+					<span ng-if="options.status == 3">退稿</span>
+					<span class="caret"></span>
+					<span class="sr-only">Toggle Dropdown</span>
+				</button>
+				<ul class="dropdown-menu" role="menu">
+					<li><a ng-click="change_status()">全部状态</a></li>
+					<li><a ng-click="change_status(99)">已发布</a></li>
+					<li><a ng-click="change_status(1)">未发布</a></li>
+					<li><a ng-click="change_status(0)">未审核</a></li>
+					<li><a ng-click="change_status(3)">退稿</a></li>
+				</ul>
+			</div>
+			<div class="input-group" style="margin:0 10px 10px 0;float:left;width:200px">
+				<div class="input-group-btn">
+					<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
+						<span ng-if="options.search_type == 'id' || !options.search_type">图片ID查询</span>
+						<span ng-if="options.search_type == 'gameid'">游戏ID查询</span>
+						<span ng-if="options.search_type == 'userid'">投稿人ID查询</span>
+						<span class="fa fa-caret-down"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a ng-click="change_search_type('id')">ID查询</a></li>
+						<li><a ng-click="change_search_type('gameid')">游戏ID查询</a></li>
+						<li><a ng-click="change_search_type('userid')">投稿人ID查询</a></li>
+					</ul>
+				</div><!-- /btn-group -->
+				<input type="text" class="form-control" ng-model="options.keywords" ng-keyup="game_search($event)">
+			</div>
+		</div>
+		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 ng-scope" ng-show="!tag.hide">
+			<div class="box box-primary">
+				<div class="box-header with-border">
+					<img class="img-circle" ng-src="http://img.u77.com/avatar/u77_avatar.jpg" style="width:40px;height:40px;float:left;">
+					<span class="username" style="display:block;margin-left:50px">
+						<a href="http://dev.u77.com/user/294536" target="_blank" class="ng-binding">u77_218767</a>
+					</span>
+					<span class="description" style="display:block;margin-left:50px">15年08月19日 18:38</span>
+					<div class="box-tools pull-right">
+					    <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+					    <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+					</div>
+				</div><!-- /.box-header -->
+				<div class="box-body" style="display: block;">
+						<!-- <h2 style="text-overflow: ellipsis;overflow: hidden;text-align:center;white-space: nowrap;font-size:20px" title="关于乐译汉化组“出售资源有金钱上限的问题">关于乐译汉化组“出售资源有金钱上限的问题</h2> -->
+					<!-- <input type="text" class="form-control" placeholder="标题" value="关于乐译汉化组“出售资源有金钱上限的问题"> -->
+					<img class="img-responsive" ng-src="http://img.u77.com/ugame/201509/a683d5f94f16a6d6.jpg">
+				</div><!-- /.box-body -->
+				<div class="box-footer no-padding" style="display: block;">
+				  <ul class="nav nav-pills nav-stacked">
+				    <li>
+				    	<a href="{{Path+'/game/5745'}}" style="text-align:center;">冒险与挖矿</a>
+				    </li>
+				    <li>
+				    	<div class="form-group" style="text-align:center;margin:0">
+							<a class="btn btn-sm btn-success" ng-click="game.status=99">已发布</a>
+							<a class="btn" ng-click="game.status=1">未发布</a>
+							<a class="btn" ng-click="game.status=0">未审核</a>
+						</div>
+				    </li>
+				    <li><a style="text-align:right">
+				    	<span class="btn btn-danger" ng-click="delete_tag(tag)">删除</span>
+				    	<span class="btn btn-primary" ng-click="submit(tag)">提交</span>
+				    </a></li>
+				  </ul>
+				</div><!-- /.footer -->
+			</div>
+		</div>
+	</div>
+</section>

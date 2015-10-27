@@ -102,6 +102,106 @@ app.config(['$stateProvider','$urlRouterProvider',
 					}
 				}
 			})
+			.state('base.gameCream',{
+				url:'/cream/:gameid',
+				views:{
+					'content':{
+						templateUrl:'game/cream.html',
+						controller:'CreamCtrl',
+					}
+				}
+			})
+			.state('base.cream',{
+				url:'/cream',
+				views:{
+					'content':{
+						templateUrl:'game/cream.html',
+						controller:'CreamCtrl',
+					}
+				}
+			})
+			.state('base.creamEdit',{
+				url:'/cream/edit/:id',
+				views:{
+					'content':{
+						templateUrl:'game/cream-edit.html',
+						controller:'CreamEditCtrl'
+					}
+				}
+			})
+			.state('base.video',{
+				url:'/video',
+				views:{
+					'content':{
+						templateUrl:'game/video.html',
+						controller:'VideoCtrl'
+					}
+				}
+			})
+			.state('base.image',{
+				url:'/image',
+				views:{
+					'content':{
+						templateUrl:'game/image.html',
+						controller:'ImageCtrl'
+					}
+				}
+			})
+			.state('base.gameNotice',{
+				url:'/notice/{id}',
+				views:{
+					'content':{
+						templateUrl:'game/notice.html',
+						controller:'NoticeCtrl'
+					}
+				}
+			})
+			.state('base.notice',{
+				url:'/notice',
+				views:{
+					'content':{
+						templateUrl:'game/notice.html',
+						controller:'NoticeCtrl'
+					}
+				}
+			})
+			.state('base.noticeEdit',{
+				url:'/notice/edit/:id',
+				views:{
+					'content':{
+						templateUrl:'game/notice-edit.html',
+						controller:'NoticeEditCtrl'
+					}
+				}
+			})
+			.state('base.recExamine',{
+				url:'/game/rec',
+				views:{
+					'content':{
+						templateUrl:'game/rec-examine.html',
+						controller:'RecExamineCtrl'
+					}
+				}
+			})
+			.state('base.errorReport',{
+				url:'/error-report',
+				views:{
+					'content':{
+						templateUrl:'game/error-report.html',
+						controller:'ErrorReportCtrl'
+					}
+				}
+			})
+			.state('base.comment',{
+				url:'/comment',
+				views:{
+					'content':{
+						templateUrl:'comment/index.html',
+						controller:'CommentCtrl'
+					}
+				}
+			})
+
 
 		// $urlRouterProvider.when("", "/dashboard");
 		// $urlRouterProvider.otherwise('/dashboard');
@@ -563,9 +663,9 @@ app.service('UploadService',['Upload','$q',
 			}
 		}
 	}]);
-app.controller('DashboardCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
-
+app.controller('CommentCtrl',['$scope','$rootScope','$stateParams',
+	function($scope,$rootScope,$stateParams){
+		console.log($stateParams);
 	}]);
 app.controller('BigEyeCtrl',['$scope','$rootScope','UploadService',
 	function($scope,$rootScope,UploadService){
@@ -643,7 +743,7 @@ app.controller('GameExamineCtrl',['$scope','$rootScope','GameService',
 			status:0
 		}
 		GameService.list($scope.options).then(function(data){
-			$scope.gameList = data.data;
+			$scope.gameList = data;
 		});
 	}]);
 
@@ -676,6 +776,10 @@ app.service('DailyGameVilidService',['$http','$q','GameService',
 	}]);
 
 
+app.controller('DashboardCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+
+	}]);
 app.controller('SingleGameCtrl',['$scope','$rootScope',
 	function($scope,$rootScope){
 
@@ -940,12 +1044,53 @@ app.controller('TagCtrl',['$scope','$rootScope','TagService',
 		}
 
 		$scope.submit = function(tag){
-			console.log(tag);
+			TagService.update(tag);
+			tag.hide = true;
 		}
 
 		$scope.delete_tag = function(tag){
-			console.log(tag);
+			TagService.delete_tag(tag);
 		}
+	}]);
+
+app.controller('CreamCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+
+	}]);
+
+app.controller('CreamEditCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+		
+	}]);
+
+app.controller('VideoCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+
+	}]);
+
+app.controller('ImageCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+
+	}]);
+
+app.controller('NoticeCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+		
+	}]);
+
+app.controller('NoticeEditCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+
+	}]);
+
+app.controller('RecExamineCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+
+	}]);
+
+app.controller('ErrorReportCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+
 	}]);
 app.directive('gameList',function(){
 	return {
@@ -1023,7 +1168,7 @@ app.service('TagService',['$q',
 			},
 			delete_tag:function(tag){
 				var deffered = $q.defer();
-				$.get(ManagePath+'tag/delete',tag,function(data){
+				$.get(ManagePath+'tag/delete/'+tag.id,function(data){
 					deffered.resolve(data);
 				});
 				return deffered.promise;

@@ -262,10 +262,51 @@ app.controller('TagCtrl',['$scope','$rootScope','TagService',
 		}
 
 		$scope.submit = function(tag){
-			console.log(tag);
+			TagService.update(tag);
+			tag.hide = true;
 		}
 
 		$scope.delete_tag = function(tag){
-			console.log(tag);
+			TagService.delete_tag(tag);
 		}
+	}]);
+
+app.controller('CreamCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+
+	}]);
+
+app.controller('CreamEditCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+		
+	}]);
+
+app.controller('VideoCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+
+	}]);
+
+app.controller('ImageCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+
+	}]);
+
+app.controller('NoticeCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+		
+	}]);
+
+app.controller('NoticeEditCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+
+	}]);
+
+app.controller('RecExamineCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+
+	}]);
+
+app.controller('ErrorReportCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+
 	}]);
