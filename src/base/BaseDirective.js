@@ -111,8 +111,57 @@ app.directive('navPager',function(){
 		link:function($scope,element,attrs){
 			$scope.pageChanged = function() {
 				$scope.pageChange($scope.data.current_page);
-				 $('body,html').animate({ scrollTop: 0 }, 500);
+				$('body,html').animate({ scrollTop: 0 }, 500);
 			};
 		}
 	}
 })
+
+/**  
+ * Two-way data binding for contenteditable elements with ng-model.  
+ * @example  
+ *   <p contenteditable="true" ng-model="text"></p>  
+ */ 
+app.directive('contenteditable', function() {  
+  return {  
+    require: '?ngModel',  
+    link: function(scope, element, attrs, ctrl) {  
+   
+      // Do nothing if this is not bound to a model  
+      if (!ctrl) { return; }  
+   
+      // Checks for updates (input or pressing ENTER)  
+      // view -> model  
+      element.bind('input enterKey', function() {  
+        var rerender = false;  
+        var html = element.html();  
+   
+        if (attrs.noLineBreaks) {  
+          html = html.replace(/<div>/g, '').replace(/<br>/g, '').replace(/<\/div>/g, '');  
+          rerender = true;  
+        }  
+   
+        scope.$apply(function() {  
+          ctrl.$setViewValue(html);  
+          if(rerender) {  
+            ctrl.$render();  
+          }  
+        });  
+      });  
+   
+      element.keyup(function(e){  
+        if(e.keyCode === 13){  
+          element.trigger('enterKey');  
+        }  
+      });  
+   
+      // model -> view  
+      ctrl.$render = function() {  
+        element.html(ctrl.$viewValue);  
+      };  
+   
+      // load init value from DOM  
+      ctrl.$render();  
+    }  
+  };  
+}); 

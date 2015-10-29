@@ -4,7 +4,15 @@ app.filter(
             return $sce.trustAsHtml(html_decode(text));  
         }  
     }]
-)
+);
+
+app.filter(  
+    'trusted', ['$sce', function ($sce) {  
+        return function (text) {  
+            return $sce.trustAsHtml(text);  
+        }  
+    }]
+);
 
 app.filter('fromNow',[function(){
 	return function(unix){
@@ -19,6 +27,18 @@ app.filter('time',[function(){
 }])
 
 app.filter('dateTime',[function(){
+  return function(unix){
+    return moment.unix(parseInt(unix)).format("YYYY/MM/DD H:mm:ss");
+  }
+}])
+
+app.filter('toUnix',[function(){
+  return function(time){
+    return moment(time).unix();
+  }
+}])
+
+app.filter('dt',[function(){
   return function(unix){
     return moment.unix(parseInt(unix)).format("YY/MM/DD H:mm:ss");
   }

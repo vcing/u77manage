@@ -12,18 +12,16 @@
 <section class="content">
 	<div class="row">
 		<div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3">
-			<input type="text" class="form-control" placeholder="标题">
-			<div contenteditable="true" style="width:100%;min-height:500px;background:#fff;border:1px solid #ccc;margin-top:20px"></div>
-			<input type="text" class="form-control" data-inputmask="'alias': 'datetime'" data-mask="" style="margin-top:20px">
-			<div class="form-group" style="text-align:center;margin:0;margin-top:20px">
-				<a class="btn btn-sm btn-success" ng-click="game.status=99">已发布</a>
-				<a class="btn" ng-click="game.status=1">未发布</a>
-				<a class="btn" ng-click="game.status=0">未审核</a>
+			<input type="text" class="form-control" placeholder="标题" ng-model="cream.title">
+			<div contenteditable="true" style="width:100%;min-height:500px;background:#fff;border:1px solid #ccc;margin-top:20px" ng-model="cream.content">
 			</div>
-			<a class="btn btn-primary col-xs-6 col-xs-offset-3" style="margin-top:20px">提交</a>
+			<input type="text" class="form-control" style="margin-top:20px" ng-model="cream.create_time">
+			<div class="form-group" style="text-align:center;margin:0;margin-top:20px">
+				<a class="btn" ng-click="cream.status = 99" ng-class="{true:'btn-sm btn-success'}[cream.status == 99]">已发布</a>
+				<a class="btn" ng-click="cream.status = 3" ng-class="{true:'btn-sm btn-success'}[cream.status == 3]">退稿</a>
+				<a class="btn" ng-click="cream.status = 0" ng-class="{true:'btn-sm btn-success'}[cream.status == 0]">未审核</a>
+			</div>
+			<a class="btn btn-primary col-xs-6 col-xs-offset-3" style="margin-top:20px" ng-click="submit()">提交</a>
 		</div>
 	</div>
 </section>
-<script type="text/javascript">
-	$("[data-mask]").inputmask();
-</script>

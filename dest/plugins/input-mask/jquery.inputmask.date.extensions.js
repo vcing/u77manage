@@ -368,7 +368,7 @@ Optional extensions on the jquery.inputmask base
         },
         'datetime': {
             mask: "y/1/2 h:s:s",
-            placeholder: "yyyy/mm/dd hh:mm:ss",
+            placeholder: "yyyy-mm-dd hh:mm:ss",
             alias: "yyyy/mm/dd",
             regex: {
                 hrspre: new RegExp("[012]"), //hours pre

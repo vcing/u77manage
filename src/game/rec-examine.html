@@ -30,25 +30,27 @@
 					<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
 						<span ng-if="options.search_type == 'id' || !options.search_type">推荐ID查询</span>
 						<span ng-if="options.search_type == 'key'">关键词查询</span>
-						<span ng-if="options.search_type == 'gameid'">游戏ID查询</span>
+						<span ng-if="options.search_type == 'tid'">游戏ID查询</span>
+						<span ng-if="options.search_type == 'userid'">用户ID查询</span>
 						<span class="fa fa-caret-down"></span>
 					</button>
 					<ul class="dropdown-menu">
 						<li><a ng-click="change_search_type('id')">ID查询</a></li>
 						<li><a ng-click="change_search_type('key')">关键词查询</a></li>
-						<li><a ng-click="change_search_type('gameid')">游戏ID查询</a></li>
+						<li><a ng-click="change_search_type('tid')">游戏ID查询</a></li>
+						<li><a ng-click="change_search_type('userid')">用户ID查询</a></li>
 					</ul>
 				</div><!-- /btn-group -->
-				<input type="text" class="form-control" ng-model="options.keywords" ng-keyup="game_search($event)">
+				<input type="text" class="form-control" ng-model="options.keywords" ng-keyup="search($event)">
 			</div>
 		</div>
-		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" ng-show="!rec.hide" ng-repeat="rec in list.data">
 			<div class="box box-widget">
 				<div class="box-header with-border">
 					<div class="user-block">
-						<img class="img-circle" src="../dist/img/user1-128x128.jpg" alt="User Image">
-						<span class="username"><a href="#">Jonathan Burke Jr.</a></span>
-						<span class="description">Shared publicly - 7:30 PM Today</span>
+						<img class="img-circle" ng-src="http://img.u77.com/avatar/{{rec.user.avatar}}" alt="User Image">
+						<span class="username"><a href="{{Path}}/user/{{rec.user.userid}}" ng-bind="rec.user.nickname"></a></span>
+						<span class="description" ng-bind="rec.create_at | dateTime"></span>
 					</div>
 					<div class="box-tools">
 						<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
@@ -56,22 +58,25 @@
 					</div>
 				</div>
 				<div class="box-body with-border">
-					杀时间利器系列…………然而自己的评分越来越低了呢………然而自己也是刚玩…2468分… 以上就是因为推荐理由必须水够一定一定字数才可以…所以有意见请投诉斯巴达就好啦…嗯…
+					<div style="height:100px;overflow:auto">{{rec.content}}</div>
 					<div class="attachment-block clearfix">
-						<img class="attachment-img" ng-src="http://img.u77.com/g/2015/04/582a0d03755c69b6.jpg" alt="attachment image" style="width:100px;height:57px" src="http://img.u77.com/g/2015/04/582a0d03755c69b6.jpg">
+						<img class="attachment-img" ng-src="{{rec.game.image}}" alt="attachment image" style="width:100px;height:57px">
 						<div class="attachment-pushed">
-							<h4 class="attachment-heading"><a href="http://dev.u77.com/game/5745" target="_blank" style="display: inline-block;text-overflow: ellipsis;overflow: hidden;white-space: nowrap;max-width: 100%;">刀剑魔药2</a></h4>
+							<h4 class="attachment-heading"><a href="{{Path+'/game/'+rec.game.id}}" target="_blank" style="display: inline-block;text-overflow: ellipsis;overflow: hidden;white-space: nowrap;max-width: 100%;">{{rec.game.title}}</a></h4>
 							<div class="attachment-text">
-								首次推荐于<br><span>15年03月30日 11:23</span>
+								首次推荐于<br><span>{{rec.game.create_at|dateTime}}</span>
 							</div><!-- /.attachment-text -->
 						</div><!-- /.attachment-pushed -->
 					</div>
 				</div>
 				<div class="box-footer">
-					<button class="btn btn-warning btn-xs" ng-click="ignore(report)"><i class="fa fa-times"></i> 删除</button>
-					<button class="btn btn-info btn-xs" ng-click="accept(report)"><i class="fa fa-check"></i> 通过</button>
+					<button class="btn btn-warning btn-xs" ng-click="delete(rec)"><i class="fa fa-times"></i> 删除</button>
+					<button class="btn btn-info btn-xs" ng-click="accept(rec)" ng-if="rec.status != 99"><i class="fa fa-check"></i> 通过</button>
 				</div>
 			</div>
+		</div>
+		<div class="col-xs-12">
+			<div nav-pager='list' page-change="pageChange"></div>
 		</div>
 	</div>
 </section>

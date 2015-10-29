@@ -15,7 +15,6 @@
 				<button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 					<span ng-if="!options.status && options.status != 0">全部状态</span>
 					<span ng-if="options.status == 99">已发布</span>
-					<span ng-if="options.status == 1">未发布</span>
 					<span ng-if="options.status == 0">未审核</span>
 					<span ng-if="options.status == 3">退稿</span>
 					<span class="caret"></span>
@@ -24,7 +23,6 @@
 				<ul class="dropdown-menu" role="menu">
 					<li><a ng-click="change_status()">全部状态</a></li>
 					<li><a ng-click="change_status(99)">已发布</a></li>
-					<li><a ng-click="change_status(1)">未发布</a></li>
 					<li><a ng-click="change_status(0)">未审核</a></li>
 					<li><a ng-click="change_status(3)">退稿</a></li>
 				</ul>
@@ -45,49 +43,52 @@
 						<li><a ng-click="change_search_type('userid')">投稿人ID查询</a></li>
 					</ul>
 				</div><!-- /btn-group -->
-				<input type="text" class="form-control" ng-model="options.keywords" ng-keyup="game_search($event)">
+				<input type="text" class="form-control" ng-model="options.keywords" ng-keyup="search($event)">
 			</div>
 		</div>
-		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 ng-scope" ng-show="!tag.hide">
+		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" ng-repeat="cream in list.data" ng-show="!cream.hide">
 			<div class="box box-primary">
 				<div class="box-header with-border">
-					<img class="img-circle" ng-src="http://img.u77.com/avatar/u77_avatar.jpg" style="width:40px;height:40px;float:left;">
+					<img class="img-circle" ng-src="http://img.u77.com/avatar/{{cream.user.avatar}}" style="width:40px;height:40px;float:left;">
 					<span class="username" style="display:block;margin-left:50px">
-						<a href="http://dev.u77.com/user/294536" target="_blank" class="ng-binding">u77_218767</a>
+						<a href="http://dev.u77.com/user/{{cream.user.userid}}" target="_blank" ng-bind="cream.user.nickname"></a>
 					</span>
-					<span class="description" style="display:block;margin-left:50px">15年08月19日 18:38</span>
+					<span class="description" style="display:block;margin-left:50px">{{cream.create_at | dateTime}}</span>
 					<div class="box-tools pull-right">
 					    <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
 					    <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
 					</div>
 				</div><!-- /.box-header -->
 				<div class="box-body" style="display: block;">
-					<a href="http://dev.u77.com/tag/638" target="_blank">
-						<h2 style="text-overflow: ellipsis;overflow: hidden;text-align:center;white-space: nowrap;font-size:20px" title="关于乐译汉化组“出售资源有金钱上限的问题">关于乐译汉化组“出售资源有金钱上限的问题</h2>
+					<a href="http://dev.u77.com/post/{{cream.id}}" target="_blank">
+						<h2 style="text-overflow: ellipsis;overflow: hidden;text-align:center;white-space: nowrap;font-size:20px" title="{{cream.title}}" ng-bind="cream.title"></h2>
 					</a>
 				</div><!-- /.box-body -->
 				<div class="box-footer no-padding" style="display: block;">
 				  <ul class="nav nav-pills nav-stacked">
 				    <li>
-				    	<a href="{{Path+'/game/5745'}}" target="_blank">
-				    		<img class="img-responsive" ng-src="http://img.u77.com/g/2014/11/354e2946207e94dc.png" width="100%">
+				    	<a href="{{Path+'/game/'+cream.game.id}}" target="_blank">
+				    		<img class="img-responsive" ng-src="{{cream.game.image}}" width="100%">
 				    	</a>
-				    	<a href="{{Path+'/game/5745'}}" style="text-align:center;">冒险与挖矿</a>
+				    	<a href="{{Path+'/game/'+cream.game.id}}" style="text-align:center;" ng-bind="cream.game.title" target="_blank"></a>
 				    </li>
 				    <li>
 				    	<div class="form-group" style="text-align:center;margin:0">
-							<a class="btn btn-sm btn-success" ng-click="game.status=99">已发布</a>
-							<a class="btn" ng-click="game.status=1">未发布</a>
-							<a class="btn" ng-click="game.status=0">未审核</a>
+							<a class="btn" ng-click="change_cream_status(cream,99)" ng-class="{true:'btn-sm btn-success'}[cream.status == 99]">已发布</a>
+							<a class="btn" ng-click="change_cream_status(cream,3)" ng-class="{true:'btn-sm btn-success'}[cream.status == 3]">退稿</a>
+							<a class="btn" ng-click="change_cream_status(cream,0)" ng-class="{true:'btn-sm btn-success'}[cream.status == 0]">未审核</a>
 						</div>
 				    </li>
 				    <li><a style="text-align:right">
-				    	<span class="btn btn-danger" ng-click="delete_tag(tag)">删除</span>
-				    	<span class="btn btn-primary" ui-sref="base.creamEdit({id:2})">编辑</span>
+				    	<span class="btn btn-danger" ng-click="delete(cream)">删除</span>
+				    	<span class="btn btn-primary" ui-sref="base.creamEdit({id:cream.id})">编辑</span>
 				    </a></li>
 				  </ul>
 				</div><!-- /.footer -->
 			</div>
+		</div>
+		<div class="col-xs-12">
+			<div nav-pager='list' page-change="pageChange"></div>
 		</div>
 	</div>
 </section>

@@ -148,7 +148,7 @@ app.config(['$stateProvider','$urlRouterProvider',
 				}
 			})
 			.state('base.gameNotice',{
-				url:'/notice/{id}',
+				url:'/notice/:id',
 				views:{
 					'content':{
 						templateUrl:'game/notice.html',

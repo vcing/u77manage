@@ -148,7 +148,7 @@ app.config(['$stateProvider','$urlRouterProvider',
 				}
 			})
 			.state('base.gameNotice',{
-				url:'/notice/{id}',
+				url:'/notice/:id',
 				views:{
 					'content':{
 						templateUrl:'game/notice.html',
@@ -392,18 +392,75 @@ app.directive('navPager',function(){
 		link:function($scope,element,attrs){
 			$scope.pageChanged = function() {
 				$scope.pageChange($scope.data.current_page);
-				 $('body,html').animate({ scrollTop: 0 }, 500);
+				$('body,html').animate({ scrollTop: 0 }, 500);
 			};
 		}
 	}
 })
+
+/**  
+ * Two-way data binding for contenteditable elements with ng-model.  
+ * @example  
+ *   <p contenteditable="true" ng-model="text"></p>  
+ */ 
+app.directive('contenteditable', function() {  
+  return {  
+    require: '?ngModel',  
+    link: function(scope, element, attrs, ctrl) {  
+   
+      // Do nothing if this is not bound to a model  
+      if (!ctrl) { return; }  
+   
+      // Checks for updates (input or pressing ENTER)  
+      // view -> model  
+      element.bind('input enterKey', function() {  
+        var rerender = false;  
+        var html = element.html();  
+   
+        if (attrs.noLineBreaks) {  
+          html = html.replace(/<div>/g, '').replace(/<br>/g, '').replace(/<\/div>/g, '');  
+          rerender = true;  
+        }  
+   
+        scope.$apply(function() {  
+          ctrl.$setViewValue(html);  
+          if(rerender) {  
+            ctrl.$render();  
+          }  
+        });  
+      });  
+   
+      element.keyup(function(e){  
+        if(e.keyCode === 13){  
+          element.trigger('enterKey');  
+        }  
+      });  
+   
+      // model -> view  
+      ctrl.$render = function() {  
+        element.html(ctrl.$viewValue);  
+      };  
+   
+      // load init value from DOM  
+      ctrl.$render();  
+    }  
+  };  
+}); 
 app.filter(  
     'to_trusted', ['$sce', function ($sce) {  
         return function (text) {  
             return $sce.trustAsHtml(html_decode(text));  
         }  
     }]
-)
+);
+
+app.filter(  
+    'trusted', ['$sce', function ($sce) {  
+        return function (text) {  
+            return $sce.trustAsHtml(text);  
+        }  
+    }]
+);
 
 app.filter('fromNow',[function(){
 	return function(unix){
@@ -418,6 +475,18 @@ app.filter('time',[function(){
 }])
 
 app.filter('dateTime',[function(){
+  return function(unix){
+    return moment.unix(parseInt(unix)).format("YYYY/MM/DD H:mm:ss");
+  }
+}])
+
+app.filter('toUnix',[function(){
+  return function(time){
+    return moment(time).unix();
+  }
+}])
+
+app.filter('dt',[function(){
   return function(unix){
     return moment.unix(parseInt(unix)).format("YY/MM/DD H:mm:ss");
   }
@@ -903,8 +972,8 @@ app.controller('GameNewCtrl',['$scope','$rootScope','GameService','UploadService
 		}
 	}]);
 
-app.controller('GameEditCtrl',['$scope','$rootScope','GameService','$stateParams','UploadService','$state',
-	function($scope,$rootScope,GameService,$stateParams,UploadService,$state){
+app.controller('GameEditCtrl',['$scope','$rootScope','GameService','$stateParams','UploadService','$state','$filter',
+	function($scope,$rootScope,GameService,$stateParams,UploadService,$state,$filter){
 		$scope.game_types = [
 			{id:1,label:'web'},
 			{id:2,label:'PC'},
@@ -929,10 +998,11 @@ app.controller('GameEditCtrl',['$scope','$rootScope','GameService','$stateParams
 		}else{
 			// edit game
 			GameService.promise($stateParams.id).then(function(data){
-				data.update_at = moment.unix(parseInt(data.update_at)).format("YYYY/MM/DD H:mm:SS");
+				// data.update_at = moment.unix(parseInt(data.update_at)).format("YYYY/MM/DD H:mm:SS");
 				$scope.game = data;
 				$scope.game_type = $scope.game_types[$scope.game.type-1];
 				$scope.url_type = $scope.url_types[$scope.game.content.url_type-1];
+				$scope.game.create_time = $filter('dateTime')($scope.game.create_at);
 			});
 		}
 
@@ -975,9 +1045,15 @@ app.controller('GameEditCtrl',['$scope','$rootScope','GameService','$stateParams
 		});
 
 		$scope.submit = function(){
-			$scope.game.update_at = moment($scope.game.update_at,"YYYY/MM/DD H:mm:SS").unix();
-			$.post(ManagePath+'/game/update',$scope.game,function(data){
-				$state.go('base.gameList');
+			// $scope.game.update_at = moment($scope.game.update_at,"YYYY/MM/DD H:mm:SS").unix();
+			$scope.game.create_at = $filter('toUnix')($scope.game.create_time);
+			console.log($scope.game.update_at);
+			delete $scope.game.create_time;
+			$.post(ManagePath+'game/update',$scope.game,function(data){
+				if(data == $scope.game.id){
+					$state.go('base.gameList');	
+				}
+				
 			});
 		}
 	}]);
@@ -1053,44 +1129,371 @@ app.controller('TagCtrl',['$scope','$rootScope','TagService',
 		}
 	}]);
 
-app.controller('CreamCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
+app.controller('CreamCtrl',['$scope','$rootScope','CreamService',
+	function($scope,$rootScope,CreamService){
+		$scope.options = {};
+		$scope.options.search_type = 'id';
+
+		$scope.change_type = function(id){
+			$scope.options.type = id;
+			query();
+		}
+
+		$scope.change_search_type = function(type){
+			$scope.options.search_type = type;
+		}
+
+		$scope.change_status = function(status){
+			$scope.options.status = status;
+			query();
+		}
+
+		$scope.search = function(e){
+			var keycode = window.event?e.keyCode:e.which;
+			if(keycode == 13){
+				query();
+			}
+		}
+
+		function query(page){
+			var _options = _.clone($scope.options);
+			if(page)_options.page = page;
+			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
+			delete _options.search_type;
+			delete _options.keywords;
+			CreamService.list(_options).then(function(data){
+				$scope.list = data;
+			});
+		}
+
+		CreamService.list().then(function(data){
+			$scope.list = data;
+			console.log(data);
+		});
+
+		$scope.pageChange = query;
+
+		$scope.change_cream_status = function(cream,status){
+			cream.status = status;
+			CreamService.update(cream);
+		}
+
+		$scope.delete = function(cream){
+			CreamService.delete(cream.id);
+			cream.hide = true;
+		}
 
 	}]);
 
-app.controller('CreamEditCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
+app.controller('CreamEditCtrl',['$scope','$rootScope','$stateParams','CreamService','$filter',
+	function($scope,$rootScope,$stateParams,CreamService,$filter){
+		CreamService.info($stateParams.id).then(function(info){
+			console.log(info);
+			$scope.cream = info;
+			$scope.cream.create_time = $filter('dateTime')($scope.cream.create_at);
+		});
+
+		$scope.submit = function(){
+			$scope.cream.create_at = $filter('toUnix')($scope.cream.create_time);
+			CreamService.update($scope.cream);
+		}
+	}]);
+
+app.controller('VideoCtrl',['$scope','$rootScope','VideoService',
+	function($scope,$rootScope,VideoService){
+		$scope.options = {};
+		$scope.options.search_type = 'id';
+
+		$scope.change_type = function(id){
+			$scope.options.type = id;
+			query();
+		}
+
+		$scope.change_search_type = function(type){
+			$scope.options.search_type = type;
+		}
+
+		$scope.change_status = function(status){
+			$scope.options.status = status;
+			query();
+		}
+
+		$scope.search = function(e){
+			var keycode = window.event?e.keyCode:e.which;
+			if(keycode == 13){
+				query();
+			}
+		}
+
+		$scope.submit = function(video){
+			VideoService.update(video);
+		}
+
+		$scope.delete = function(video){
+			VideoService.delete(video.id);
+			video.hide = true;
+		}
+
+		function query(page){
+			var _options = _.clone($scope.options);
+			if(page)_options.page = page;
+			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
+			delete _options.search_type;
+			delete _options.keywords;
+			VideoService.list(_options).then(function(data){
+				$scope.list = data;
+			});
+		}
+
+		VideoService.list().then(function(data){
+			$scope.list = data;
+			console.log(data);
+		});
+
+		$scope.pageChange = query;
+	}]);
+
+app.controller('ImageCtrl',['$scope','$rootScope','ImageService',
+	function($scope,$rootScope,ImageService){
+		$scope.options = {};
+		$scope.options.search_type = 'id';
+
+		$scope.change_type = function(id){
+			$scope.options.type = id;
+			query();
+		}
+
+		$scope.change_search_type = function(type){
+			$scope.options.search_type = type;
+		}
+
+		$scope.change_status = function(status){
+			$scope.options.status = status;
+			query();
+		}
+
+		$scope.search = function(e){
+			var keycode = window.event?e.keyCode:e.which;
+			if(keycode == 13){
+				query();
+			}
+		}
+
+		$scope.submit = function(image){
+			console.log(image);
+			ImageService.update(image);
+		}
+
+		$scope.delete = function(image){
+			ImageService.delete(image.id);
+			image.hide = true;
+		}
+
+		function query(page){
+			var _options = _.clone($scope.options);
+			if(page)_options.page = page;
+			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
+			delete _options.search_type;
+			delete _options.keywords;
+			ImageService.list(_options).then(function(data){
+				$scope.list = data;
+			});
+		}
+
+		ImageService.list().then(function(data){
+			$scope.list = data;
+			console.log(data);
+		});
+
+		$scope.pageChange = query;
+	}]);
+
+app.controller('NoticeCtrl',['$scope','$rootScope','NoticeService','$stateParams',
+	function($scope,$rootScope,NoticeService,$stateParams){
+		$scope.options = {};
+		$scope.options.search_type = 'id';
+
+		$scope.change_type = function(id){
+			$scope.options.type = id;
+			query();
+		}
+
+		$scope.change_search_type = function(type){
+			$scope.options.search_type = type;
+		}
+
+		$scope.change_status = function(status){
+			$scope.options.status = status;
+			query();
+		}
+
+		$scope.search = function(e){
+			var keycode = window.event?e.keyCode:e.which;
+			if(keycode == 13){
+				query();
+			}
+		}
+
+		function query(page){
+			var _options = _.clone($scope.options);
+			if(page)_options.page = page;
+			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
+			delete _options.search_type;
+			delete _options.keywords;
+			NoticeService.list(_options).then(function(data){
+				$scope.list = data;
+			});
+		}
+		if($stateParams.id){
+			$scope.options.search_type = 'tid';
+			$scope.options.keywords = $stateParams.id;
+			query();	
+		}else{
+			query();
+		}
 		
-	}]);
 
-app.controller('VideoCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
+		$scope.pageChange = query;
 
-	}]);
+		$scope.change_notice_status = function(notice,status){
+			notice.status = status;
+			NoticeService.update(notice);
+		}
 
-app.controller('ImageCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
-
-	}]);
-
-app.controller('NoticeCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
-		
-	}]);
-
-app.controller('NoticeEditCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
+		$scope.delete = function(cream){
+			NoticeService.delete(cream.id);
+			cream.hide = true;
+		}
 
 	}]);
 
-app.controller('RecExamineCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
+app.controller('NoticeEditCtrl',['$scope','$rootScope','$filter','NoticeService','$stateParams',
+	function($scope,$rootScope,$filter,NoticeService,$stateParams){
+		NoticeService.info($stateParams.id).then(function(info){
+			console.log(info);
+			$scope.notice = info;
+			$scope.notice.create_time = $filter('dateTime')($scope.notice.create_at);
+		});
 
+		$scope.submit = function(){
+			$scope.notice.create_at = $filter('toUnix')($scope.notice.create_time);
+			NoticeService.update($scope.notice);
+		}
 	}]);
 
-app.controller('ErrorReportCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
+app.controller('RecExamineCtrl',['$scope','$rootScope','GamerecService',
+	function($scope,$rootScope,GamerecService){
+		$scope.options = {};
+		$scope.options.search_type = 'id';
 
+		$scope.change_type = function(id){
+			$scope.options.type = id;
+			query();
+		}
+
+		$scope.change_search_type = function(type){
+			$scope.options.search_type = type;
+		}
+
+		$scope.change_status = function(status){
+			$scope.options.status = status;
+			query();
+		}
+
+		$scope.search = function(e){
+			var keycode = window.event?e.keyCode:e.which;
+			if(keycode == 13){
+				query();
+			}
+		}
+
+		function query(page){
+			var _options = _.clone($scope.options);
+			if(page)_options.page = page;
+			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
+			delete _options.search_type;
+			delete _options.keywords;
+			GamerecService.list(_options).then(function(data){
+				$scope.list = data;
+			});
+		}
+
+		GamerecService.list().then(function(data){
+			$scope.list = data;
+			console.log(data);
+		});
+
+		$scope.pageChange = query;
+
+		$scope.change_notice_status = function(notice,status){
+			notice.status = status;
+			GamerecService.update(notice);
+		}
+
+		$scope.delete = function(gamerec){
+			GamerecService.delete(gamerec.id);
+			gamerec.hide = true;
+		}
+
+		$scope.accept = function(gamerec){
+			gamerec.status = 99;
+			GamerecService.update(gamerec);
+		}
+	}]);
+
+app.controller('ErrorReportCtrl',['$scope','$rootScope','GameerrorService',
+	function($scope,$rootScope,GameerrorService){
+		$scope.options = {};
+		$scope.options.search_type = 'id';
+
+		$scope.change_type = function(id){
+			$scope.options.type = id;
+			query();
+		}
+
+		$scope.change_search_type = function(type){
+			$scope.options.search_type = type;
+		}
+
+		$scope.change_status = function(status){
+			$scope.options.status = status;
+			query();
+		}
+
+		$scope.search = function(e){
+			var keycode = window.event?e.keyCode:e.which;
+			if(keycode == 13){
+				query();
+			}
+		}
+
+		function query(page){
+			var _options = _.clone($scope.options);
+			if(page)_options.page = page;
+			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
+			delete _options.search_type;
+			delete _options.keywords;
+			GameerrorService.list(_options).then(function(data){
+				$scope.list = data;
+			});
+		}
+
+		GameerrorService.list().then(function(data){
+			$scope.list = data;
+			console.log(data);
+		});
+
+		$scope.pageChange = query;
+
+		$scope.change_notice_status = function(notice,status){
+			notice.status = status;
+			GameerrorService.update(notice);
+		}
+
+		$scope.delete = function(gamerec){
+			GameerrorService.delete(gamerec.id);
+			gamerec.hide = true;
+		}
 	}]);
 app.directive('gameList',function(){
 	return {
@@ -1172,6 +1575,196 @@ app.service('TagService',['$q',
 					deffered.resolve(data);
 				});
 				return deffered.promise;
+			}
+		}
+	}]);
+
+app.service('CreamService',['$q',
+	function($q){
+		return {
+			list:function(options){
+				var deffered = $q.defer();
+				$.get(ManagePath+'cream/list',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			update:function(cream){
+				var deffered = $q.defer();
+				$.post(ManagePath+'cream/update',cream,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
+			delete:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'cream/delete/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			info:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'cream/info/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			}
+		}
+	}]);
+
+app.service('VideoService',['$q',
+	function($q){
+		return {
+			list:function(options){
+				var deffered = $q.defer();
+				$.get(ManagePath+'video/list',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			update:function(video){
+				var deffered = $q.defer();
+				$.post(ManagePath+'video/update',video,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
+			delete:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'video/delete/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			}
+		}
+	}]);
+
+app.service('ImageService',['$q',
+	function($q){
+		return {
+			list:function(options){
+				var deffered = $q.defer();
+				$.get(ManagePath+'image/list',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			update:function(image){
+				var deffered = $q.defer();
+				$.post(ManagePath+'image/update',image,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
+			delete:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'image/delete/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			}
+		}
+	}]);
+
+app.service('NoticeService',['$q',
+	function($q){
+		return {
+			list:function(options){
+				var deffered = $q.defer();
+				$.get(ManagePath+'notice/list',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			update:function(notice){
+				var deffered = $q.defer();
+				$.post(ManagePath+'notice/update',notice,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
+			delete:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'notice/delete/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			info:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'notice/info/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			}
+		}
+	}]);
+
+app.service('GamerecService',['$q',
+	function($q){
+		return {
+			list:function(options){
+				var deffered = $q.defer();
+				$.get(ManagePath+'gamerec/list',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			update:function(gamerec){
+				var deffered = $q.defer();
+				$.post(ManagePath+'gamerec/update',gamerec,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
+			delete:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'gamerec/delete/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			info:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'gamerec/info/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			}
+		}
+	}]);
+
+app.service('GameerrorService',['$q',
+	function($q){
+		return {
+			list:function(options){
+				var deffered = $q.defer();
+				$.get(ManagePath+'gameerror/list',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			update:function(gameerror){
+				var deffered = $q.defer();
+				$.post(ManagePath+'gameerror/update',gameerror,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
+			delete:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'gameerror/delete/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			info:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'gameerror/info/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
 			}
 		}
 	}]);

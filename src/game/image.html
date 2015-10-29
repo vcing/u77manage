@@ -15,74 +15,72 @@
 				<button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
 					<span ng-if="!options.status && options.status != 0">全部状态</span>
 					<span ng-if="options.status == 99">已发布</span>
-					<span ng-if="options.status == 1">未发布</span>
 					<span ng-if="options.status == 0">未审核</span>
-					<span ng-if="options.status == 3">退稿</span>
 					<span class="caret"></span>
 					<span class="sr-only">Toggle Dropdown</span>
 				</button>
 				<ul class="dropdown-menu" role="menu">
 					<li><a ng-click="change_status()">全部状态</a></li>
 					<li><a ng-click="change_status(99)">已发布</a></li>
-					<li><a ng-click="change_status(1)">未发布</a></li>
 					<li><a ng-click="change_status(0)">未审核</a></li>
-					<li><a ng-click="change_status(3)">退稿</a></li>
 				</ul>
 			</div>
 			<div class="input-group" style="margin:0 10px 10px 0;float:left;width:200px">
 				<div class="input-group-btn">
 					<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
 						<span ng-if="options.search_type == 'id' || !options.search_type">图片ID查询</span>
-						<span ng-if="options.search_type == 'gameid'">游戏ID查询</span>
+						<span ng-if="options.search_type == 'tid'">游戏ID查询</span>
 						<span ng-if="options.search_type == 'userid'">投稿人ID查询</span>
 						<span class="fa fa-caret-down"></span>
 					</button>
 					<ul class="dropdown-menu">
 						<li><a ng-click="change_search_type('id')">ID查询</a></li>
-						<li><a ng-click="change_search_type('gameid')">游戏ID查询</a></li>
+						<li><a ng-click="change_search_type('tid')">游戏ID查询</a></li>
 						<li><a ng-click="change_search_type('userid')">投稿人ID查询</a></li>
 					</ul>
 				</div><!-- /btn-group -->
-				<input type="text" class="form-control" ng-model="options.keywords" ng-keyup="game_search($event)">
+				<input type="text" class="form-control" ng-model="options.keywords" ng-keyup="search($event)">
 			</div>
 		</div>
-		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 ng-scope" ng-show="!tag.hide">
+		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 ng-scope" ng-show="!image.hide" ng-repeat="image in list.data">
 			<div class="box box-primary">
 				<div class="box-header with-border">
-					<img class="img-circle" ng-src="http://img.u77.com/avatar/u77_avatar.jpg" style="width:40px;height:40px;float:left;">
+					<img class="img-circle" ng-src="http://img.u77.com/avatar/{{image.user.avatar}}" style="width:40px;height:40px;float:left;">
 					<span class="username" style="display:block;margin-left:50px">
-						<a href="http://dev.u77.com/user/294536" target="_blank" class="ng-binding">u77_218767</a>
+						<a href="http://dev.u77.com/user/{{image.user.userid}}" target="_blank" ng-bind="image.user.nickname"></a>
 					</span>
-					<span class="description" style="display:block;margin-left:50px">15年08月19日 18:38</span>
+					<span class="description" style="display:block;margin-left:50px">{{image.create_at | dateTime}}</span>
 					<div class="box-tools pull-right">
 					    <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
 					    <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
 					</div>
 				</div><!-- /.box-header -->
 				<div class="box-body" style="display: block;">
-						<!-- <h2 style="text-overflow: ellipsis;overflow: hidden;text-align:center;white-space: nowrap;font-size:20px" title="关于乐译汉化组“出售资源有金钱上限的问题">关于乐译汉化组“出售资源有金钱上限的问题</h2> -->
-					<!-- <input type="text" class="form-control" placeholder="标题" value="关于乐译汉化组“出售资源有金钱上限的问题"> -->
-					<img class="img-responsive" ng-src="http://img.u77.com/ugame/201509/a683d5f94f16a6d6.jpg">
+					<a href="{{image.img}}" target="_blank">
+						<img class="img-responsive" ng-src="{{image.img}}">
+					</a>
 				</div><!-- /.box-body -->
 				<div class="box-footer no-padding" style="display: block;">
 				  <ul class="nav nav-pills nav-stacked">
 				    <li>
-				    	<a href="{{Path+'/game/5745'}}" style="text-align:center;">冒险与挖矿</a>
+				    	<a href="{{Path+'/game/'+image.game.id}}" target="_blank" style="text-align:center;" ng-bind="image.game.title"></a>
 				    </li>
 				    <li>
 				    	<div class="form-group" style="text-align:center;margin:0">
-							<a class="btn btn-sm btn-success" ng-click="game.status=99">已发布</a>
-							<a class="btn" ng-click="game.status=1">未发布</a>
-							<a class="btn" ng-click="game.status=0">未审核</a>
+							<a class="btn" ng-click="image.status = 99" ng-class="{true:'btn-sm btn-success'}[image.status == 99]">已发布</a>
+							<a class="btn" ng-click="image.status = 0" ng-class="{true:'btn-sm btn-success'}[image.status == 0]">未审核</a>
 						</div>
 				    </li>
 				    <li><a style="text-align:right">
-				    	<span class="btn btn-danger" ng-click="delete_tag(tag)">删除</span>
-				    	<span class="btn btn-primary" ng-click="submit(tag)">提交</span>
+				    	<span class="btn btn-danger" ng-click="delete(image)">删除</span>
+				    	<span class="btn btn-primary" ng-click="submit(image)">提交</span>
 				    </a></li>
 				  </ul>
 				</div><!-- /.footer -->
 			</div>
+		</div>
+		<div class="col-xs-12">
+			<div nav-pager='list' page-change="pageChange"></div>
 		</div>
 	</div>
 </section>
