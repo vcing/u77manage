@@ -93,6 +93,15 @@ app.config(['$stateProvider','$urlRouterProvider',
 					}
 				}
 			})
+			.state('base.relation',{
+				url:'/game/relation/:id',
+				views:{
+					'content':{
+						templateUrl:'game/relation.html',
+						controller:'RelationCtrl'
+					}
+				}
+			})
 			.state('base.tag',{
 				url:'/tag',
 				views:{
@@ -278,6 +287,106 @@ app.controller('ListReportCtrl',['$scope','$rootScope','ReportService',
 				$scope.reportList = data.data;
 			});
 		}		
+	}]);
+
+
+// const IS_SYSTEM			= 1;
+// const IS_NOTICE			= 2;
+// const IS_PM 			= 3;
+
+// const FLAG_MIN          = 99;
+
+// const HAS_MESSAGE 		= 99;		// has message
+
+// const M_AT              = 100;		// at
+// const M_COMMENT_REPLY   = 101;		// comment
+// const M_COMMENT_SUPPORT = 102;		// support
+// const M_POST_COMMENT    = 103;		// post comment 
+// const M_POST_SUPPORT    = 104;		// post support
+
+// const N_PUBLISH         = 105;		// publish
+// const N_POST            = 106;		// post
+// const N_VIDEO           = 107;		// video
+// const N_REPORT          = 108;		// report
+
+// const FLAG_MAX          = 200;
+app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options','MessageService',
+	function($scope,$rootScope,$uibModalInstance,options,MessageService){
+		$scope.options = options;
+
+		$scope.typeOptions = [{
+			label:'游戏审核通知',
+			id:105
+		},{
+			label:'精华审核通知',
+			id:106,
+		},{
+			label:'视频审核通知',
+			id:107
+		},{
+			label:'评论删除通知',
+			id:108
+		}];
+
+		var userid;
+		switch($scope.options.type){
+			case 105:
+				userid = $scope.options.content.userid;
+				break;
+			case 106:
+				userid = $scope.options.content.userid;
+				break;
+			case 107:
+				userid = $scope.options.content.userid;
+				break;
+			case 108:
+				userid = $scope.options.content.userid;
+				break;
+		}
+
+		$scope.cancel = function () {
+			$uibModalInstance.dismiss('cancel');
+		};
+
+		$scope.submit = function(){
+
+			var content = '';
+			
+			switch($scope.options.type){
+				case 105:
+					content += "你投稿的游戏 <a href='"+($scope.options.status ? "/game/"+$scope.options.content.id : "javascript:;")+"' target='_blank'>";
+					content += $scope.options.content.title+"</a>";
+					content += " 审核"+($scope.options.status ? "通过" : "未通过");
+					content += $scope.options.status ? '' : " 原因:"+$scope.options.cause;
+					content += '<a class="fr" href="/account/publish?game">查看投稿</a>';
+					break;
+				case 106:
+					content += "你投稿的游戏精华 <a href='"+($scope.options.status ? "/post/"+$scope.options.content.id : "javascript:;")+"' target='_blank'>";
+					content += $scope.options.content.title+"</a>";
+					content += " 审核"+($scope.options.status ? "通过" : "未通过");
+					content += $scope.options.status ? '' : " 原因:"+$scope.options.cause;
+					content += '<a class="fr" href="/account/publish?post">查看投稿</a>';
+					break;
+				case 107:
+					content += "你在 <a href='"+"/game/"+$scope.options.content.game.id+"' target='_blank'>"+$scope.options.content.game.title+"</a>";
+					content += "投稿的视频 <a href='/video/"+$scope.options.content.id+"' target='_blank'>"+$scope.options.content.title+"</a>";
+					content += "审核"+($scope.options.status ? "通过" : "未通过");
+					break;
+			}
+
+			var _options = {
+				istype:1,
+				mtype:$scope.options.type,
+				userid:userid,
+				users:'',
+				content:content
+			}
+			console.log(_options);
+			MessageService.send(_options).then(function(data){
+				$uibModalInstance.close($scope.options);
+			});
+		}
+
 	}]);
 app.directive('mainSidebar',function(){
 	return {
@@ -732,6 +841,55 @@ app.service('UploadService',['Upload','$q',
 			}
 		}
 	}]);
+
+
+// const IS_SYSTEM			= 1;
+// const IS_NOTICE			= 2;
+// const IS_PM 			= 3;
+
+// const FLAG_MIN          = 99;
+
+// const HAS_MESSAGE 		= 99;		// has message
+
+// const M_AT              = 100;		// at
+// const M_COMMENT_REPLY   = 101;		// comment
+// const M_COMMENT_SUPPORT = 102;		// support
+// const M_POST_COMMENT    = 103;		// post comment 
+// const M_POST_SUPPORT    = 104;		// post support
+
+// const N_PUBLISH         = 105;		// publish
+// const N_POST            = 106;		// post
+// const N_VIDEO           = 107;		// video
+// const N_REPORT          = 108;		// report
+
+// const FLAG_MAX          = 200;
+app.service('MessageService',['$q','$uibModal',
+	function($q,$uibModal){
+		return {
+			create:function(options){
+				var modalInstance = $uibModal.open({
+					animation:true,
+					templateUrl:'base/message.html',
+					controller:'MessageCtrl',
+					size:'md',
+					resolve:{
+						options:function(){
+							return options;
+						}
+					}
+				});
+
+				return modalInstance.result;
+			},
+			send:function(options){
+				var deffered = $q.defer();
+				$.post(ManagePath+'message/create',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			}
+		}
+	}]);
 app.controller('CommentCtrl',['$scope','$rootScope','$stateParams',
 	function($scope,$rootScope,$stateParams){
 		console.log($stateParams);
@@ -849,9 +1007,22 @@ app.controller('DashboardCtrl',['$scope','$rootScope',
 	function($scope,$rootScope){
 
 	}]);
-app.controller('SingleGameCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
-
+app.controller('SingleGameCtrl',['$scope','$rootScope','MessageService',
+	function($scope,$rootScope,MessageService){
+		$scope.sendBack = function(game){
+			var options = {
+				content:game,
+				type:105,
+				status:false
+			}
+			MessageService.create(options).then(function(data){
+				if(data.status === false){
+					game.status = 3;
+					$.post(ManagePath+'game/update',game,function(data){
+					});
+				}
+			});
+		}
 	}]);
 
 app.controller('ListGameCtrl',['$scope','$rootScope','GameService',
@@ -972,8 +1143,8 @@ app.controller('GameNewCtrl',['$scope','$rootScope','GameService','UploadService
 		}
 	}]);
 
-app.controller('GameEditCtrl',['$scope','$rootScope','GameService','$stateParams','UploadService','$state','$filter',
-	function($scope,$rootScope,GameService,$stateParams,UploadService,$state,$filter){
+app.controller('GameEditCtrl',['$scope','$rootScope','GameService','$stateParams','UploadService','$state','$filter','MessageService',
+	function($scope,$rootScope,GameService,$stateParams,UploadService,$state,$filter,MessageService){
 		$scope.game_types = [
 			{id:1,label:'web'},
 			{id:2,label:'PC'},
@@ -1045,15 +1216,37 @@ app.controller('GameEditCtrl',['$scope','$rootScope','GameService','$stateParams
 		});
 
 		$scope.submit = function(){
-			// $scope.game.update_at = moment($scope.game.update_at,"YYYY/MM/DD H:mm:SS").unix();
-			$scope.game.create_at = $filter('toUnix')($scope.game.create_time);
-			console.log($scope.game.update_at);
-			delete $scope.game.create_time;
-			$.post(ManagePath+'game/update',$scope.game,function(data){
-				if(data == $scope.game.id){
-					$state.go('base.gameList');	
+			if($scope.game.status == 99){
+				pass($scope.game,function(){
+					$scope.game.create_at = $filter('toUnix')($scope.game.create_time);
+					delete $scope.game.create_time;
+					$.post(ManagePath+'game/update',$scope.game,function(data){
+						if(data == $scope.game.id){
+							$state.go('base.gameList');	
+						}
+					});
+				});
+			}else{
+				$scope.game.create_at = $filter('toUnix')($scope.game.create_time);
+				delete $scope.game.create_time;
+				$.post(ManagePath+'game/update',$scope.game,function(data){
+					if(data == $scope.game.id){
+						$state.go('base.gameList');	
+					}
+				});
+			}
+		}
+
+		var pass = function(game,fn){
+			var options = {
+				content:game,
+				type:105,
+				status:true
+			}
+			MessageService.create(options).then(function(data){
+				if(data.status === true){
+					fn();
 				}
-				
 			});
 		}
 	}]);
@@ -1129,8 +1322,8 @@ app.controller('TagCtrl',['$scope','$rootScope','TagService',
 		}
 	}]);
 
-app.controller('CreamCtrl',['$scope','$rootScope','CreamService',
-	function($scope,$rootScope,CreamService){
+app.controller('CreamCtrl',['$scope','$rootScope','CreamService','MessageService',
+	function($scope,$rootScope,CreamService,MessageService){
 		$scope.options = {};
 		$scope.options.search_type = 'id';
 
@@ -1174,8 +1367,15 @@ app.controller('CreamCtrl',['$scope','$rootScope','CreamService',
 		$scope.pageChange = query;
 
 		$scope.change_cream_status = function(cream,status){
-			cream.status = status;
-			CreamService.update(cream);
+			if(status == 3){
+				sendBack(cream);
+			}else if(status == 99){
+				pass(cream);
+			}else{
+				cream.status = status;
+				CreamService.update(cream);	
+			}
+			
 		}
 
 		$scope.delete = function(cream){
@@ -1183,10 +1383,38 @@ app.controller('CreamCtrl',['$scope','$rootScope','CreamService',
 			cream.hide = true;
 		}
 
+		var pass = function(cream){
+			var options = {
+				content:cream,
+				type:106,
+				status:true
+			}
+			MessageService.create(options).then(function(data){
+				if(data.status === true){
+					cream.status = 99;
+					CreamService.update(cream);
+				}
+			});
+		}
+
+		var sendBack = function(cream){
+			var options = {
+				content:cream,
+				type:106,
+				status:false
+			}
+			MessageService.create(options).then(function(data){
+				if(data.status === false){
+					cream.status = 3;
+					CreamService.update(cream);
+				}
+			});
+		}
+
 	}]);
 
-app.controller('CreamEditCtrl',['$scope','$rootScope','$stateParams','CreamService','$filter',
-	function($scope,$rootScope,$stateParams,CreamService,$filter){
+app.controller('CreamEditCtrl',['$scope','$rootScope','$state','$stateParams','CreamService','$filter','MessageService',
+	function($scope,$rootScope,$state,$stateParams,CreamService,$filter,MessageService){
 		CreamService.info($stateParams.id).then(function(info){
 			console.log(info);
 			$scope.cream = info;
@@ -1194,13 +1422,49 @@ app.controller('CreamEditCtrl',['$scope','$rootScope','$stateParams','CreamServi
 		});
 
 		$scope.submit = function(){
-			$scope.cream.create_at = $filter('toUnix')($scope.cream.create_time);
-			CreamService.update($scope.cream);
+			if($scope.cream.status == 99){
+				pass($scope.cream);
+			}else{
+				sendBack($scope.cream);
+			}
+		}
+
+
+		var pass = function(cream){
+			var options = {
+				content:cream,
+				type:106,
+				status:true
+			}
+			MessageService.create(options).then(function(data){
+				if(data.status === true){
+					$scope.cream.create_at = $filter('toUnix')($scope.cream.create_time);
+					CreamService.update($scope.cream).then(function(){
+						$state.go('base.cream');
+					});
+				}
+			});
+		}
+
+		var sendBack = function(cream){
+			var options = {
+				content:cream,
+				type:106,
+				status:false
+			}
+			MessageService.create(options).then(function(data){
+				if(data.status === false){
+					$scope.cream.create_at = $filter('toUnix')($scope.cream.create_time);
+					CreamService.update($scope.cream).then(function(){
+						$state.go('base.cream');
+					});
+				}
+			});
 		}
 	}]);
 
-app.controller('VideoCtrl',['$scope','$rootScope','VideoService',
-	function($scope,$rootScope,VideoService){
+app.controller('VideoCtrl',['$scope','$rootScope','VideoService','MessageService',
+	function($scope,$rootScope,VideoService,MessageService){
 		$scope.options = {};
 		$scope.options.search_type = 'id';
 
@@ -1226,12 +1490,21 @@ app.controller('VideoCtrl',['$scope','$rootScope','VideoService',
 		}
 
 		$scope.submit = function(video){
-			VideoService.update(video);
+			if(video.status == 1){
+				pass(video,function(){
+					VideoService.update(video);		
+				});
+			}else{
+				VideoService.update(video);	
+			}
+			
 		}
 
 		$scope.delete = function(video){
-			VideoService.delete(video.id);
-			video.hide = true;
+			_delete(video,function(){
+				VideoService.delete(video.id);
+				video.hide = true;
+			});
 		}
 
 		function query(page){
@@ -1242,6 +1515,32 @@ app.controller('VideoCtrl',['$scope','$rootScope','VideoService',
 			delete _options.keywords;
 			VideoService.list(_options).then(function(data){
 				$scope.list = data;
+			});
+		}
+
+		var pass = function(video,fn){
+			var options = {
+				content:video,
+				type:107,
+				status:true
+			}
+			MessageService.create(options).then(function(data){
+				if(data.status === true){
+					fn();
+				}
+			});
+		}
+
+		var _delete = function(video,fn){
+			var options = {
+				content:video,
+				type:107,
+				status:false
+			}
+			MessageService.create(options).then(function(data){
+				if(data.status === false){
+					fn();
+				}
 			});
 		}
 
@@ -1495,6 +1794,44 @@ app.controller('ErrorReportCtrl',['$scope','$rootScope','GameerrorService',
 			gamerec.hide = true;
 		}
 	}]);
+
+app.controller('RelationCtrl',['$scope','$rootScope','$stateParams','GameService',
+	function($scope,$rootScope,$stateParams,GameService){
+
+		GameService.relationGame($stateParams.id).then(function(data){
+			$scope.gameList = data;
+		});
+
+		$scope.relate = function(){
+			var options = {
+				gameid:$stateParams.id,
+				ids:$scope.relate_input
+			}
+			GameService.relation(options).then(function(data){
+				if(data == '1'){
+					alert("合并成功");
+					$scope.relate_input = '';
+				}else{
+					alert('合并失败,请重试');
+				}
+			});
+		}
+
+		$scope.mergy = function(){
+			var options = {
+				id:$stateParams.id,
+				dirid:$scope.mergy_input
+			}
+			GameService.mergy(options).then(function(data){
+				if(data == $scope.mergy_input){
+					alert('合并成功');
+					$scope.mergy_input = '';
+				}else{
+					alert('合并失败,请重试');
+				}
+			});	
+		}
+	}]);
 app.directive('gameList',function(){
 	return {
 		restrict:'A',
@@ -1531,6 +1868,27 @@ app.service('GameService',['$q',
 			list:function(options){
 				var deffered = $q.defer();
 				$.get(ManagePath+'game/list',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			mergy:function(options){
+				var deffered = $q.defer();
+				$.post(ManagePath+'game/merge',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			relation:function(options){
+				var deffered = $q.defer();
+				$.post(ManagePath+'game/relation',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			relationGame:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'game/relationgame/'+id,function(data){
 					deffered.resolve(data);
 				});
 				return deffered.promise;

@@ -93,6 +93,15 @@ app.config(['$stateProvider','$urlRouterProvider',
 					}
 				}
 			})
+			.state('base.relation',{
+				url:'/game/relation/:id',
+				views:{
+					'content':{
+						templateUrl:'game/relation.html',
+						controller:'RelationCtrl'
+					}
+				}
+			})
 			.state('base.tag',{
 				url:'/tag',
 				views:{

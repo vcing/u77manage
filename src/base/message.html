@@ -1,0 +1,22 @@
+<div class="modal-header">
+	<h3 class="modal-title" >发送系统消息</h3>
+</div>
+<div class="modal-body">
+	<div class="from-group">
+		<label>类型:</label>
+		<select class="form-control" ng-options="type.id as type.label for type in typeOptions" ng-model="options.type"></select>
+	</div>
+	<div class="form-group" style="text-align:center;margin:0;margin-top:20px" ng-if="options.type == 105 || options.type == 106 || options.type == 107">
+		<label>状态:</label>
+		<a class="btn" ng-click="options.status = true" ng-class="{true:'btn-success'}[options.status]">通过</a>
+		<a class="btn" ng-click="options.status = false" ng-class="{false:'btn-warning'}[options.status]">未通过</a>
+	</div>
+	<div class="form-group" ng-if="!options.status && (options.type == 105 || options.type == 106)">
+		<label>原因:</label>
+		<input type="text" class="form-control" placeholder="请输入退稿详细原因." ng-model="options.cause">
+	</div>
+</div>
+<div class="modal-footer">
+	<button class="btn btn-primary" type="button" ng-click="submit()">发送</button>
+	<button class="btn btn-warning" type="button" ng-click="cancel()">取消</button>
+</div>

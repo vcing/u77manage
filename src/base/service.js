@@ -182,3 +182,52 @@ app.service('UploadService',['Upload','$q',
 			}
 		}
 	}]);
+
+
+// const IS_SYSTEM			= 1;
+// const IS_NOTICE			= 2;
+// const IS_PM 			= 3;
+
+// const FLAG_MIN          = 99;
+
+// const HAS_MESSAGE 		= 99;		// has message
+
+// const M_AT              = 100;		// at
+// const M_COMMENT_REPLY   = 101;		// comment
+// const M_COMMENT_SUPPORT = 102;		// support
+// const M_POST_COMMENT    = 103;		// post comment 
+// const M_POST_SUPPORT    = 104;		// post support
+
+// const N_PUBLISH         = 105;		// publish
+// const N_POST            = 106;		// post
+// const N_VIDEO           = 107;		// video
+// const N_REPORT          = 108;		// report
+
+// const FLAG_MAX          = 200;
+app.service('MessageService',['$q','$uibModal',
+	function($q,$uibModal){
+		return {
+			create:function(options){
+				var modalInstance = $uibModal.open({
+					animation:true,
+					templateUrl:'base/message.html',
+					controller:'MessageCtrl',
+					size:'md',
+					resolve:{
+						options:function(){
+							return options;
+						}
+					}
+				});
+
+				return modalInstance.result;
+			},
+			send:function(options){
+				var deffered = $q.defer();
+				$.post(ManagePath+'message/create',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			}
+		}
+	}]);

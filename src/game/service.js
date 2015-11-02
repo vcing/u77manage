@@ -17,6 +17,27 @@ app.service('GameService',['$q',
 					deffered.resolve(data);
 				});
 				return deffered.promise;
+			},
+			mergy:function(options){
+				var deffered = $q.defer();
+				$.post(ManagePath+'game/merge',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			relation:function(options){
+				var deffered = $q.defer();
+				$.post(ManagePath+'game/relation',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			relationGame:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'game/relationgame/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
 			}
 		}
 	}]);
