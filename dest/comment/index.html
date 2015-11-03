@@ -1,1 +1,96 @@
-index.html
+<section class="content-header">
+	<h1>
+		评论
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+		<li class="active">评论</li>
+	</ol>
+</section>
+<section class="content-header">
+	<div class="row">
+		<div class="col-xs-12" style="margin:15px 0">
+			<div class="btn-group" style="margin:0 10px 10px 0;float:left">
+				<button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+					<span ng-if="!options.type && options.type != 0">全部类型</span>
+					<span ng-if="options.type == 1">游戏评论</span>
+					<span ng-if="options.type == 4">精华评论</span>
+					<span ng-if="options.type == 2">文章评论</span>
+					<span class="caret"></span>
+					<span class="sr-only">Toggle Dropdown</span>
+				</button>
+				<ul class="dropdown-menu" role="menu">
+					<li><a ng-click="change_status()">全部类型</a></li>
+					<li><a ng-click="change_status(1)">游戏评论</a></li>
+					<li><a ng-click="change_status(4)">精华评论</a></li>
+					<li><a ng-click="change_status(2)">文章评论</a></li>
+				</ul>
+			</div>
+			<div class="input-group" style="margin:0 10px 10px 0;float:left;width:200px">
+				<div class="input-group-btn">
+					<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
+						<span ng-if="options.search_type == 'id' || !options.search_type">评论ID查询</span>
+						<span ng-if="options.search_type == 'tid'">主体ID查询</span>
+						<span ng-if="options.search_type == 'sender'">用户ID查询</span>
+						<span class="fa fa-caret-down"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a ng-click="change_search_type('id')">评论ID查询</a></li>
+						<li><a ng-click="change_search_type('tid')">主体ID查询</a></li>
+						<li><a ng-click="change_search_type('sender')">用户ID查询</a></li>
+					</ul>
+				</div><!-- /btn-group -->
+				<input type="text" class="form-control" ng-model="options.keywords" ng-keyup="search($event)">
+			</div>
+			<div class="input-group" style="max-width:300px">
+				<input type="text" class="form-control" ng-model="userid" placeholder="用户ID">
+				<div class="input-group-btn">
+					<button type="button" class="btn btn-danger" ng-click="deleteByUser()">删除该用户所有评论.</button>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" ng-show="!comment.hide" ng-repeat="comment in list.data">
+			<div class="box box-widget">
+				<div class="box-header with-border">
+					<div class="user-block">
+						<img class="img-circle" ng-src="http://img.u77.com/avatar/{{comment.user.avatar}}" alt="User Image">
+						<span class="username"><a href="{{Path}}/user/{{comment.user.userid}}" ng-bind="comment.user.nickname"></a></span>
+						<a class="description" href="{{Path+'/comment/'+comment.id+'#comment'}}" target="_blank" ng-bind="comment.create_at | dateTime"></a>
+					</div>
+					<div class="box-tools">
+						<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+						<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+					</div>
+				</div>
+				<div class="box-body with-border">
+					<div style="height:100px;overflow:auto" ng-bind-html="comment.content.content | to_trusted"></div>
+					<div class="attachment-block clearfix" ng-if="comment.body">
+						<img class="attachment-img" ng-src="{{comment.body.image}}" alt="attachment image" style="width:100px;height:57px" ng-if="comment.body.image">
+						<img class="attachment-img" ng-src="{{comment.body.game.image}}" alt="attachment image" style="width:100px;height:57px" ng-if="comment.body.game.image">
+						<div class="attachment-pushed">
+							<h4 class="attachment-heading" ng-if="comment.type == 1">
+								<a href="{{Path+'/game/'+comment.body.id}}" target="_blank" ng-bind="comment.body.title" style="display: inline-block;text-overflow: ellipsis;overflow: hidden;white-space: nowrap;max-width: 100%;"></a>
+							</h4>
+							<h4 class="attachment-heading" ng-if="comment.type == 2">
+								<a href="{{Path+'/post/'+comment.body.id}}" target="_blank" ng-bind="comment.body.title" style="display: inline-block;text-overflow: ellipsis;overflow: hidden;white-space: nowrap;max-width: 100%;"></a>
+							</h4>
+							<div class="attachment-text" ng-if="comment.type == 1">
+								首次推荐于<br><span>{{comment.body.create_at | time}}</span>
+							</div><!-- /.attachment-text -->
+							<div class="attachment-text" ng-if="comment.type == 2">
+								发表于 <a href="{{Path+'/game/'+comment.body.game.id}}" target="_blank">{{comment.body.game.title}}</a><br>
+								的精华文章
+							</div><!-- /.attachment-text -->
+						</div><!-- /.attachment-pushed -->
+					</div>
+				</div>
+				<div class="box-footer">
+					<button class="btn btn-warning btn-xs" ng-click="delete(comment)"><i class="fa fa-times"></i> 删除</button>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-12">
+			<div nav-pager='list' page-change="pageChange"></div>
+		</div>
+	</div>
+</section>

@@ -251,13 +251,101 @@ app.run(['$rootScope','$state',
 
 // ---------------------------------------------------------------------------------------------
 
+app.controller('CommentCtrl',['$scope','$rootScope','$stateParams','CommentService',
+	function($scope,$rootScope,$stateParams,CommentService){
+		$scope.options = {};
+		$scope.options.search_type = 'id';
+
+		$scope.change_type = function(id){
+			$scope.options.type = id;
+			query();
+		}
+
+		$scope.change_search_type = function(type){
+			$scope.options.search_type = type;
+		}
+
+		$scope.change_status = function(status){
+			$scope.options.type = status;
+			query();
+		}
+
+		$scope.search = function(e){
+			var keycode = window.event?e.keyCode:e.which;
+			if(keycode == 13){
+				query();
+			}
+		}
+
+		function query(page){
+			var _options = _.clone($scope.options);
+			if(page)_options.page = page;
+			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
+			delete _options.search_type;
+			delete _options.keywords;
+			CommentService.list(_options).then(function(data){
+				$scope.list = data;
+			});
+		}
+
+		CommentService.list().then(function(data){
+			$scope.list = data;
+			console.log(data);
+		});
+
+		$scope.pageChange = query;
+
+		$scope.change_notice_status = function(comment,status){
+			comment.status = status;
+			CommentService.update(comment);
+		}
+
+		$scope.delete = function(comment){
+			CommentService._delete(comment.id);
+			comment.content.content = "该评论已删除";
+			// comment.hide = true;
+		}
+
+
+		$scope.deleteByUser = function(){
+			if(confirm('该操作会删除该用户的所有评论! \r\n 确认执行吗？')){
+				CommentService.deleteByUser($scope.userid);	
+			}
+		}
+	}]);
+app.service('CommentService',['$q',
+	function($q){
+		return {
+			list:function(options){
+				var deffered = $q.defer();
+				$.get(ManagePath + 'comment/list',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			_delete:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath + 'comment/delete/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
+			deleteByUser:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath + 'comment/deletebyuser/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			}
+		}
+	}]);
 app.controller('BaseCtrl',['$scope','$rootScope',
 	function($scope,$rootScope){
 
 	}]);
 
-app.controller('SingleReportCtrl',['$scope','$rootScope','ReportService',
-	function($scope,$rootScope,ReportService){
+app.controller('SingleReportCtrl',['$scope','$rootScope','ReportService','MessageService',
+	function($scope,$rootScope,ReportService,MessageService){
 		$scope.ignore = function(report){
 			ReportService.ignore(report.id).then(function(done){
 				if(done){
@@ -268,14 +356,34 @@ app.controller('SingleReportCtrl',['$scope','$rootScope','ReportService',
 			});
 		}
 
+			
 		$scope.accept = function(report){
-			ReportService.accept(report.id).then(function(done){
-				if(done){
-					report.hide = true;
-				}else{
-					alert('操作失败,请重试.');
+			if(report.t_type == 1){
+				var options = {
+					content:report,
+					type:108,
+					status:false
 				}
-			});
+				MessageService.create(options).then(function(data){
+					if(data.status === false){
+						ReportService.accept(report.id).then(function(done){
+							if(done){
+								report.hide = true;
+							}else{
+								alert('操作失败,请重试.');
+							}
+						});
+					}
+				});	
+			}else{
+				ReportService.accept(report.id).then(function(done){
+					if(done){
+						report.hide = true;
+					}else{
+						alert('操作失败,请重试.');
+					}
+				});
+			}
 		}
 	}]);
 
@@ -310,10 +418,9 @@ app.controller('ListReportCtrl',['$scope','$rootScope','ReportService',
 // const N_REPORT          = 108;		// report
 
 // const FLAG_MAX          = 200;
-app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options','MessageService',
-	function($scope,$rootScope,$uibModalInstance,options,MessageService){
+app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options','MessageService','$filter',
+	function($scope,$rootScope,$uibModalInstance,options,MessageService,$filter){
 		$scope.options = options;
-
 		$scope.typeOptions = [{
 			label:'游戏审核通知',
 			id:105
@@ -340,7 +447,7 @@ app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options
 				userid = $scope.options.content.userid;
 				break;
 			case 108:
-				userid = $scope.options.content.userid;
+				userid = $scope.options.content.content.sender;
 				break;
 		}
 
@@ -372,6 +479,10 @@ app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options
 					content += "投稿的视频 <a href='/video/"+$scope.options.content.id+"' target='_blank'>"+$scope.options.content.title+"</a>";
 					content += "审核"+($scope.options.status ? "通过" : "未通过");
 					break;
+				case 108:
+					content += "您发表的"+($scope.options.content.content.type == 1 ? '游戏评论' : $scope.options.content.content.type == 2 ? '文章评论' : '精华评论');
+					content += $scope.options.content.content.content.content;
+					content += "被管理员删除";
 			}
 
 			var _options = {
@@ -381,7 +492,6 @@ app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options
 				users:'',
 				content:content
 			}
-			console.log(_options);
 			MessageService.send(_options).then(function(data){
 				$uibModalInstance.close($scope.options);
 			});
@@ -682,15 +792,15 @@ app.service('ReportService',['$q',
 				return deffered.promise;
 			},
 			accept:function(id){
-				$.get(ManagePath+'report/accept'+id,function(data){
-					var deffered = $q.defer();
+				var deffered = $q.defer();
+				$.get(ManagePath+'report/delete/'+id,function(data){
 					if(data != 1){
 						deffered.resolve(false);
 					}else{
 						deffered.resolve(true);
 					}
-					return deffered.promise;
 				});
+				return deffered.promise;
 			}
 		}
 	}]);
@@ -890,10 +1000,6 @@ app.service('MessageService',['$q','$uibModal',
 			}
 		}
 	}]);
-app.controller('CommentCtrl',['$scope','$rootScope','$stateParams',
-	function($scope,$rootScope,$stateParams){
-		console.log($stateParams);
-	}]);
 app.controller('BigEyeCtrl',['$scope','$rootScope','UploadService',
 	function($scope,$rootScope,UploadService){
 		$scope.list = [];
@@ -1003,10 +1109,6 @@ app.service('DailyGameVilidService',['$http','$q','GameService',
 	}]);
 
 
-app.controller('DashboardCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
-
-	}]);
 app.controller('SingleGameCtrl',['$scope','$rootScope','MessageService',
 	function($scope,$rootScope,MessageService){
 		$scope.sendBack = function(game){
@@ -1018,6 +1120,8 @@ app.controller('SingleGameCtrl',['$scope','$rootScope','MessageService',
 			MessageService.create(options).then(function(data){
 				if(data.status === false){
 					game.status = 3;
+					delete game.content.$$hashKey;
+					delete game.$$hashKey;
 					$.post(ManagePath+'game/update',game,function(data){
 					});
 				}
@@ -2216,4 +2320,8 @@ app.controller('TagsListCtrl',['$scope','TagService',
 				$scope.tagList[data.type - 1].tags.push(data);
 			});
 		});
+	}]);
+app.controller('DashboardCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+
 	}]);

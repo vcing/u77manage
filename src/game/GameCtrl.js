@@ -9,6 +9,8 @@ app.controller('SingleGameCtrl',['$scope','$rootScope','MessageService',
 			MessageService.create(options).then(function(data){
 				if(data.status === false){
 					game.status = 3;
+					delete game.content.$$hashKey;
+					delete game.$$hashKey;
 					$.post(ManagePath+'game/update',game,function(data){
 					});
 				}

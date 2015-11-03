@@ -3,8 +3,8 @@ app.controller('BaseCtrl',['$scope','$rootScope',
 
 	}]);
 
-app.controller('SingleReportCtrl',['$scope','$rootScope','ReportService',
-	function($scope,$rootScope,ReportService){
+app.controller('SingleReportCtrl',['$scope','$rootScope','ReportService','MessageService',
+	function($scope,$rootScope,ReportService,MessageService){
 		$scope.ignore = function(report){
 			ReportService.ignore(report.id).then(function(done){
 				if(done){
@@ -15,14 +15,34 @@ app.controller('SingleReportCtrl',['$scope','$rootScope','ReportService',
 			});
 		}
 
+			
 		$scope.accept = function(report){
-			ReportService.accept(report.id).then(function(done){
-				if(done){
-					report.hide = true;
-				}else{
-					alert('操作失败,请重试.');
+			if(report.t_type == 1){
+				var options = {
+					content:report,
+					type:108,
+					status:false
 				}
-			});
+				MessageService.create(options).then(function(data){
+					if(data.status === false){
+						ReportService.accept(report.id).then(function(done){
+							if(done){
+								report.hide = true;
+							}else{
+								alert('操作失败,请重试.');
+							}
+						});
+					}
+				});	
+			}else{
+				ReportService.accept(report.id).then(function(done){
+					if(done){
+						report.hide = true;
+					}else{
+						alert('操作失败,请重试.');
+					}
+				});
+			}
 		}
 	}]);
 
@@ -57,10 +77,9 @@ app.controller('ListReportCtrl',['$scope','$rootScope','ReportService',
 // const N_REPORT          = 108;		// report
 
 // const FLAG_MAX          = 200;
-app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options','MessageService',
-	function($scope,$rootScope,$uibModalInstance,options,MessageService){
+app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options','MessageService','$filter',
+	function($scope,$rootScope,$uibModalInstance,options,MessageService,$filter){
 		$scope.options = options;
-
 		$scope.typeOptions = [{
 			label:'游戏审核通知',
 			id:105
@@ -87,7 +106,7 @@ app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options
 				userid = $scope.options.content.userid;
 				break;
 			case 108:
-				userid = $scope.options.content.userid;
+				userid = $scope.options.content.content.sender;
 				break;
 		}
 
@@ -119,6 +138,10 @@ app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options
 					content += "投稿的视频 <a href='/video/"+$scope.options.content.id+"' target='_blank'>"+$scope.options.content.title+"</a>";
 					content += "审核"+($scope.options.status ? "通过" : "未通过");
 					break;
+				case 108:
+					content += "您发表的"+($scope.options.content.content.type == 1 ? '游戏评论' : $scope.options.content.content.type == 2 ? '文章评论' : '精华评论');
+					content += $scope.options.content.content.content.content;
+					content += "被管理员删除";
 			}
 
 			var _options = {
@@ -128,7 +151,6 @@ app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options
 				users:'',
 				content:content
 			}
-			console.log(_options);
 			MessageService.send(_options).then(function(data){
 				$uibModalInstance.close($scope.options);
 			});

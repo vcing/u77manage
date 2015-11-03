@@ -23,15 +23,15 @@ app.service('ReportService',['$q',
 				return deffered.promise;
 			},
 			accept:function(id){
-				$.get(ManagePath+'report/accept'+id,function(data){
-					var deffered = $q.defer();
+				var deffered = $q.defer();
+				$.get(ManagePath+'report/delete/'+id,function(data){
 					if(data != 1){
 						deffered.resolve(false);
 					}else{
 						deffered.resolve(true);
 					}
-					return deffered.promise;
 				});
+				return deffered.promise;
 			}
 		}
 	}]);

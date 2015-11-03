@@ -24,7 +24,7 @@
 		</a>
 		<div style="height: 200px;overflow: auto;" ng-bind-html="report.content.content | to_trusted" ng-if="report.t_type != 1"></div>
 		<div style="height: 200px;overflow: auto;" ng-bind-html="report.content.content.content | to_trusted" ng-if="report.t_type == 1"></div>
-		<div class="attachment-block clearfix">
+		<div class="attachment-block clearfix" ng-if="report.t_type != 1">
 			<img class="attachment-img" ng-src="{{report.content.game.image}}" alt="attachment image" style="width:100px;height:57px">
 			<div class="attachment-pushed">
 				<h4 class="attachment-heading"><a href="{{Path+'/game/'+report.content.game.id}}" target="_blank" ng-bind="report.content.game.title" style="display: inline-block;text-overflow: ellipsis;overflow: hidden;white-space: nowrap;max-width: 100%;"></a></h4>
