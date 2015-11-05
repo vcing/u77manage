@@ -12,11 +12,11 @@
 			</div>
 		</div>
 			<!-- search form -->
-		<form action="#" method="get" class="sidebar-form">
+		<form class="sidebar-form">
 			<div class="input-group">
-				<input type="text" name="q" class="form-control" placeholder="Search...">
+				<input type="text" name="q" class="form-control" placeholder="Search..." ng-model="gameId" ng-keyup="searchKeyUp($event)">
 				<span class="input-group-btn">
-					<button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i></button>
+					<button id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i></button>
 				</span>
 			</div>
 		</form>
@@ -77,9 +77,8 @@
 					<i class="fa fa-angle-left pull-right"></i>
 				</a>
 				<ul class="treeview-menu">
-					<li><a href=""><i class="fa fa-circle-o"></i>添加</a></li>
-					<li><a href=""><i class="fa fa-circle-o"></i>列表</a></li>
-					<li><a href=""><i class="fa fa-circle-o"></i>评论</a></li>
+					<li><a ui-sref="base.pageNew"><i class="fa fa-circle-o"></i>添加</a></li>
+					<li><a ui-sref="base.page"><i class="fa fa-circle-o"></i>列表</a></li>
 				</ul>
 			</li>
 			<li>

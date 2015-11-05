@@ -1,6 +1,17 @@
-app.controller('BaseCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
+app.controller('BaseCtrl',['$scope','$rootScope','$state',
+	function($scope,$rootScope,$state){
+		// 主导航搜索
+		$scope.search = function(){
+			$state.go('base.gameEdit',{id:$scope.gameId});
+			$scope.gameId = '';
+		}
 
+		$scope.searchKeyUp = function(e){
+			var keycode = window.event?e.keyCode:e.which;
+			if(keycode == 13){
+				$scope.search();
+			}
+		}
 	}]);
 
 app.controller('SingleReportCtrl',['$scope','$rootScope','ReportService','MessageService',
@@ -17,6 +28,9 @@ app.controller('SingleReportCtrl',['$scope','$rootScope','ReportService','Messag
 
 			
 		$scope.accept = function(report){
+			if(!confirm('确定删除该举报的内容吗?')){
+				return;
+			}
 			if(report.t_type == 1){
 				var options = {
 					content:report,

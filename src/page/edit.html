@@ -1,0 +1,43 @@
+<section class="content-header">
+	<h1>
+		编辑文章
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+		<li>游戏</li>
+		<li>文章</li>
+		<li class="active">编辑文章</li>
+	</ol>
+</section>
+<section class="content">
+	<div class="row form-horizontal">
+		<div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3">
+			<input type="text" class="form-control" placeholder="标题" ng-model="page.title">
+			<div contenteditable="true" style="width:100%;min-height:500px;background:#fff;border:1px solid #ccc;margin-top:20px" ng-model="page.content">
+			</div>
+			<div class="form-group" style="margin-top:20px">
+				<label for="views" class="col-sm-2 control-label">访问量:</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" id="views" ng-model="page.views" placeholder="访问量">
+				</div>
+			</div>
+			<div class="form-group" style="margin-top:20px">
+				<label for="views" class="col-sm-2 control-label">作者ID:</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" id="views" ng-model="page.userid" placeholder="斯巴达:130692">
+				</div>
+			</div>
+			<div class="form-group" style="margin-top:20px">
+				<label for="views" class="col-sm-2 control-label">创建时间:</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" id="views" ng-model="page.create_time" placeholder="格式:2016/08/08 08:08:08">
+				</div>
+			</div>
+			<div class="form-group" style="text-align:center;margin:0;margin-top:20px">
+				<a class="btn" ng-click="page.status = 99" ng-class="{true:'btn-sm btn-success'}[page.status == 99]">已发布</a>
+				<a class="btn" ng-click="page.status = 0" ng-class="{true:'btn-sm btn-success'}[page.status == 0]">未发布</a>
+			</div>
+			<a class="btn btn-primary col-xs-6 col-xs-offset-3" style="margin-top:20px" ng-click="submit()">提交</a>
+		</div>
+	</div>
+</section>

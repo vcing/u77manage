@@ -181,6 +181,13 @@ app.service('NoticeService',['$q',
 				});
 				return deffered.promise;
 			},
+			create:function(notice){
+				var deffered = $q.defer();
+				$.post(ManagePath+'notice/new',notice,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
 			update:function(notice){
 				var deffered = $q.defer();
 				$.post(ManagePath+'notice/update',notice,function(data){

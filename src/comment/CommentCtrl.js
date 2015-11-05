@@ -48,8 +48,10 @@ app.controller('CommentCtrl',['$scope','$rootScope','$stateParams','CommentServi
 		}
 
 		$scope.delete = function(comment){
-			CommentService._delete(comment.id);
-			comment.content.content = "该评论已删除";
+			if(confirm('确定删除改评论?')){
+				CommentService._delete(comment.id);
+				comment.content.content = "该评论已删除";	
+			}
 			// comment.hide = true;
 		}
 

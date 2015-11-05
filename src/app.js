@@ -174,6 +174,15 @@ app.config(['$stateProvider','$urlRouterProvider',
 					}
 				}
 			})
+			.state('base.noticeNew',{
+				url:'/notice/new/:id',
+				views:{
+					'content':{
+						templateUrl:'game/notice-edit.html',
+						controller:'NoticeNewCtrl'
+					}
+				}
+			})
 			.state('base.noticeEdit',{
 				url:'/notice/edit/:id',
 				views:{
@@ -207,6 +216,33 @@ app.config(['$stateProvider','$urlRouterProvider',
 					'content':{
 						templateUrl:'comment/index.html',
 						controller:'CommentCtrl'
+					}
+				}
+			})
+			.state('base.page',{
+				url:'/page',
+				views:{
+					'content':{
+						templateUrl:'page/index.html',
+						controller:'PageCtrl'
+					}
+				}
+			})
+			.state('base.pageNew',{
+				url:'/page/new',
+				views:{
+					'content':{
+						templateUrl:'page/edit.html',
+						controller:'PageNewCtrl'
+					}
+				}
+			})
+			.state('base.pageEdit',{
+				url:'/page/edit/:id',
+				views:{
+					'content':{
+						templateUrl:'page/edit.html',
+						controller:'PageEditCtrl'
 					}
 				}
 			})

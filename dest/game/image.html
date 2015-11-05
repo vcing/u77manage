@@ -41,6 +41,7 @@
 				</div><!-- /btn-group -->
 				<input type="text" class="form-control" ng-model="options.keywords" ng-keyup="search($event)">
 			</div>
+			<button class="btn btn-primary" ng-click="acceptAll()">当前页面全部通过</button>
 		</div>
 		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 ng-scope" ng-show="!image.hide" ng-repeat="image in list.data">
 			<div class="box box-primary">

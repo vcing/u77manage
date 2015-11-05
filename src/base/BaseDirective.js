@@ -122,46 +122,68 @@ app.directive('navPager',function(){
  * @example  
  *   <p contenteditable="true" ng-model="text"></p>  
  */ 
-app.directive('contenteditable', function() {  
-  return {  
-    require: '?ngModel',  
-    link: function(scope, element, attrs, ctrl) {  
+// app.directive('contenteditable', function() {  
+//   return {  
+//     require: '?ngModel',  
+//     link: function(scope, element, attrs, ctrl) {  
    
-      // Do nothing if this is not bound to a model  
-      if (!ctrl) { return; }  
+//       // Do nothing if this is not bound to a model  
+//       if (!ctrl) { return; }  
    
-      // Checks for updates (input or pressing ENTER)  
-      // view -> model  
-      element.bind('input enterKey', function() {  
-        var rerender = false;  
-        var html = element.html();  
+//       // Checks for updates (input or pressing ENTER)  
+//       // view -> model  
+//       element.bind('input enterKey', function() {  
+//         var rerender = false;  
+//         var html = element.html();  
    
-        if (attrs.noLineBreaks) {  
-          html = html.replace(/<div>/g, '').replace(/<br>/g, '').replace(/<\/div>/g, '');  
-          rerender = true;  
-        }  
+//         if (attrs.noLineBreaks) {  
+//           html = html.replace(/<div>/g, '').replace(/<br>/g, '').replace(/<\/div>/g, '');  
+//           rerender = true;  
+//         }  
    
-        scope.$apply(function() {  
-          ctrl.$setViewValue(html);  
-          if(rerender) {  
-            ctrl.$render();  
-          }  
-        });  
-      });  
+//         scope.$apply(function() {  
+//           ctrl.$setViewValue(html);  
+//           if(rerender) {  
+//             ctrl.$render();  
+//           }  
+//         });  
+//       });  
    
-      element.keyup(function(e){  
-        if(e.keyCode === 13){  
-          element.trigger('enterKey');  
-        }  
-      });  
+//       element.keyup(function(e){  
+//         if(e.keyCode === 13){  
+//           element.trigger('enterKey');  
+//         }  
+//       });  
    
-      // model -> view  
-      ctrl.$render = function() {  
-        element.html(ctrl.$viewValue);  
-      };  
+//       // model -> view  
+//       ctrl.$render = function() {  
+//         element.html(ctrl.$viewValue);  
+//       };  
    
-      // load init value from DOM  
-      ctrl.$render();  
-    }  
-  };  
-}); 
+//       // load init value from DOM  
+//       ctrl.$render();  
+//     }  
+//   };  
+// }); 
+
+app.directive('contenteditable', function() {
+        return {
+            require: 'ngModel',
+            link: function(scope, elm, attrs, ctrl) {
+                // view -> model
+                elm.bind('blur', function() {
+                    scope.$apply(function() {
+                        ctrl.$setViewValue(elm.html());
+                    });
+                });
+
+                // model -> view
+                ctrl.$render = function() {
+                    elm.html(ctrl.$viewValue);
+                };
+
+                // load init value from DOM
+                ctrl.$setViewValue(elm.html());
+            }
+        };
+    });

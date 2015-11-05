@@ -242,6 +242,25 @@ app.controller('GameEditCtrl',['$scope','$rootScope','GameService','$stateParams
 				}
 			});
 		}
+
+		$scope.sendBack = function(){
+			var options = {
+				content:$scope.game,
+				type:105,
+				status:false
+			}
+			MessageService.create(options).then(function(data){
+				if(data.status === false){
+					$scope.game.status = 3;
+					$scope.game.create_at = $filter('toUnix')($scope.game.create_time);
+					delete $scope.game.create_time;
+					delete $scope.game.content.$$hashKey;
+					delete $scope.game.$$hashKey;
+					$.post(ManagePath+'game/update',$scope.game,function(data){
+					});
+				}
+			});
+		}
 	}]);
 
 app.controller('TagCtrl',['$scope','$rootScope','TagService',
@@ -538,9 +557,27 @@ app.controller('VideoCtrl',['$scope','$rootScope','VideoService','MessageService
 		}
 
 		VideoService.list().then(function(data){
-			$scope.list = data;
-			console.log(data);
+			$scope.list = format_url(data);
 		});
+
+		function format_url(data){
+			_.forEach(data.data,function(video){
+				if(video.v_type == 1){
+					if(video.origin_url.indexOf('acfun.tv') == -1){
+						video.origin_url = "http://www.acfun.tv"+video.origin_url;
+					}
+				}else if(video.v_type == 2){
+					if(video.origin_url.indexOf('bilibili.com') == -1){
+						video.origin_url = "http://www.bilibili.com"+video.origin_url;
+					}
+				}else if(video.v_type == 3){
+					if(video.origin_url.indexOf('youku.com') == -1){
+						video.origin_url = "http://www.youku.com"+video.origin_url;
+					}
+				}
+			});
+			return data;
+		}
 
 		$scope.pageChange = query;
 	}]);
@@ -571,14 +608,22 @@ app.controller('ImageCtrl',['$scope','$rootScope','ImageService',
 			}
 		}
 
-		$scope.submit = function(image){
-			console.log(image);
+		$scope.submit = function(image,i){
 			ImageService.update(image);
+			if(!i)alert('提交成功');
 		}
 
 		$scope.delete = function(image){
+			if(!confirm('确认删除该图片吗?'))return;
 			ImageService.delete(image.id);
 			image.hide = true;
+		}
+
+		$scope.acceptAll = function(){
+			_.forEach($scope.list.data,function(image){
+				image.status = 99;
+				$scope.submit(image,true);
+			});
 		}
 
 		function query(page){
@@ -600,8 +645,8 @@ app.controller('ImageCtrl',['$scope','$rootScope','ImageService',
 		$scope.pageChange = query;
 	}]);
 
-app.controller('NoticeCtrl',['$scope','$rootScope','NoticeService','$stateParams',
-	function($scope,$rootScope,NoticeService,$stateParams){
+app.controller('NoticeCtrl',['$scope','$rootScope','NoticeService','$stateParams','$state',
+	function($scope,$rootScope,NoticeService,$stateParams,$state){
 		$scope.options = {};
 		$scope.options.search_type = 'id';
 
@@ -650,17 +695,44 @@ app.controller('NoticeCtrl',['$scope','$rootScope','NoticeService','$stateParams
 		$scope.change_notice_status = function(notice,status){
 			notice.status = status;
 			NoticeService.update(notice);
+			alert('操作成功');
 		}
 
 		$scope.delete = function(cream){
+			if(!confirm('确认删除该公告吗?'))return;
 			NoticeService.delete(cream.id);
 			cream.hide = true;
 		}
 
+		$scope.addNotice = function(){
+			if($scope.options.search_type == 'tid' && !isNaN($scope.options.keywords)){
+				$state.go('base.noticeNew',{id:$scope.options.keywords});
+			}else{
+				alert('请选择游戏ID查询并输入ID后 再添加公告');
+			}
+		}
 	}]);
 
-app.controller('NoticeEditCtrl',['$scope','$rootScope','$filter','NoticeService','$stateParams',
-	function($scope,$rootScope,$filter,NoticeService,$stateParams){
+app.controller('NoticeNewCtrl',['$scope','$rootScope','$filter','NoticeService','$stateParams','$state',
+	function($scope,$rootScope,$filter,NoticeService,$stateParams,$state){
+
+		$scope.notice = {
+			tid:$stateParams.id,
+			create_time:moment().format('YYYY/MM/DD HH:mm:ss'),
+		};
+
+		$scope.submit = function(){
+			$scope.notice.create_at = $filter('toUnix')($scope.notice.create_time);
+			$scope.notice.update_at = $scope.notice.create_at;
+			delete $scope.notice.create_time;
+			NoticeService.create($scope.notice);
+			alert('创建成功.');
+			$state.go('base.notice');
+		}
+	}]);
+
+app.controller('NoticeEditCtrl',['$scope','$rootScope','$filter','NoticeService','$stateParams','$state',
+	function($scope,$rootScope,$filter,NoticeService,$stateParams,$state){
 		NoticeService.info($stateParams.id).then(function(info){
 			console.log(info);
 			$scope.notice = info;
@@ -669,7 +741,11 @@ app.controller('NoticeEditCtrl',['$scope','$rootScope','$filter','NoticeService'
 
 		$scope.submit = function(){
 			$scope.notice.create_at = $filter('toUnix')($scope.notice.create_time);
+			$scope.notice.update_at = $scope.notice.create_at;
+			delete $scope.notice.create_time;
 			NoticeService.update($scope.notice);
+			alert('修改成功.');
+			$state.go('base.notice');
 		}
 	}]);
 
@@ -723,6 +799,9 @@ app.controller('RecExamineCtrl',['$scope','$rootScope','GamerecService',
 		}
 
 		$scope.delete = function(gamerec){
+			if(!confirm('确认删除该推荐吗?')){
+				return;
+			}
 			GamerecService.delete(gamerec.id);
 			gamerec.hide = true;
 		}
@@ -783,6 +862,7 @@ app.controller('ErrorReportCtrl',['$scope','$rootScope','GameerrorService',
 		}
 
 		$scope.delete = function(gamerec){
+			if(!confirm("确认删除该错误报告吗?"))return;
 			GameerrorService.delete(gamerec.id);
 			gamerec.hide = true;
 		}

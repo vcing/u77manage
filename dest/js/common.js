@@ -174,6 +174,15 @@ app.config(['$stateProvider','$urlRouterProvider',
 					}
 				}
 			})
+			.state('base.noticeNew',{
+				url:'/notice/new/:id',
+				views:{
+					'content':{
+						templateUrl:'game/notice-edit.html',
+						controller:'NoticeNewCtrl'
+					}
+				}
+			})
 			.state('base.noticeEdit',{
 				url:'/notice/edit/:id',
 				views:{
@@ -207,6 +216,33 @@ app.config(['$stateProvider','$urlRouterProvider',
 					'content':{
 						templateUrl:'comment/index.html',
 						controller:'CommentCtrl'
+					}
+				}
+			})
+			.state('base.page',{
+				url:'/page',
+				views:{
+					'content':{
+						templateUrl:'page/index.html',
+						controller:'PageCtrl'
+					}
+				}
+			})
+			.state('base.pageNew',{
+				url:'/page/new',
+				views:{
+					'content':{
+						templateUrl:'page/edit.html',
+						controller:'PageNewCtrl'
+					}
+				}
+			})
+			.state('base.pageEdit',{
+				url:'/page/edit/:id',
+				views:{
+					'content':{
+						templateUrl:'page/edit.html',
+						controller:'PageEditCtrl'
 					}
 				}
 			})
@@ -251,97 +287,20 @@ app.run(['$rootScope','$state',
 
 // ---------------------------------------------------------------------------------------------
 
-app.controller('CommentCtrl',['$scope','$rootScope','$stateParams','CommentService',
-	function($scope,$rootScope,$stateParams,CommentService){
-		$scope.options = {};
-		$scope.options.search_type = 'id';
-
-		$scope.change_type = function(id){
-			$scope.options.type = id;
-			query();
+app.controller('BaseCtrl',['$scope','$rootScope','$state',
+	function($scope,$rootScope,$state){
+		// 主导航搜索
+		$scope.search = function(){
+			$state.go('base.gameEdit',{id:$scope.gameId});
+			$scope.gameId = '';
 		}
 
-		$scope.change_search_type = function(type){
-			$scope.options.search_type = type;
-		}
-
-		$scope.change_status = function(status){
-			$scope.options.type = status;
-			query();
-		}
-
-		$scope.search = function(e){
+		$scope.searchKeyUp = function(e){
 			var keycode = window.event?e.keyCode:e.which;
 			if(keycode == 13){
-				query();
+				$scope.search();
 			}
 		}
-
-		function query(page){
-			var _options = _.clone($scope.options);
-			if(page)_options.page = page;
-			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
-			delete _options.search_type;
-			delete _options.keywords;
-			CommentService.list(_options).then(function(data){
-				$scope.list = data;
-			});
-		}
-
-		CommentService.list().then(function(data){
-			$scope.list = data;
-			console.log(data);
-		});
-
-		$scope.pageChange = query;
-
-		$scope.change_notice_status = function(comment,status){
-			comment.status = status;
-			CommentService.update(comment);
-		}
-
-		$scope.delete = function(comment){
-			CommentService._delete(comment.id);
-			comment.content.content = "该评论已删除";
-			// comment.hide = true;
-		}
-
-
-		$scope.deleteByUser = function(){
-			if(confirm('该操作会删除该用户的所有评论! \r\n 确认执行吗？')){
-				CommentService.deleteByUser($scope.userid);	
-			}
-		}
-	}]);
-app.service('CommentService',['$q',
-	function($q){
-		return {
-			list:function(options){
-				var deffered = $q.defer();
-				$.get(ManagePath + 'comment/list',options,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;
-			},
-			_delete:function(id){
-				var deffered = $q.defer();
-				$.get(ManagePath + 'comment/delete/'+id,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;	
-			},
-			deleteByUser:function(id){
-				var deffered = $q.defer();
-				$.get(ManagePath + 'comment/deletebyuser/'+id,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;	
-			}
-		}
-	}]);
-app.controller('BaseCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
-
 	}]);
 
 app.controller('SingleReportCtrl',['$scope','$rootScope','ReportService','MessageService',
@@ -358,6 +317,9 @@ app.controller('SingleReportCtrl',['$scope','$rootScope','ReportService','Messag
 
 			
 		$scope.accept = function(report){
+			if(!confirm('确定删除该举报的内容吗?')){
+				return;
+			}
 			if(report.t_type == 1){
 				var options = {
 					content:report,
@@ -622,49 +584,71 @@ app.directive('navPager',function(){
  * @example  
  *   <p contenteditable="true" ng-model="text"></p>  
  */ 
-app.directive('contenteditable', function() {  
-  return {  
-    require: '?ngModel',  
-    link: function(scope, element, attrs, ctrl) {  
+// app.directive('contenteditable', function() {  
+//   return {  
+//     require: '?ngModel',  
+//     link: function(scope, element, attrs, ctrl) {  
    
-      // Do nothing if this is not bound to a model  
-      if (!ctrl) { return; }  
+//       // Do nothing if this is not bound to a model  
+//       if (!ctrl) { return; }  
    
-      // Checks for updates (input or pressing ENTER)  
-      // view -> model  
-      element.bind('input enterKey', function() {  
-        var rerender = false;  
-        var html = element.html();  
+//       // Checks for updates (input or pressing ENTER)  
+//       // view -> model  
+//       element.bind('input enterKey', function() {  
+//         var rerender = false;  
+//         var html = element.html();  
    
-        if (attrs.noLineBreaks) {  
-          html = html.replace(/<div>/g, '').replace(/<br>/g, '').replace(/<\/div>/g, '');  
-          rerender = true;  
-        }  
+//         if (attrs.noLineBreaks) {  
+//           html = html.replace(/<div>/g, '').replace(/<br>/g, '').replace(/<\/div>/g, '');  
+//           rerender = true;  
+//         }  
    
-        scope.$apply(function() {  
-          ctrl.$setViewValue(html);  
-          if(rerender) {  
-            ctrl.$render();  
-          }  
-        });  
-      });  
+//         scope.$apply(function() {  
+//           ctrl.$setViewValue(html);  
+//           if(rerender) {  
+//             ctrl.$render();  
+//           }  
+//         });  
+//       });  
    
-      element.keyup(function(e){  
-        if(e.keyCode === 13){  
-          element.trigger('enterKey');  
-        }  
-      });  
+//       element.keyup(function(e){  
+//         if(e.keyCode === 13){  
+//           element.trigger('enterKey');  
+//         }  
+//       });  
    
-      // model -> view  
-      ctrl.$render = function() {  
-        element.html(ctrl.$viewValue);  
-      };  
+//       // model -> view  
+//       ctrl.$render = function() {  
+//         element.html(ctrl.$viewValue);  
+//       };  
    
-      // load init value from DOM  
-      ctrl.$render();  
-    }  
-  };  
-}); 
+//       // load init value from DOM  
+//       ctrl.$render();  
+//     }  
+//   };  
+// }); 
+
+app.directive('contenteditable', function() {
+        return {
+            require: 'ngModel',
+            link: function(scope, elm, attrs, ctrl) {
+                // view -> model
+                elm.bind('blur', function() {
+                    scope.$apply(function() {
+                        ctrl.$setViewValue(elm.html());
+                    });
+                });
+
+                // model -> view
+                ctrl.$render = function() {
+                    elm.html(ctrl.$viewValue);
+                };
+
+                // load init value from DOM
+                ctrl.$setViewValue(elm.html());
+            }
+        };
+    });
 app.filter(  
     'to_trusted', ['$sce', function ($sce) {  
         return function (text) {  
@@ -1000,6 +984,96 @@ app.service('MessageService',['$q','$uibModal',
 			}
 		}
 	}]);
+app.controller('CommentCtrl',['$scope','$rootScope','$stateParams','CommentService',
+	function($scope,$rootScope,$stateParams,CommentService){
+		$scope.options = {};
+		$scope.options.search_type = 'id';
+
+		$scope.change_type = function(id){
+			$scope.options.type = id;
+			query();
+		}
+
+		$scope.change_search_type = function(type){
+			$scope.options.search_type = type;
+		}
+
+		$scope.change_status = function(status){
+			$scope.options.type = status;
+			query();
+		}
+
+		$scope.search = function(e){
+			var keycode = window.event?e.keyCode:e.which;
+			if(keycode == 13){
+				query();
+			}
+		}
+
+		function query(page){
+			var _options = _.clone($scope.options);
+			if(page)_options.page = page;
+			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
+			delete _options.search_type;
+			delete _options.keywords;
+			CommentService.list(_options).then(function(data){
+				$scope.list = data;
+			});
+		}
+
+		CommentService.list().then(function(data){
+			$scope.list = data;
+			console.log(data);
+		});
+
+		$scope.pageChange = query;
+
+		$scope.change_notice_status = function(comment,status){
+			comment.status = status;
+			CommentService.update(comment);
+		}
+
+		$scope.delete = function(comment){
+			if(confirm('确定删除改评论?')){
+				CommentService._delete(comment.id);
+				comment.content.content = "该评论已删除";	
+			}
+			// comment.hide = true;
+		}
+
+
+		$scope.deleteByUser = function(){
+			if(confirm('该操作会删除该用户的所有评论! \r\n 确认执行吗？')){
+				CommentService.deleteByUser($scope.userid);	
+			}
+		}
+	}]);
+app.service('CommentService',['$q',
+	function($q){
+		return {
+			list:function(options){
+				var deffered = $q.defer();
+				$.get(ManagePath + 'comment/list',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			_delete:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath + 'comment/delete/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
+			deleteByUser:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath + 'comment/deletebyuser/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			}
+		}
+	}]);
 app.controller('BigEyeCtrl',['$scope','$rootScope','UploadService',
 	function($scope,$rootScope,UploadService){
 		$scope.list = [];
@@ -1109,6 +1183,10 @@ app.service('DailyGameVilidService',['$http','$q','GameService',
 	}]);
 
 
+app.controller('DashboardCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+
+	}]);
 app.controller('SingleGameCtrl',['$scope','$rootScope','MessageService',
 	function($scope,$rootScope,MessageService){
 		$scope.sendBack = function(game){
@@ -1350,6 +1428,25 @@ app.controller('GameEditCtrl',['$scope','$rootScope','GameService','$stateParams
 			MessageService.create(options).then(function(data){
 				if(data.status === true){
 					fn();
+				}
+			});
+		}
+
+		$scope.sendBack = function(){
+			var options = {
+				content:$scope.game,
+				type:105,
+				status:false
+			}
+			MessageService.create(options).then(function(data){
+				if(data.status === false){
+					$scope.game.status = 3;
+					$scope.game.create_at = $filter('toUnix')($scope.game.create_time);
+					delete $scope.game.create_time;
+					delete $scope.game.content.$$hashKey;
+					delete $scope.game.$$hashKey;
+					$.post(ManagePath+'game/update',$scope.game,function(data){
+					});
 				}
 			});
 		}
@@ -1649,9 +1746,27 @@ app.controller('VideoCtrl',['$scope','$rootScope','VideoService','MessageService
 		}
 
 		VideoService.list().then(function(data){
-			$scope.list = data;
-			console.log(data);
+			$scope.list = format_url(data);
 		});
+
+		function format_url(data){
+			_.forEach(data.data,function(video){
+				if(video.v_type == 1){
+					if(video.origin_url.indexOf('acfun.tv') == -1){
+						video.origin_url = "http://www.acfun.tv"+video.origin_url;
+					}
+				}else if(video.v_type == 2){
+					if(video.origin_url.indexOf('bilibili.com') == -1){
+						video.origin_url = "http://www.bilibili.com"+video.origin_url;
+					}
+				}else if(video.v_type == 3){
+					if(video.origin_url.indexOf('youku.com') == -1){
+						video.origin_url = "http://www.youku.com"+video.origin_url;
+					}
+				}
+			});
+			return data;
+		}
 
 		$scope.pageChange = query;
 	}]);
@@ -1682,14 +1797,22 @@ app.controller('ImageCtrl',['$scope','$rootScope','ImageService',
 			}
 		}
 
-		$scope.submit = function(image){
-			console.log(image);
+		$scope.submit = function(image,i){
 			ImageService.update(image);
+			if(!i)alert('提交成功');
 		}
 
 		$scope.delete = function(image){
+			if(!confirm('确认删除该图片吗?'))return;
 			ImageService.delete(image.id);
 			image.hide = true;
+		}
+
+		$scope.acceptAll = function(){
+			_.forEach($scope.list.data,function(image){
+				image.status = 99;
+				$scope.submit(image,true);
+			});
 		}
 
 		function query(page){
@@ -1711,8 +1834,8 @@ app.controller('ImageCtrl',['$scope','$rootScope','ImageService',
 		$scope.pageChange = query;
 	}]);
 
-app.controller('NoticeCtrl',['$scope','$rootScope','NoticeService','$stateParams',
-	function($scope,$rootScope,NoticeService,$stateParams){
+app.controller('NoticeCtrl',['$scope','$rootScope','NoticeService','$stateParams','$state',
+	function($scope,$rootScope,NoticeService,$stateParams,$state){
 		$scope.options = {};
 		$scope.options.search_type = 'id';
 
@@ -1761,17 +1884,44 @@ app.controller('NoticeCtrl',['$scope','$rootScope','NoticeService','$stateParams
 		$scope.change_notice_status = function(notice,status){
 			notice.status = status;
 			NoticeService.update(notice);
+			alert('操作成功');
 		}
 
 		$scope.delete = function(cream){
+			if(!confirm('确认删除该公告吗?'))return;
 			NoticeService.delete(cream.id);
 			cream.hide = true;
 		}
 
+		$scope.addNotice = function(){
+			if($scope.options.search_type == 'tid' && !isNaN($scope.options.keywords)){
+				$state.go('base.noticeNew',{id:$scope.options.keywords});
+			}else{
+				alert('请选择游戏ID查询并输入ID后 再添加公告');
+			}
+		}
 	}]);
 
-app.controller('NoticeEditCtrl',['$scope','$rootScope','$filter','NoticeService','$stateParams',
-	function($scope,$rootScope,$filter,NoticeService,$stateParams){
+app.controller('NoticeNewCtrl',['$scope','$rootScope','$filter','NoticeService','$stateParams','$state',
+	function($scope,$rootScope,$filter,NoticeService,$stateParams,$state){
+
+		$scope.notice = {
+			tid:$stateParams.id,
+			create_time:moment().format('YYYY/MM/DD HH:mm:ss'),
+		};
+
+		$scope.submit = function(){
+			$scope.notice.create_at = $filter('toUnix')($scope.notice.create_time);
+			$scope.notice.update_at = $scope.notice.create_at;
+			delete $scope.notice.create_time;
+			NoticeService.create($scope.notice);
+			alert('创建成功.');
+			$state.go('base.notice');
+		}
+	}]);
+
+app.controller('NoticeEditCtrl',['$scope','$rootScope','$filter','NoticeService','$stateParams','$state',
+	function($scope,$rootScope,$filter,NoticeService,$stateParams,$state){
 		NoticeService.info($stateParams.id).then(function(info){
 			console.log(info);
 			$scope.notice = info;
@@ -1780,7 +1930,11 @@ app.controller('NoticeEditCtrl',['$scope','$rootScope','$filter','NoticeService'
 
 		$scope.submit = function(){
 			$scope.notice.create_at = $filter('toUnix')($scope.notice.create_time);
+			$scope.notice.update_at = $scope.notice.create_at;
+			delete $scope.notice.create_time;
 			NoticeService.update($scope.notice);
+			alert('修改成功.');
+			$state.go('base.notice');
 		}
 	}]);
 
@@ -1834,6 +1988,9 @@ app.controller('RecExamineCtrl',['$scope','$rootScope','GamerecService',
 		}
 
 		$scope.delete = function(gamerec){
+			if(!confirm('确认删除该推荐吗?')){
+				return;
+			}
 			GamerecService.delete(gamerec.id);
 			gamerec.hide = true;
 		}
@@ -1894,6 +2051,7 @@ app.controller('ErrorReportCtrl',['$scope','$rootScope','GameerrorService',
 		}
 
 		$scope.delete = function(gamerec){
+			if(!confirm("确认删除该错误报告吗?"))return;
 			GameerrorService.delete(gamerec.id);
 			gamerec.hide = true;
 		}
@@ -2139,6 +2297,13 @@ app.service('NoticeService',['$q',
 				});
 				return deffered.promise;
 			},
+			create:function(notice){
+				var deffered = $q.defer();
+				$.post(ManagePath+'notice/new',notice,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
 			update:function(notice){
 				var deffered = $q.defer();
 				$.post(ManagePath+'notice/update',notice,function(data){
@@ -2321,7 +2486,133 @@ app.controller('TagsListCtrl',['$scope','TagService',
 			});
 		});
 	}]);
-app.controller('DashboardCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
+app.controller('PageCtrl',['$scope','$rootScope','PageService',
+	function($scope,$rootScope,PageService){
+		$scope.options = {};
+		$scope.options.search_type = 'id';
 
+		$scope.change_type = function(id){
+			$scope.options.type = id;
+			query();
+		}
+
+		$scope.change_search_type = function(type){
+			$scope.options.search_type = type;
+		}
+
+		$scope.change_status = function(status){
+			$scope.options.status = status;
+			query();
+		}
+
+		$scope.search = function(e){
+			var keycode = window.event?e.keyCode:e.which;
+			if(keycode == 13){
+				query();
+			}
+		}
+
+		function query(page){
+			var _options = _.clone($scope.options);
+			if(page)_options.page = page;
+			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
+			delete _options.search_type;
+			delete _options.keywords;
+			PageService.list(_options).then(function(data){
+				$scope.list = data;
+			});
+		}
+
+		query();
+
+		$scope.pageChange = query;
+
+		$scope.change_page_status = function(page,status){
+			page.status = status;
+			PageService.update(page);
+			alert('操作成功');
+		}
+
+		$scope.delete = function(page){
+			if(!confirm('确认删除该公告吗?'))return;
+			PageService.delete(page.id);
+			page.hide = true;
+		}
+
+	}]);
+
+app.controller('PageEditCtrl',['$scope','$rootScope','$filter','PageService','$stateParams','$state',
+	function($scope,$rootScope,$filter,PageService,$stateParams,$state){
+		PageService.info($stateParams.id).then(function(info){
+			console.log(info);
+			$scope.page = info;
+			$scope.page.create_time = $filter('dateTime')($scope.page.create_at);
+		});
+
+		$scope.submit = function(){
+			$scope.page.create_at = $filter('toUnix')($scope.page.create_time);
+			$scope.page.update_at = $scope.page.create_at;
+			delete $scope.page.create_time;
+			PageService.update($scope.page);
+			alert('修改成功.');
+			$state.go('base.page');
+		}
+	}]);
+
+app.controller('PageNewCtrl',['$scope','$rootScope','$filter','PageService','$stateParams','$state',
+	function($scope,$rootScope,$filter,PageService,$stateParams,$state){
+
+		$scope.page = {
+			tid:$stateParams.id,
+			create_time:moment().format('YYYY/MM/DD HH:mm:ss'),
+		};
+
+		$scope.submit = function(){
+			$scope.page.create_at = $filter('toUnix')($scope.page.create_time);
+			$scope.page.update_at = $scope.page.create_at;
+			delete $scope.page.create_time;
+			PageService.create($scope.page);
+			alert('创建成功.');
+			$state.go('base.page');
+		}
+	}]);
+app.service('PageService',['$q',
+	function($q){
+		return {
+			list:function(options){
+				var deffered = $q.defer();
+				$.get(ManagePath+'page/list',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			create:function(page){
+				var deffered = $q.defer();
+				$.post(ManagePath+'page/create',page,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
+			update:function(page){
+				var deffered = $q.defer();
+				$.post(ManagePath+'page/update',page,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
+			delete:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'page/delete/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			info:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'page/info/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			}
+		}
 	}]);
