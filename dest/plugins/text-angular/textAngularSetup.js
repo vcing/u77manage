@@ -436,7 +436,7 @@ angular.module('textAngularSetup', [])
 		}
 	};
 }])
-.run(['taRegisterTool', '$window', 'taTranslations', 'taSelection', 'taToolFunctions', '$sanitize', 'taOptions', function(taRegisterTool, $window, taTranslations, taSelection, taToolFunctions, $sanitize, taOptions){
+.run(['taRegisterTool', '$window', 'taTranslations', 'taSelection', 'taToolFunctions', '$sanitize', 'taOptions','UploadService', function(taRegisterTool, $window, taTranslations, taSelection, taToolFunctions, $sanitize, taOptions,UploadService){
 	// test for the version of $sanitize that is in use
 	// You can disable this check by setting taOptions.textAngularSanitize == false
 	var gv = {}; $sanitize('', gv);
@@ -462,6 +462,8 @@ angular.module('textAngularSetup', [])
 	var headerAction = function(){
 		return this.$editor().wrapSelection("formatBlock", "<" + this.name.toUpperCase() +">");
 	};
+
+
 	angular.forEach(['h1','h2','h3','h4','h5','h6'], function(h){
 		taRegisterTool(h.toLowerCase(), {
 			buttontext: h.toUpperCase(),
@@ -728,16 +730,17 @@ angular.module('textAngularSetup', [])
 		iconclass: 'fa fa-picture-o',
 		tooltiptext: taTranslations.insertImage.tooltip,
 		action: function(){
-			var imageLink;
-			imageLink = $window.prompt(taTranslations.insertImage.dialogPrompt, 'http://');
-			if(imageLink && imageLink !== '' && imageLink !== 'http://'){
-				return this.$editor().wrapSelection('insertImage', imageLink, true);
-			}
+			// imageLink = $window.prompt(taTranslations.insertImage.dialogPrompt, 'http://');
+			// if(imageLink && imageLink !== '' && imageLink !== 'http://'){
+			// 	return this.$editor().wrapSelection('insertImage', imageLink, true);
+			// }
+			// return this.$editor().wrapSelection('insertImage', 'http://img.u77.com/g/2015/11/3yt332eeh0ntes2j.jpg!440250', true);
 		},
 		onElementSelect: {
 			element: 'img',
 			action: taToolFunctions.imgOnSelectAction
-		}
+		},
+		display:'<button class="btn btn-default" ngf-select="uploadPostImage($file)">上传图片</button>',
 	});
 	taRegisterTool('insertVideo', {
 		iconclass: 'fa fa-youtube-play',

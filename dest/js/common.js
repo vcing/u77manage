@@ -3,7 +3,7 @@
  * 
  */
 
-var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch','infinite-scroll','ngFileUpload']);
+var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch','infinite-scroll','ngFileUpload','textAngular']);
 var BasePath = 'http://dev.u77.com/admin/';
 var Path = 'http://dev.u77.com';
 var AvatarPath = 'http://img.u77.com/avatar/';
@@ -255,13 +255,21 @@ app.config(['$stateProvider','$urlRouterProvider',
 		moment.locale('zh-cn');
 	}]);
 
-app.run(['$rootScope','$state',
-	function($rootScope,$state){
+app.run(['$rootScope','$state','UploadService',
+	function($rootScope,$state,UploadService){
 		$rootScope.loading = true;
 		$rootScope.BasePath = BasePath;
 		$rootScope.Path = Path;
 		$rootScope.AvatarPath = AvatarPath;
 		$rootScope.ManagePath = ManagePath;
+		UploadService.post().then(function(fn){
+			window.uploadPostImage = function($file){
+				fn($file,function(resp){
+					console.log(resp);
+				});
+			}
+		});
+		
 	}])
 
 
