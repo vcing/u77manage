@@ -170,4 +170,8 @@ app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options
 			});
 		}
 
+		$scope.submitWithoutMessage = function(){
+			$uibModalInstance.close($scope.options);
+		}
+
 	}]);

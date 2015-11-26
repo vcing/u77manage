@@ -18,6 +18,12 @@
   opacity: 0.6;
   pointer-events: none; }
 
+/*
+editor
+*/
+.ta-scroll-window {
+  /*max-height: 500px;*/ }
+
 /**
  * base 
  * 

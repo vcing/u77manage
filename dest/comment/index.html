@@ -54,7 +54,7 @@
 				<div class="box-header with-border">
 					<div class="user-block">
 						<img class="img-circle" ng-src="http://img.u77.com/avatar/{{comment.user.avatar}}" alt="User Image">
-						<span class="username"><a href="{{Path}}/user/{{comment.user.userid}}" ng-bind="comment.user.nickname"></a></span>
+						<span class="username"><a href="{{Path}}user/{{comment.user.userid}}" ng-bind="comment.user.nickname"></a></span>
 						<a class="description" href="{{Path+'/comment/'+comment.id+'#comment'}}" target="_blank" ng-bind="comment.create_at | dateTime"></a>
 					</div>
 					<div class="box-tools">

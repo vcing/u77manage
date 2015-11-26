@@ -2,7 +2,7 @@
 	<div class="box-header with-border">
 		<div class="user-block">
 			<img class="img-circle" ng-src="{{AvatarPath+report.content.user.avatar}}" alt="user image">
-			<span class="username"><a href="{{Path + '/user/'+report.content.user.userid}}" target="_blank" ng-bind="report.content.user.nickname"></a></span>
+			<span class="username"><a href="{{Path + 'user/'+report.content.user.userid}}" target="_blank" ng-bind="report.content.user.nickname"></a></span>
 			<span class="description"><a ng-href="{{Path+'/user/'+report.user.userid}}" target="_blank" ng-bind="report.user.nickname"></a> 举报于 <span>{{report.create_at | fromNow}}</span></span>
 		</div><!-- /.user-block -->
 		<div class="box-tools">
@@ -13,13 +13,13 @@
 	</div><!-- /.box-header -->
 	<div class="box-body">
 		<!-- post text -->
-		<a class="btn btn-block btn-social btn-twitter" href="{{Path + '/comment/' + report.content.id + '#comment'}}" target="_blank" ng-if="report.t_type == 1">
+		<a class="btn btn-block btn-social btn-twitter" href="{{Path + 'comment/' + report.content.id + '#comment'}}" target="_blank" ng-if="report.t_type == 1">
 			<i class="fa fa-commenting-o"></i> 评论
 		</a>
-		<a class="btn btn-block btn-social btn-dropbox" href="{{Path + '/post/' + report.content.id}}" target="_blank" ng-if="report.t_type == 2">
+		<a class="btn btn-block btn-social btn-dropbox" href="{{Path + 'post/' + report.content.id}}" target="_blank" ng-if="report.t_type == 2">
 			<i class="fa fa-newspaper-o"></i> 精华
 		</a>
-		<a class="btn btn-block btn-social btn-facebook" href="{{Path + '/game/' + report.content.tid}}" target="_blank" ng-if="report.t_type == 4">
+		<a class="btn btn-block btn-social btn-facebook" href="{{Path + 'game/' + report.content.tid}}" target="_blank" ng-if="report.t_type == 4">
 			<i class="fa fa-thumbs-o-up"></i> 推荐
 		</a>
 		<div style="height: 200px;overflow: auto;" ng-bind-html="report.content.content | to_trusted" ng-if="report.t_type != 1"></div>

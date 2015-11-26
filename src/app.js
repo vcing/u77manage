@@ -4,12 +4,14 @@
  */
 
 var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch','infinite-scroll','ngFileUpload','textAngular']);
-var BasePath = 'http://dev.u77.com/admin/';
-var Path = 'http://dev.u77.com';
+// var BasePath = 'http://dev.u77.com/admin/';
+// var Path = 'http://dev.u77.com';
+var BasePath = 'http://www.u77.com/admin/';
+var Path = 'http://www.u77.com/';
 var AvatarPath = 'http://img.u77.com/avatar/';
 var ManagePath = 'http://manage.u77.com/'
-app.config(['$stateProvider','$urlRouterProvider',
-	function($stateProvider,$urlRouterProvider){
+app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
+	function($stateProvider,$urlRouterProvider,$locationProvider){
 
 		$stateProvider
 			.state('base',{
@@ -246,10 +248,10 @@ app.config(['$stateProvider','$urlRouterProvider',
 					}
 				}
 			})
-
+		$locationProvider.html5Mode(true);
 
 		// $urlRouterProvider.when("", "/dashboard");
-		// $urlRouterProvider.otherwise('/dashboard');
+		$urlRouterProvider.otherwise('/dashboard');
 
 		// 时间本地化
 		moment.locale('zh-cn');

@@ -4,12 +4,14 @@
  */
 
 var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch','infinite-scroll','ngFileUpload','textAngular']);
-var BasePath = 'http://dev.u77.com/admin/';
-var Path = 'http://dev.u77.com';
+// var BasePath = 'http://dev.u77.com/admin/';
+// var Path = 'http://dev.u77.com';
+var BasePath = 'http://www.u77.com/admin/';
+var Path = 'http://www.u77.com/';
 var AvatarPath = 'http://img.u77.com/avatar/';
 var ManagePath = 'http://manage.u77.com/'
-app.config(['$stateProvider','$urlRouterProvider',
-	function($stateProvider,$urlRouterProvider){
+app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
+	function($stateProvider,$urlRouterProvider,$locationProvider){
 
 		$stateProvider
 			.state('base',{
@@ -246,10 +248,10 @@ app.config(['$stateProvider','$urlRouterProvider',
 					}
 				}
 			})
-
+		$locationProvider.html5Mode(true);
 
 		// $urlRouterProvider.when("", "/dashboard");
-		// $urlRouterProvider.otherwise('/dashboard');
+		$urlRouterProvider.otherwise('/dashboard');
 
 		// 时间本地化
 		moment.locale('zh-cn');
@@ -465,6 +467,10 @@ app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options
 			MessageService.send(_options).then(function(data){
 				$uibModalInstance.close($scope.options);
 			});
+		}
+
+		$scope.submitWithoutMessage = function(){
+			$uibModalInstance.close($scope.options);
 		}
 
 	}]);
@@ -1262,7 +1268,13 @@ app.controller('GameListCtrl',['$scope','$rootScope','GameService',
 		$scope.options = {};
 		GameService.list().then(function(data){
 			$scope.gameList = data;
-		});	
+		});
+
+		$scope.getTop10 = function(){
+			GameService.top10().then(function(data){
+				$scope.gameList = data;
+			});
+		}
 	}]);
 
 app.controller('GameNewCtrl',['$scope','$rootScope','GameService','UploadService','$state',
@@ -2159,6 +2171,13 @@ app.service('GameService',['$q',
 			relationGame:function(id){
 				var deffered = $q.defer();
 				$.get(ManagePath+'game/relationgame/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			getTop10:function(){
+				var deffered = $q.defer();
+				$.get(ManagePath+'game/top10/'+id,function(data){
 					deffered.resolve(data);
 				});
 				return deffered.promise;

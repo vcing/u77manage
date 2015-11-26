@@ -21,5 +21,8 @@
     "gulp": "^3.9.0",
     "gulp-concat": "^2.6.0",
     "gulp-sass": "^2.0.4"
+  },
+  "dependencies": {
+    "path": "^0.12.7"
   }
 }

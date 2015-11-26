@@ -50,7 +50,7 @@
 				<div class="box-header with-border">
 					<img class="img-circle" ng-src="http://img.u77.com/avatar/{{notice.user.avatar}}" style="width:40px;height:40px;float:left;">
 					<span class="username" style="display:block;margin-left:50px">
-						<a href="{{Path}}/user/{{notice.user.userid}}" target="_blank" ng-bind="notice.user.nickname"></a>
+						<a href="{{Path}}user/{{notice.user.userid}}" target="_blank" ng-bind="notice.user.nickname"></a>
 					</span>
 					<span class="description" style="display:block;margin-left:50px" ng-bind="notice.create_at | dateTime"></span>
 					<div class="box-tools pull-right">
@@ -59,7 +59,7 @@
 					</div>
 				</div><!-- /.box-header -->
 				<div class="box-body" style="display: block;">
-					<a href="http://dev.u77.com/game/{{notice.game.id}}" target="_blank">
+					<a href="{{Path}}game/{{notice.game.id}}" target="_blank">
 						<h2 style="text-overflow: ellipsis;overflow: hidden;text-align:center;white-space: nowrap;font-size:20px" title="{{notice.title}}">{{notice.title}}</h2>
 					</a>
 				</div><!-- /.box-body -->

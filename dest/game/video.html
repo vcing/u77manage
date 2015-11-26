@@ -49,7 +49,7 @@
 				<div class="box-header with-border">
 					<img class="img-circle" ng-src="http://img.u77.com/avatar/{{video.user.avatar}}" style="width:40px;height:40px;float:left;">
 					<span class="username" style="display:block;margin-left:50px">
-						<a href="{{Path}}/user/{{video.user.userid}}" target="_blank" ng-bind="video.user.nickname"></a>
+						<a href="{{Path}}user/{{video.user.userid}}" target="_blank" ng-bind="video.user.nickname"></a>
 					</span>
 					<a href="{{Path+'/video/'+video.id}}" target="_blank">
 						<span class="description" style="display:block;margin-left:50px" ng-bind="video.create_at | dateTime"></span>

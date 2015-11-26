@@ -42,7 +42,7 @@
 				<div class="box-header with-border">
 					<div class="user-block">
 						<img class="img-circle" ng-src="http://img.u77.com/avatar/{{error.user.avatar}}" alt="User Image">
-						<span class="username"><a href="{{Path}}/user/{{error.user.userid}}" ng-bind="error.user.nickname"></a></span>
+						<span class="username"><a href="{{Path}}user/{{error.user.userid}}" ng-bind="error.user.nickname"></a></span>
 						<span class="description" ng-bind="error.create_at | dateTime"></span>
 					</div>
 					<div class="box-tools">
@@ -51,11 +51,20 @@
 					</div>
 				</div>
 				<div class="box-body with-border">
+					<a class="btn btn-block btn-social btn-google ng-scope" ng-if="error.type == 1">
+						<i class="fa fa-close"></i> 游戏白屏,打不开,链接失效
+					</a>
+					<a class="btn btn-block btn-social btn-facebook ng-scope" ng-if="error.type == 2">
+						<i class="fa fa-cloud-upload"></i> 游戏有新版本了,请更新版本
+					</a>
+					<a class="btn btn-block btn-social btn-twitter ng-scope" ng-if="error.type == 3">
+						<i class="fa fa-minus-circle"></i> 其他问题
+					</a>
 					<div style="height:100px;overflow:auto">{{error.content}}</div>
 					<div class="attachment-block clearfix">
 						<img class="attachment-img" ng-src="{{error.game.image}}" alt="attachment image" style="width:100px;height:57px">
 						<div class="attachment-pushed">
-							<h4 class="attachment-heading"><a href="{{Path+'/game/'+error.game.id}}" target="_blank" style="display: inline-block;text-overflow: ellipsis;overflow: hidden;white-space: nowrap;max-width: 100%;">{{error.game.title}}</a></h4>
+							<h4 class="attachment-heading"><a href="{{Path+'game/'+error.game.id}}" target="_blank" style="display: inline-block;text-overflow: ellipsis;overflow: hidden;white-space: nowrap;max-width: 100%;">{{error.game.title}}</a></h4>
 							<div class="attachment-text">
 								首次推荐于<br><span>{{error.game.create_at|dateTime}}</span>
 							</div><!-- /.attachment-text -->

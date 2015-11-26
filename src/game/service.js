@@ -38,6 +38,13 @@ app.service('GameService',['$q',
 					deffered.resolve(data);
 				});
 				return deffered.promise;
+			},
+			getTop10:function(){
+				var deffered = $q.defer();
+				$.get(ManagePath+'game/top10/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
 			}
 		}
 	}]);

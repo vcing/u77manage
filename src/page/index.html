@@ -47,7 +47,7 @@
 				<div class="box-header with-border">
 					<img class="img-circle" ng-src="http://img.u77.com/avatar/{{page.user.avatar}}" style="width:40px;height:40px;float:left;">
 					<span class="username" style="display:block;margin-left:50px">
-						<a href="{{Path}}/user/{{page.user.userid}}" target="_blank" ng-bind="page.user.nickname"></a>
+						<a href="{{Path}}user/{{page.user.userid}}" target="_blank" ng-bind="page.user.nickname"></a>
 					</span>
 					<span class="description" style="display:block;margin-left:50px" ng-bind="page.create_at | dateTime"></span>
 					<div class="box-tools pull-right">
@@ -56,7 +56,7 @@
 					</div>
 				</div><!-- /.box-header -->
 				<div class="box-body" style="display: block;">
-					<a href="http://dev.u77.com/page/{{page.id}}" target="_blank">
+					<a href="{{Path}}page/{{page.id}}" target="_blank">
 						<h2 style="text-overflow: ellipsis;overflow: hidden;text-align:center;white-space: nowrap;font-size:20px" title="{{page.title}}">{{page.title}}</h2>
 					</a>
 				</div><!-- /.box-body -->
@@ -68,7 +68,7 @@
 				    <li>
 				    	<div class="form-group" style="text-align:center;margin:0">
 							<a class="btn" ng-click="change_page_status(page,99)" ng-class="{true:'btn-sm btn-success'}[page.status == 99]">已发布</a>
-							<a class="btn" ng-click="change_page_status(page,0)" ng-class="{true:'btn-sm btn-success'}[page.status == 0]">未审核</a>
+							<a class="btn" ng-click="change_page_status(page,0)" ng-class="{true:'btn-sm btn-success'}[page.status == 0]">未发布</a>
 						</div>
 				    </li>
 				    <li><a style="text-align:right">

@@ -65,7 +65,13 @@ app.controller('GameListCtrl',['$scope','$rootScope','GameService',
 		$scope.options = {};
 		GameService.list().then(function(data){
 			$scope.gameList = data;
-		});	
+		});
+
+		$scope.getTop10 = function(){
+			GameService.top10().then(function(data){
+				$scope.gameList = data;
+			});
+		}
 	}]);
 
 app.controller('GameNewCtrl',['$scope','$rootScope','GameService','UploadService','$state',

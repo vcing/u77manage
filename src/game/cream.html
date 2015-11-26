@@ -51,7 +51,7 @@
 				<div class="box-header with-border">
 					<img class="img-circle" ng-src="http://img.u77.com/avatar/{{cream.user.avatar}}" style="width:40px;height:40px;float:left;">
 					<span class="username" style="display:block;margin-left:50px">
-						<a href="http://dev.u77.com/user/{{cream.user.userid}}" target="_blank" ng-bind="cream.user.nickname"></a>
+						<a href="{{Path}}user/{{cream.user.userid}}" target="_blank" ng-bind="cream.user.nickname"></a>
 					</span>
 					<span class="description" style="display:block;margin-left:50px">{{cream.create_at | dateTime}}</span>
 					<div class="box-tools pull-right">
@@ -60,7 +60,7 @@
 					</div>
 				</div><!-- /.box-header -->
 				<div class="box-body" style="display: block;">
-					<a href="http://dev.u77.com/post/{{cream.id}}" target="_blank">
+					<a href="{{Path}}post/{{cream.id}}" target="_blank">
 						<h2 style="text-overflow: ellipsis;overflow: hidden;text-align:center;white-space: nowrap;font-size:20px" title="{{cream.title}}" ng-bind="cream.title"></h2>
 					</a>
 				</div><!-- /.box-body -->

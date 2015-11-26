@@ -48,7 +48,7 @@
 				<div class="box-header with-border">
 					<img class="img-circle" ng-src="http://img.u77.com/avatar/{{image.user.avatar}}" style="width:40px;height:40px;float:left;">
 					<span class="username" style="display:block;margin-left:50px">
-						<a href="http://dev.u77.com/user/{{image.user.userid}}" target="_blank" ng-bind="image.user.nickname"></a>
+						<a href="{{Path}}user/{{image.user.userid}}" target="_blank" ng-bind="image.user.nickname"></a>
 					</span>
 					<span class="description" style="display:block;margin-left:50px">{{image.create_at | dateTime}}</span>
 					<div class="box-tools pull-right">

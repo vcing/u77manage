@@ -463,6 +463,23 @@ angular.module('textAngularSetup', [])
 		return this.$editor().wrapSelection("formatBlock", "<" + this.name.toUpperCase() +">");
 	};
 
+	
+	var _uploader;
+	var _cb;
+	UploadService.post().then(function(fn){
+		_uploader = function(file,cb){
+			fn(file,function(resp){
+				cb(resp);
+			});
+		}
+	});
+
+	var uploader = function(file){
+		_uploader(file,function(resp){
+			_cb(resp);
+		});
+	}
+
 
 	angular.forEach(['h1','h2','h3','h4','h5','h6'], function(h){
 		taRegisterTool(h.toLowerCase(), {
@@ -734,13 +751,17 @@ angular.module('textAngularSetup', [])
 			// if(imageLink && imageLink !== '' && imageLink !== 'http://'){
 			// 	return this.$editor().wrapSelection('insertImage', imageLink, true);
 			// }
-			// return this.$editor().wrapSelection('insertImage', 'http://img.u77.com/g/2015/11/3yt332eeh0ntes2j.jpg!440250', true);
+			var _editor = this.$editor();
+			_cb = function(resp){
+				_editor.wrapSelection('insertImage', resp.data.url, true);
+			}
 		},
 		onElementSelect: {
 			element: 'img',
 			action: taToolFunctions.imgOnSelectAction
 		},
 		display:'<button class="btn btn-default" ngf-select="uploadPostImage($file)">上传图片</button>',
+		uploadPostImage:uploader
 	});
 	taRegisterTool('insertVideo', {
 		iconclass: 'fa fa-youtube-play',
