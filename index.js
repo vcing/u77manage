@@ -1,16 +1,11 @@
-const express = require('express')
-const path = require('path')
-const port = process.env.PORT || 80
-const app = express()
+var express = require('express');
+var app = express();
 
-// 通常用于加载静态资源
-app.use(express.static(__dirname + '/dest'));
+app.use('/static',express.static(__dirname + '/dest'));
 
-// 在你应用 JavaScript 文件中包含了一个 script 标签
-// 的 index.html 中处理任何一个 route
-app.get('*', function (request, response){
-  response.sendFile(path.resolve(__dirname, 'dest/index.html'))
-})
+app.all('/*', function(req, res, next) {
+    // Just send the index.html for other files to support HTML5Mode
+    res.sendFile('dest/index.html', { root: __dirname });
+});
 
-app.listen(port)
-console.log("server started on port " + port)
+app.listen(80); //the port you want to use

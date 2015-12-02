@@ -1,7 +1,7 @@
 app.directive('tagsList',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/game/tags-list.html',
+		templateUrl:'/static/game/tags-list.html',
 		replace:true,
 		scope:{
 			tagsCacheList:'=tagsList'

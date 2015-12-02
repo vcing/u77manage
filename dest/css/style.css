@@ -69,7 +69,8 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6, a, span, div, section, i, 
       margin: 2%;
       font-size: 12px;
       padding: 0;
-      height: 25px; }
+      height: 25px;
+      line-height: 24px; }
 
 .widget-user.game-block .box-footer .row .status .description-block {
   color: #fff !important;

@@ -95,9 +95,10 @@
 							<a class="btn" ng-class="{true:'btn-danger'}[game.isvote == 0]" ng-click="game.isvote=0">NO</a>
 						</div>
 						<div class="btn-group" style="float:right;position:absolute;bottom:25px;right:10px">
-							<button class="btn btn-primary" ui-sref="base.relation({id:game.id})">相关</button>
-							<button class="btn btn-warning" ui-sref="base.gameNotice({id:game.id})">公告</button>
-							<button class="btn btn-danger" ng-click="sendBack()">退稿</button>
+							<button class="btn btn-info" ui-sref="base.relation({id:game.id})">相关</button>
+							<button class="btn btn-primary" ui-sref="base.gameNotice({id:game.id})">公告</button>
+							<button class="btn btn-warning" ng-click="sendBack()">退稿</button>
+							<button class="btn btn-danger" ng-click="deleteGame()">删除</button>
 						</div>
 					</form>
 				</div>

@@ -9,7 +9,8 @@ var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch','infi
 var BasePath = 'http://www.u77.com/admin/';
 var Path = 'http://www.u77.com/';
 var AvatarPath = 'http://img.u77.com/avatar/';
-var ManagePath = 'http://manage.u77.com/'
+var ManagePath = 'http://manage.u77.com/';
+var ChargePath = 'http://localhost:3000/api/'
 app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 	function($stateProvider,$urlRouterProvider,$locationProvider){
 
@@ -18,7 +19,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'',
 				views:{
 					'main':{
-						templateUrl:'base/base.html',
+						templateUrl:'/static/base/base.html',
 						controller:'BaseCtrl'
 					}
 				}
@@ -27,7 +28,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/dashboard',
 				views:{
 					'content':{
-						templateUrl:'dashboard/index.html',
+						templateUrl:'/static/dashboard/main.html',
 						controller:'DashboardCtrl'
 					}
 				}
@@ -36,7 +37,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 			// 	url:'/daily',
 			// 	views:{
 			// 		'content':{
-			// 			templateUrl:'daily/big-eye.html',
+			// 			templateUrl:'/static/daily/big-eye.html',
 			// 			controller:'BigEyeCtrl'
 			// 		}
 			// 	}
@@ -45,7 +46,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/daily-big-eye',
 				views:{
 					'content':{
-						templateUrl:'daily/big-eye.html',
+						templateUrl:'/static/daily/big-eye.html',
 						controller:'BigEyeCtrl'
 					}
 				}
@@ -54,7 +55,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/daily-game-examine',
 				views:{
 					'content':{
-						templateUrl:'daily/game-examine.html',
+						templateUrl:'/static/daily/game-examine.html',
 						controller:'GameExamineCtrl'
 					}
 				}
@@ -63,7 +64,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/daily-report-examine',
 				views:{
 					'content':{
-						templateUrl:'daily/report-examine.html',
+						templateUrl:'/static/daily/report-examine.html',
 						controller:'ReportExamineCtrl'
 					}
 				}
@@ -72,7 +73,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/game-list',
 				views:{
 					'content':{
-						templateUrl:'game/game-lists.html',
+						templateUrl:'/static/game/game-lists.html',
 						controller:'GameListCtrl'
 					}
 				}
@@ -81,7 +82,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/game-edit/:id',
 				views:{
 					'content':{
-						templateUrl:'game/game-edit.html',
+						templateUrl:'/static/game/game-edit.html',
 						controller:'GameEditCtrl'
 					}
 				}
@@ -90,7 +91,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/game-new',
 				views:{
 					'content':{
-						templateUrl:'game/game-edit.html',
+						templateUrl:'/static/game/game-edit.html',
 						controller:'GameNewCtrl'
 					}
 				}
@@ -99,7 +100,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/game/relation/:id',
 				views:{
 					'content':{
-						templateUrl:'game/relation.html',
+						templateUrl:'/static/game/relation.html',
 						controller:'RelationCtrl'
 					}
 				}
@@ -108,7 +109,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/tag',
 				views:{
 					'content':{
-						templateUrl:'game/tag.html',
+						templateUrl:'/static/game/tag.html',
 						controller:'TagCtrl'
 					}
 				}
@@ -117,7 +118,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/cream/:gameid',
 				views:{
 					'content':{
-						templateUrl:'game/cream.html',
+						templateUrl:'/static/game/cream.html',
 						controller:'CreamCtrl',
 					}
 				}
@@ -126,7 +127,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/cream',
 				views:{
 					'content':{
-						templateUrl:'game/cream.html',
+						templateUrl:'/static/game/cream.html',
 						controller:'CreamCtrl',
 					}
 				}
@@ -135,7 +136,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/cream/edit/:id',
 				views:{
 					'content':{
-						templateUrl:'game/cream-edit.html',
+						templateUrl:'/static/game/cream-edit.html',
 						controller:'CreamEditCtrl'
 					}
 				}
@@ -144,7 +145,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/video',
 				views:{
 					'content':{
-						templateUrl:'game/video.html',
+						templateUrl:'/static/game/video.html',
 						controller:'VideoCtrl'
 					}
 				}
@@ -153,7 +154,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/image',
 				views:{
 					'content':{
-						templateUrl:'game/image.html',
+						templateUrl:'/static/game/image.html',
 						controller:'ImageCtrl'
 					}
 				}
@@ -162,7 +163,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/notice/:id',
 				views:{
 					'content':{
-						templateUrl:'game/notice.html',
+						templateUrl:'/static/game/notice.html',
 						controller:'NoticeCtrl'
 					}
 				}
@@ -171,7 +172,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/notice',
 				views:{
 					'content':{
-						templateUrl:'game/notice.html',
+						templateUrl:'/static/game/notice.html',
 						controller:'NoticeCtrl'
 					}
 				}
@@ -180,7 +181,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/notice/new/:id',
 				views:{
 					'content':{
-						templateUrl:'game/notice-edit.html',
+						templateUrl:'/static/game/notice-edit.html',
 						controller:'NoticeNewCtrl'
 					}
 				}
@@ -189,7 +190,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/notice/edit/:id',
 				views:{
 					'content':{
-						templateUrl:'game/notice-edit.html',
+						templateUrl:'/static/game/notice-edit.html',
 						controller:'NoticeEditCtrl'
 					}
 				}
@@ -198,7 +199,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/game/rec',
 				views:{
 					'content':{
-						templateUrl:'game/rec-examine.html',
+						templateUrl:'/static/game/rec-examine.html',
 						controller:'RecExamineCtrl'
 					}
 				}
@@ -207,7 +208,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/error-report',
 				views:{
 					'content':{
-						templateUrl:'game/error-report.html',
+						templateUrl:'/static/game/error-report.html',
 						controller:'ErrorReportCtrl'
 					}
 				}
@@ -216,7 +217,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/comment',
 				views:{
 					'content':{
-						templateUrl:'comment/index.html',
+						templateUrl:'/static/comment/main.html',
 						controller:'CommentCtrl'
 					}
 				}
@@ -225,7 +226,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/page',
 				views:{
 					'content':{
-						templateUrl:'page/index.html',
+						templateUrl:'/static/page/main.html',
 						controller:'PageCtrl'
 					}
 				}
@@ -234,7 +235,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/page/new',
 				views:{
 					'content':{
-						templateUrl:'page/edit.html',
+						templateUrl:'/static/page/edit.html',
 						controller:'PageNewCtrl'
 					}
 				}
@@ -243,11 +244,12 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/page/edit/:id',
 				views:{
 					'content':{
-						templateUrl:'page/edit.html',
+						templateUrl:'/static/page/edit.html',
 						controller:'PageEditCtrl'
 					}
 				}
 			})
+			// .state('')
 		$locationProvider.html5Mode(true);
 
 		// $urlRouterProvider.when("", "/dashboard");
@@ -477,7 +479,7 @@ app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options
 app.directive('mainSidebar',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/base/sidebar.html',
+		templateUrl:'/static/base/sidebar.html',
 		replace:true,
 	};
 });
@@ -485,7 +487,7 @@ app.directive('mainSidebar',function(){
 app.directive('navHeader',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/base/nav-header.html',
+		templateUrl:'/static/base/nav-header.html',
 		replace:true,
 		// link:function($scope,element,attrs){
 
@@ -496,7 +498,7 @@ app.directive('navHeader',function(){
 app.directive('navMessageList',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/base/nav-message-list.html',
+		templateUrl:'/static/base/nav-message-list.html',
 		replace:true,
 		// link:function($scope,element,attrs){
 
@@ -507,7 +509,7 @@ app.directive('navMessageList',function(){
 app.directive('navNotificationList',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/base/nav-notification-list.html',
+		templateUrl:'/static/base/nav-notification-list.html',
 		replace:true,
 		// link:function($scope,element,attrs){
 
@@ -518,7 +520,7 @@ app.directive('navNotificationList',function(){
 app.directive('navTaskList',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/base/nav-task-list.html',
+		templateUrl:'/static/base/nav-task-list.html',
 		replace:true,
 		// link:function($scope,element,attrs){
 
@@ -576,7 +578,7 @@ app.directive('upload',function(){
 app.directive('navPager',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/base/pager.html',
+		templateUrl:'/static/base/pager.html',
 		scope:{
 			data:'=navPager',
 			pageChange:'=pageChange'
@@ -593,54 +595,6 @@ app.directive('navPager',function(){
 	}
 })
 
-/**  
- * Two-way data binding for contenteditable elements with ng-model.  
- * @example  
- *   <p contenteditable="true" ng-model="text"></p>  
- */ 
-// app.directive('contenteditable', function() {  
-//   return {  
-//     require: '?ngModel',  
-//     link: function(scope, element, attrs, ctrl) {  
-   
-//       // Do nothing if this is not bound to a model  
-//       if (!ctrl) { return; }  
-   
-//       // Checks for updates (input or pressing ENTER)  
-//       // view -> model  
-//       element.bind('input enterKey', function() {  
-//         var rerender = false;  
-//         var html = element.html();  
-   
-//         if (attrs.noLineBreaks) {  
-//           html = html.replace(/<div>/g, '').replace(/<br>/g, '').replace(/<\/div>/g, '');  
-//           rerender = true;  
-//         }  
-   
-//         scope.$apply(function() {  
-//           ctrl.$setViewValue(html);  
-//           if(rerender) {  
-//             ctrl.$render();  
-//           }  
-//         });  
-//       });  
-   
-//       element.keyup(function(e){  
-//         if(e.keyCode === 13){  
-//           element.trigger('enterKey');  
-//         }  
-//       });  
-   
-//       // model -> view  
-//       ctrl.$render = function() {  
-//         element.html(ctrl.$viewValue);  
-//       };  
-   
-//       // load init value from DOM  
-//       ctrl.$render();  
-//     }  
-//   };  
-// }); 
 
 app.directive('contenteditable', function() {
         return {
@@ -663,6 +617,53 @@ app.directive('contenteditable', function() {
             }
         };
     });
+
+app.directive('lineChart',function(){
+	return {
+		restrict:'A',
+		scope:{
+			data:'=lineChart',
+			click:'=click',
+		},
+		link:function($scope,element,attrs){
+			var _chart;
+			$scope.$watch('data',function(){
+				if($scope.data){
+					_chart ? _chart.destroy() : false;
+					var ctx = $(element).get(0).getContext("2d");
+					_chart = new Chart(ctx).Line($scope.data);
+
+					$(element).on('click',function(e){
+						var point = _chart.getPointsAtEvent(e);
+						$scope.click ? $scope.click(point) : false ;
+					});
+					
+				}
+			});
+			
+		}
+	}
+})
+
+app.directive('pieChart',function(){
+	return {
+		restrict:'A',
+		scope:{
+			data:'=pieChart',
+		},
+		link:function($scope,element,attrs){
+			var _chart;
+			$scope.$watch('data',function(){
+				if($scope.data){
+					_chart ? _chart.destroy() : false;
+					var ctx = $(element).get(0).getContext("2d");
+					_chart = new Chart(ctx).Pie($scope.data);	
+				}
+			});
+			
+		}
+	}
+})
 app.filter(  
     'to_trusted', ['$sce', function ($sce) {  
         return function (text) {  
@@ -751,7 +752,7 @@ function html_decode(str)
 app.directive('reportList',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/base/report-list.html',
+		templateUrl:'/static/base/report-list.html',
 		replace:true,
 		controller:'ListReportCtrl'
 	};
@@ -760,7 +761,7 @@ app.directive('reportList',function(){
 app.directive('reportListBlock',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/base/report-list-block.html',
+		templateUrl:'/static/base/report-list-block.html',
 		replace:true,
 		controller:'SingleReportCtrl'
 	}
@@ -977,7 +978,7 @@ app.service('MessageService',['$q','$uibModal',
 			create:function(options){
 				var modalInstance = $uibModal.open({
 					animation:true,
-					templateUrl:'base/message.html',
+					templateUrl:'/static/base/message.html',
 					controller:'MessageCtrl',
 					size:'md',
 					resolve:{
@@ -1085,6 +1086,118 @@ app.service('CommentService',['$q',
 					deffered.resolve(data);
 				});
 				return deffered.promise;	
+			}
+		}
+	}]);
+app.controller('DashboardCtrl',['$scope','$rootScope','DashboardService',
+	function($scope,$rootScope,DashboardService){
+		// 昨日数据
+		DashboardService.yesterdayData().then(function(data){
+			$scope.yesterdayData = data;
+		});
+
+		DashboardService.sevenDayIncome().then(function(data){
+			$scope.sevenDayIncome = data;
+		});
+
+		DashboardService.dayIncome().then(function(data){
+			$scope.dayIncome = data;
+		})
+
+		$scope.lineChartClick = function(e){
+			DashboardService.dayIncome(e[0].label).then(function(data){
+				$scope.dayIncome = data;
+				$scope.selectDayIncome = e[0].label;
+			});
+		}
+	}]);
+app.service('DashboardService',['$q',
+	function($q){
+		return {
+			yesterdayData:function(){
+				var deffered = $q.defer();
+				$.get(ManagePath+'yesterday-data',function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			sevenDayIncome:function(){
+				var deffered = $q.defer();
+				var result = {
+					labels:[],
+					datasets:[{
+							fillColor: "#d2d6de",
+				            strokeColor: "#dd4b39",
+				            pointColor: "#ff7701",
+				            pointStrokeColor: "#fff",
+				            pointHighlightFill: "#fff",
+				            pointHighlightStroke: "#f39c12",
+							data:[]
+						}]
+				};
+				$.get(ChargePath+'analysis/seven-day-income',function(data){
+					_.map(data,function(value,key){
+						result.labels.push(key);
+						result.datasets[0].data.push(value);
+					});
+					result.labels = result.labels.reverse();
+					result.datasets[0].data = result.datasets[0].data.reverse();
+					deffered.resolve(result);
+				});
+				return deffered.promise;
+			},
+			dayIncome:function(day){
+				var deffered = $q.defer();
+				var result = [];
+				day = day ? day : '';
+				$.get(ChargePath+'analysis/day-income/'+day,function(data){
+					_.map(data,function(value,key){
+						switch(key){
+							case '仙侠道':
+								result.push({
+									value:value,
+									color:"#555299",
+									highlight:"#605ca8",
+									label:key
+								});
+								break;
+							case '玉之魂':
+								result.push({
+									value:value,
+									color:"#008d4c",
+									highlight:"#00a65a",
+									label:key
+								});
+								break;
+							case '大皇帝':
+								result.push({
+									value:value,
+									color: "#FDB45C",
+									highlight: "#FFC870",
+									label:key
+								});
+								break;
+							case '冒险与挖矿':
+								result.push({
+									value:value,
+									color:"#F7464A",
+			        				highlight: "#FF5A5E",
+									label:key
+								});
+								break;
+							case '刀剑魔药2':
+								result.push({
+									value:value,
+									color: "#46BFBD",
+									highlight: "#5AD3D1",
+									label:key
+								});
+								break;
+						}
+					});
+					deffered.resolve(result);
+				});
+				return deffered.promise;
 			}
 		}
 	}]);
@@ -1197,10 +1310,6 @@ app.service('DailyGameVilidService',['$http','$q','GameService',
 	}]);
 
 
-app.controller('DashboardCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
-
-	}]);
 app.controller('SingleGameCtrl',['$scope','$rootScope','MessageService',
 	function($scope,$rootScope,MessageService){
 		$scope.sendBack = function(game){
@@ -1371,6 +1480,7 @@ app.controller('GameEditCtrl',['$scope','$rootScope','GameService','$stateParams
 		}else{
 			// edit game
 			GameService.promise($stateParams.id).then(function(data){
+				console.log(data);
 				// data.update_at = moment.unix(parseInt(data.update_at)).format("YYYY/MM/DD H:mm:SS");
 				$scope.game = data;
 				$scope.game_type = $scope.game_types[$scope.game.type-1];
@@ -1469,6 +1579,14 @@ app.controller('GameEditCtrl',['$scope','$rootScope','GameService','$stateParams
 					});
 				}
 			});
+		}
+		$scope.deleteGame = function() {
+			if(confirm('确认删除该游戏吗？')){
+				GameService.delete($scope.game.id).then(function(){
+					alert('删除成功');
+					$state.go('base.gameList');
+				});
+			}
 		}
 	}]);
 
@@ -2117,7 +2235,7 @@ app.controller('RelationCtrl',['$scope','$rootScope','$stateParams','GameService
 app.directive('gameList',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/game/game-list.html',
+		templateUrl:'/static/game/game-list.html',
 		replace:true,
 		controller:'ListGameCtrl',
 		link:function(){
@@ -2129,7 +2247,7 @@ app.directive('gameList',function(){
 app.directive('gameListBlock',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/game/game-list-block.html',
+		templateUrl:'/static/game/game-list-block.html',
 		replace:true,
 		controller:'SingleGameCtrl'
 	}
@@ -2178,6 +2296,13 @@ app.service('GameService',['$q',
 			getTop10:function(){
 				var deffered = $q.defer();
 				$.get(ManagePath+'game/top10/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			delete:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'game/delete/'+id,function(data){
 					deffered.resolve(data);
 				});
 				return deffered.promise;
@@ -2425,7 +2550,7 @@ app.service('GameerrorService',['$q',
 app.directive('tagsList',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/game/tags-list.html',
+		templateUrl:'/static/game/tags-list.html',
 		replace:true,
 		scope:{
 			tagsCacheList:'=tagsList'

@@ -1,0 +1,152 @@
+<section class="content-header">
+	<h1>
+		控制台
+		<small>Version 1.0</small>
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+		<li class="active">控制台</li>
+	</ol>
+</section>
+<section class="content">
+	<div class="row">
+		<div class="col-md-3 col-sm-6 col-xs-12">
+			<div class="info-box">
+				<span class="info-box-icon bg-aqua"><i class="fa fa-users"></i></span>
+				<div class="info-box-content">
+					<span class="info-box-text">昨日登陆人数</span>
+					<span class="info-box-number">{{yesterdayData.loginCount}}<small>人</small></span>
+				</div>
+			<!-- /.info-box-content -->
+			</div>
+		<!-- /.info-box -->
+		</div>
+		<div class="col-md-3 col-sm-6 col-xs-12">
+			<div class="info-box">
+				<span class="info-box-icon bg-orange"><i class="fa fa-comments"></i></span>
+				<div class="info-box-content">
+					<span class="info-box-text">昨日评论数</span>
+					<span class="info-box-number">{{yesterdayData.comment}}<small>条</small></span>
+				</div>
+			<!-- /.info-box-content -->
+			</div>
+		<!-- /.info-box -->
+		</div>
+		<div class="col-md-3 col-sm-6 col-xs-12">
+			<div class="info-box">
+				<span class="info-box-icon bg-green"><i class="fa fa-user-plus"></i></span>
+				<div class="info-box-content">
+					<span class="info-box-text">昨日新注册人数</span>
+					<span class="info-box-number">{{yesterdayData.newUser}}<small>人</small></span>
+				</div>
+			<!-- /.info-box-content -->
+			</div>
+		<!-- /.info-box -->
+		</div>
+		<div class="col-md-3 col-sm-6 col-xs-12">
+			<div class="info-box">
+				<span class="info-box-icon bg-red"><i class="fa fa-play"></i></span>
+				<div class="info-box-content">
+					<span class="info-box-text">昨日游戏点击数</span>
+					<span class="info-box-number">{{yesterdayData.gameClick}}<small>次</small></span>
+				</div>
+			<!-- /.info-box-content -->
+			</div>
+		<!-- /.info-box -->
+		</div>
+	<!-- /.col -->
+	</div>
+	<div class="row">
+		<div class="col-md-12 col-lg-8">
+			<div class="box box-danger">
+				<div class="box-header with-border">
+					<h3 class="box-title">收入简报</h3>
+					<div class="box-tools pull-right">
+						<a class="label label-danger">详细数据</a>
+						<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+						<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+					</div>
+				</div>
+				<div class="box-body">
+					<div class="row">
+						<div class="col-md-6">
+							<p class="text-center"><strong>{{sevenDayIncome.labels[0]}} - {{sevenDayIncome.labels[6]}}</strong></p>
+							<div class="chart">
+								<canvas line-chart="sevenDayIncome" click="lineChartClick"></canvas>	
+							</div>
+						</div>
+						<div class="col-md-6">
+							<p class="text-center"><strong>{{selectDayIncome || '今'}}日收入占比</strong></p>
+							<div class="chart">
+								<canvas pie-chart="dayIncome"></canvas>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-12 col-lg-4">
+			<div class="info-box bg-aqua">
+				<span class="info-box-icon"><i class="fa fa-gamepad"></i></span>
+				<div class="info-box-content">
+					<span class="info-box-text">今日游戏投稿</span>
+					<span class="info-box-number">8</span>
+
+					<div class="progress">
+						<div class="progress-bar" style="width: 80%"></div>
+					</div>
+					<span class="progress-description">
+						已审核5款
+					</span>
+				</div>
+				<!-- /.info-box-content -->
+			</div>
+			<div class="info-box bg-teal">
+				<span class="info-box-icon"><i class="fa fa-newspaper-o"></i></span>
+				<div class="info-box-content">
+					<span class="info-box-text">今日精华投稿</span>
+					<span class="info-box-number">6</span>
+
+					<div class="progress">
+						<div class="progress-bar" style="width: 66%"></div>
+					</div>
+					<span class="progress-description">
+						已审核4篇
+					</span>
+				</div>
+				<!-- /.info-box-content -->
+			</div>
+			<div class="info-box bg-orange">
+				<span class="info-box-icon"><i class="fa fa-picture-o"></i></span>
+				<div class="info-box-content">
+					<span class="info-box-text">今日图片投稿</span>
+					<span class="info-box-number">12</span>
+
+					<div class="progress">
+						<div class="progress-bar" style="width: 22%"></div>
+					</div>
+					<span class="progress-description">
+						已审核2张
+					</span>
+				</div>
+				<!-- /.info-box-content -->
+			</div>
+			<div class="info-box bg-purple">
+				<span class="info-box-icon"><i class="fa fa-video-camera"></i></span>
+				<div class="info-box-content">
+					<span class="info-box-text">今日视频投稿</span>
+					<span class="info-box-number">2</span>
+
+					<div class="progress">
+						<div class="progress-bar" style="width: 100%"></div>
+					</div>
+					<span class="progress-description">
+						已审核2段
+					</span>
+				</div>
+				<!-- /.info-box-content -->
+			</div>
+		<!-- /.info-box -->
+		</div>
+	</div>
+</section>

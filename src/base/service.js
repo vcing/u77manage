@@ -210,7 +210,7 @@ app.service('MessageService',['$q','$uibModal',
 			create:function(options){
 				var modalInstance = $uibModal.open({
 					animation:true,
-					templateUrl:'base/message.html',
+					templateUrl:'/static/base/message.html',
 					controller:'MessageCtrl',
 					size:'md',
 					resolve:{

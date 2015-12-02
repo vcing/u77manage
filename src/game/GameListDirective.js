@@ -1,7 +1,7 @@
 app.directive('gameList',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/game/game-list.html',
+		templateUrl:'/static/game/game-list.html',
 		replace:true,
 		controller:'ListGameCtrl',
 		link:function(){
@@ -13,7 +13,7 @@ app.directive('gameList',function(){
 app.directive('gameListBlock',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/game/game-list-block.html',
+		templateUrl:'/static/game/game-list-block.html',
 		replace:true,
 		controller:'SingleGameCtrl'
 	}

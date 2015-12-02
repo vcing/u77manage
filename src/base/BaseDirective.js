@@ -1,7 +1,7 @@
 app.directive('mainSidebar',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/base/sidebar.html',
+		templateUrl:'/static/base/sidebar.html',
 		replace:true,
 	};
 });
@@ -9,7 +9,7 @@ app.directive('mainSidebar',function(){
 app.directive('navHeader',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/base/nav-header.html',
+		templateUrl:'/static/base/nav-header.html',
 		replace:true,
 		// link:function($scope,element,attrs){
 
@@ -20,7 +20,7 @@ app.directive('navHeader',function(){
 app.directive('navMessageList',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/base/nav-message-list.html',
+		templateUrl:'/static/base/nav-message-list.html',
 		replace:true,
 		// link:function($scope,element,attrs){
 
@@ -31,7 +31,7 @@ app.directive('navMessageList',function(){
 app.directive('navNotificationList',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/base/nav-notification-list.html',
+		templateUrl:'/static/base/nav-notification-list.html',
 		replace:true,
 		// link:function($scope,element,attrs){
 
@@ -42,7 +42,7 @@ app.directive('navNotificationList',function(){
 app.directive('navTaskList',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/base/nav-task-list.html',
+		templateUrl:'/static/base/nav-task-list.html',
 		replace:true,
 		// link:function($scope,element,attrs){
 
@@ -100,7 +100,7 @@ app.directive('upload',function(){
 app.directive('navPager',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/base/pager.html',
+		templateUrl:'/static/base/pager.html',
 		scope:{
 			data:'=navPager',
 			pageChange:'=pageChange'
@@ -117,54 +117,6 @@ app.directive('navPager',function(){
 	}
 })
 
-/**  
- * Two-way data binding for contenteditable elements with ng-model.  
- * @example  
- *   <p contenteditable="true" ng-model="text"></p>  
- */ 
-// app.directive('contenteditable', function() {  
-//   return {  
-//     require: '?ngModel',  
-//     link: function(scope, element, attrs, ctrl) {  
-   
-//       // Do nothing if this is not bound to a model  
-//       if (!ctrl) { return; }  
-   
-//       // Checks for updates (input or pressing ENTER)  
-//       // view -> model  
-//       element.bind('input enterKey', function() {  
-//         var rerender = false;  
-//         var html = element.html();  
-   
-//         if (attrs.noLineBreaks) {  
-//           html = html.replace(/<div>/g, '').replace(/<br>/g, '').replace(/<\/div>/g, '');  
-//           rerender = true;  
-//         }  
-   
-//         scope.$apply(function() {  
-//           ctrl.$setViewValue(html);  
-//           if(rerender) {  
-//             ctrl.$render();  
-//           }  
-//         });  
-//       });  
-   
-//       element.keyup(function(e){  
-//         if(e.keyCode === 13){  
-//           element.trigger('enterKey');  
-//         }  
-//       });  
-   
-//       // model -> view  
-//       ctrl.$render = function() {  
-//         element.html(ctrl.$viewValue);  
-//       };  
-   
-//       // load init value from DOM  
-//       ctrl.$render();  
-//     }  
-//   };  
-// }); 
 
 app.directive('contenteditable', function() {
         return {
@@ -187,3 +139,50 @@ app.directive('contenteditable', function() {
             }
         };
     });
+
+app.directive('lineChart',function(){
+	return {
+		restrict:'A',
+		scope:{
+			data:'=lineChart',
+			click:'=click',
+		},
+		link:function($scope,element,attrs){
+			var _chart;
+			$scope.$watch('data',function(){
+				if($scope.data){
+					_chart ? _chart.destroy() : false;
+					var ctx = $(element).get(0).getContext("2d");
+					_chart = new Chart(ctx).Line($scope.data);
+
+					$(element).on('click',function(e){
+						var point = _chart.getPointsAtEvent(e);
+						$scope.click ? $scope.click(point) : false ;
+					});
+					
+				}
+			});
+			
+		}
+	}
+})
+
+app.directive('pieChart',function(){
+	return {
+		restrict:'A',
+		scope:{
+			data:'=pieChart',
+		},
+		link:function($scope,element,attrs){
+			var _chart;
+			$scope.$watch('data',function(){
+				if($scope.data){
+					_chart ? _chart.destroy() : false;
+					var ctx = $(element).get(0).getContext("2d");
+					_chart = new Chart(ctx).Pie($scope.data);	
+				}
+			});
+			
+		}
+	}
+})

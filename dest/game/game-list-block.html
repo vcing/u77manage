@@ -13,35 +13,35 @@
 		<div class="row">
 			<div class="col-xs-4 border-right btns">
 				<div class="description-block">
-					<button class="btn btn-primary" ui-sref="base.gameEdit({id:game.id})">编辑</button>
-					<button class="btn btn-danger" ng-click="sendBack(game)">退稿</button>
-					<button class="btn btn-success" ui-sref="base.relation({id:game.id})">相关</button>
-					<button class="btn btn-warning" ui-sref="base.gameNotice({id:game.id})">公告</button>
+					<a target="_blank" class="btn btn-primary" ui-sref="base.gameEdit({id:game.id})">编辑</a>
+					<a target="_blank" class="btn btn-danger" ng-click="sendBack(game)">退稿</a>
+					<a target="_blank" class="btn btn-success" ui-sref="base.relation({id:game.id})">相关</a>
+					<a target="_blank" class="btn btn-warning" ui-sref="base.gameNotice({id:game.id})">公告</a>
 				</div><!-- /.description-block -->
 			</div><!-- /.col -->
 			<div class="col-xs-4 border-right status" ng-if="game.status == 0">
-				<div class="description-block unaudited" ui-sref="base.gameEdit({id:game.id})">
+				<a class="description-block unaudited" target="_blank" ui-sref="base.gameEdit({id:game.id})">
 					<i class="icon fa fa-warning"></i>
 					<h5 class="text">未审核</h5>
-				</div><!-- /.description-block -->
+				</a><!-- /.description-block -->
 			</div><!-- /.col -->
 			<div class="col-xs-4 border-right status" ng-if="game.status == 99">
-				<div class="description-block publish" ui-sref="base.gameEdit({id:game.id})">
+				<a class="description-block publish" target="_blank" ui-sref="base.gameEdit({id:game.id})">
 					<i class="icon fa fa-check"></i>
 					<h5 class="text">已发布</h5>
-				</div><!-- /.description-block -->
+				</a><!-- /.description-block -->
 			</div><!-- /.col -->
 			<div class="col-xs-4 border-right status" ng-if="game.status == 1">
-				<div class="description-block unpublish" ui-sref="base.gameEdit({id:game.id})">
+				<a class="description-block unpublish" target="_blank" ui-sref="base.gameEdit({id:game.id})">
 					<i class="icon fa fa-circle-o"></i>
 					<h5 class="text">未发布</h5>
-				</div><!-- /.description-block -->
+				</a><!-- /.description-block -->
 			</div><!-- /.col -->
 			<div class="col-xs-4 border-right status" ng-if="game.status == 3">
-				<div class="description-block send-back" ui-sref="base.gameEdit({id:game.id})">
+				<a class="description-block send-back" target="_blank" ui-sref="base.gameEdit({id:game.id})">
 					<i class="icon fa fa-close"></i>
 					<h5 class="text">退稿</h5>
-				</div><!-- /.description-block -->
+				</a><!-- /.description-block -->
 			</div><!-- /.col -->
 			<div class="col-xs-4" style="padding:0">
 				<div class="description-block time">

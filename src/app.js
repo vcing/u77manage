@@ -9,7 +9,8 @@ var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch','infi
 var BasePath = 'http://www.u77.com/admin/';
 var Path = 'http://www.u77.com/';
 var AvatarPath = 'http://img.u77.com/avatar/';
-var ManagePath = 'http://manage.u77.com/'
+var ManagePath = 'http://manage.u77.com/';
+var ChargePath = 'http://localhost:3000/api/'
 app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 	function($stateProvider,$urlRouterProvider,$locationProvider){
 
@@ -18,7 +19,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'',
 				views:{
 					'main':{
-						templateUrl:'base/base.html',
+						templateUrl:'/static/base/base.html',
 						controller:'BaseCtrl'
 					}
 				}
@@ -27,7 +28,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/dashboard',
 				views:{
 					'content':{
-						templateUrl:'dashboard/index.html',
+						templateUrl:'/static/dashboard/main.html',
 						controller:'DashboardCtrl'
 					}
 				}
@@ -36,7 +37,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 			// 	url:'/daily',
 			// 	views:{
 			// 		'content':{
-			// 			templateUrl:'daily/big-eye.html',
+			// 			templateUrl:'/static/daily/big-eye.html',
 			// 			controller:'BigEyeCtrl'
 			// 		}
 			// 	}
@@ -45,7 +46,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/daily-big-eye',
 				views:{
 					'content':{
-						templateUrl:'daily/big-eye.html',
+						templateUrl:'/static/daily/big-eye.html',
 						controller:'BigEyeCtrl'
 					}
 				}
@@ -54,7 +55,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/daily-game-examine',
 				views:{
 					'content':{
-						templateUrl:'daily/game-examine.html',
+						templateUrl:'/static/daily/game-examine.html',
 						controller:'GameExamineCtrl'
 					}
 				}
@@ -63,7 +64,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/daily-report-examine',
 				views:{
 					'content':{
-						templateUrl:'daily/report-examine.html',
+						templateUrl:'/static/daily/report-examine.html',
 						controller:'ReportExamineCtrl'
 					}
 				}
@@ -72,7 +73,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/game-list',
 				views:{
 					'content':{
-						templateUrl:'game/game-lists.html',
+						templateUrl:'/static/game/game-lists.html',
 						controller:'GameListCtrl'
 					}
 				}
@@ -81,7 +82,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/game-edit/:id',
 				views:{
 					'content':{
-						templateUrl:'game/game-edit.html',
+						templateUrl:'/static/game/game-edit.html',
 						controller:'GameEditCtrl'
 					}
 				}
@@ -90,7 +91,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/game-new',
 				views:{
 					'content':{
-						templateUrl:'game/game-edit.html',
+						templateUrl:'/static/game/game-edit.html',
 						controller:'GameNewCtrl'
 					}
 				}
@@ -99,7 +100,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/game/relation/:id',
 				views:{
 					'content':{
-						templateUrl:'game/relation.html',
+						templateUrl:'/static/game/relation.html',
 						controller:'RelationCtrl'
 					}
 				}
@@ -108,7 +109,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/tag',
 				views:{
 					'content':{
-						templateUrl:'game/tag.html',
+						templateUrl:'/static/game/tag.html',
 						controller:'TagCtrl'
 					}
 				}
@@ -117,7 +118,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/cream/:gameid',
 				views:{
 					'content':{
-						templateUrl:'game/cream.html',
+						templateUrl:'/static/game/cream.html',
 						controller:'CreamCtrl',
 					}
 				}
@@ -126,7 +127,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/cream',
 				views:{
 					'content':{
-						templateUrl:'game/cream.html',
+						templateUrl:'/static/game/cream.html',
 						controller:'CreamCtrl',
 					}
 				}
@@ -135,7 +136,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/cream/edit/:id',
 				views:{
 					'content':{
-						templateUrl:'game/cream-edit.html',
+						templateUrl:'/static/game/cream-edit.html',
 						controller:'CreamEditCtrl'
 					}
 				}
@@ -144,7 +145,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/video',
 				views:{
 					'content':{
-						templateUrl:'game/video.html',
+						templateUrl:'/static/game/video.html',
 						controller:'VideoCtrl'
 					}
 				}
@@ -153,7 +154,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/image',
 				views:{
 					'content':{
-						templateUrl:'game/image.html',
+						templateUrl:'/static/game/image.html',
 						controller:'ImageCtrl'
 					}
 				}
@@ -162,7 +163,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/notice/:id',
 				views:{
 					'content':{
-						templateUrl:'game/notice.html',
+						templateUrl:'/static/game/notice.html',
 						controller:'NoticeCtrl'
 					}
 				}
@@ -171,7 +172,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/notice',
 				views:{
 					'content':{
-						templateUrl:'game/notice.html',
+						templateUrl:'/static/game/notice.html',
 						controller:'NoticeCtrl'
 					}
 				}
@@ -180,7 +181,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/notice/new/:id',
 				views:{
 					'content':{
-						templateUrl:'game/notice-edit.html',
+						templateUrl:'/static/game/notice-edit.html',
 						controller:'NoticeNewCtrl'
 					}
 				}
@@ -189,7 +190,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/notice/edit/:id',
 				views:{
 					'content':{
-						templateUrl:'game/notice-edit.html',
+						templateUrl:'/static/game/notice-edit.html',
 						controller:'NoticeEditCtrl'
 					}
 				}
@@ -198,7 +199,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/game/rec',
 				views:{
 					'content':{
-						templateUrl:'game/rec-examine.html',
+						templateUrl:'/static/game/rec-examine.html',
 						controller:'RecExamineCtrl'
 					}
 				}
@@ -207,7 +208,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/error-report',
 				views:{
 					'content':{
-						templateUrl:'game/error-report.html',
+						templateUrl:'/static/game/error-report.html',
 						controller:'ErrorReportCtrl'
 					}
 				}
@@ -216,7 +217,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/comment',
 				views:{
 					'content':{
-						templateUrl:'comment/index.html',
+						templateUrl:'/static/comment/main.html',
 						controller:'CommentCtrl'
 					}
 				}
@@ -225,7 +226,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/page',
 				views:{
 					'content':{
-						templateUrl:'page/index.html',
+						templateUrl:'/static/page/main.html',
 						controller:'PageCtrl'
 					}
 				}
@@ -234,7 +235,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/page/new',
 				views:{
 					'content':{
-						templateUrl:'page/edit.html',
+						templateUrl:'/static/page/edit.html',
 						controller:'PageNewCtrl'
 					}
 				}
@@ -243,11 +244,12 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				url:'/page/edit/:id',
 				views:{
 					'content':{
-						templateUrl:'page/edit.html',
+						templateUrl:'/static/page/edit.html',
 						controller:'PageEditCtrl'
 					}
 				}
 			})
+			// .state('')
 		$locationProvider.html5Mode(true);
 
 		// $urlRouterProvider.when("", "/dashboard");

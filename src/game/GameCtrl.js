@@ -168,6 +168,7 @@ app.controller('GameEditCtrl',['$scope','$rootScope','GameService','$stateParams
 		}else{
 			// edit game
 			GameService.promise($stateParams.id).then(function(data){
+				console.log(data);
 				// data.update_at = moment.unix(parseInt(data.update_at)).format("YYYY/MM/DD H:mm:SS");
 				$scope.game = data;
 				$scope.game_type = $scope.game_types[$scope.game.type-1];
@@ -266,6 +267,14 @@ app.controller('GameEditCtrl',['$scope','$rootScope','GameService','$stateParams
 					});
 				}
 			});
+		}
+		$scope.deleteGame = function() {
+			if(confirm('确认删除该游戏吗？')){
+				GameService.delete($scope.game.id).then(function(){
+					alert('删除成功');
+					$state.go('base.gameList');
+				});
+			}
 		}
 	}]);
 

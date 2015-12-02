@@ -45,6 +45,13 @@ app.service('GameService',['$q',
 					deffered.resolve(data);
 				});
 				return deffered.promise;
+			},
+			delete:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'game/delete/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
 			}
 		}
 	}]);
