@@ -58,6 +58,32 @@
 	</div>
 	<div class="row">
 		<div class="col-md-12 col-lg-8">
+			<div class="box box-warning">
+				<div class="box-header with-border">
+					<h3 class="box-title">七日简报</h3>
+					<div class="box-tools pull-right">
+						<a class="label label-danger">详细数据</a>
+						<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+						<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+					</div>
+				</div>
+				<div class="box-body">
+					<div class="row">
+						<div class="col-md-6">
+							<p class="text-center"><strong>{{sevenDayData.labels[0]}} - {{sevenDayData.labels[6]}} <span style="color:rgba(151,187,205,1);">评论</span>/<span style="color:rgba(220,220,220,1)">新用户</span></strong></p>
+							<div class="chart">
+								<canvas line-chart="sevenDayData"></canvas>	
+							</div>
+						</div>
+						<div class="col-md-6">
+							<p class="text-center"><strong>{{sevenDayLogin.labels[0]}} - {{sevenDayLogin.labels[6]}} 登陆用户</strong></p>
+							<div class="chart">
+								<canvas line-chart="sevenDayLogin"></canvas>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 			<div class="box box-danger">
 				<div class="box-header with-border">
 					<h3 class="box-title">收入简报</h3>
@@ -86,67 +112,99 @@
 			</div>
 		</div>
 		<div class="col-md-12 col-lg-4">
-			<div class="info-box bg-aqua">
+			<a class="info-box bg-aqua" ui-sref="base.gameList" target="_blank">
 				<span class="info-box-icon"><i class="fa fa-gamepad"></i></span>
 				<div class="info-box-content">
 					<span class="info-box-text">今日游戏投稿</span>
-					<span class="info-box-number">8</span>
+					<span class="info-box-number" ng-bind="todayData.game.all"></span>
 
 					<div class="progress">
-						<div class="progress-bar" style="width: 80%"></div>
+						<div class="progress-bar" style="width: {{todayData.game.pass/todayData.game.all * 100}}%"></div>
 					</div>
 					<span class="progress-description">
-						已审核5款
+						已审核{{todayData.game.pass}}款
 					</span>
 				</div>
 				<!-- /.info-box-content -->
-			</div>
-			<div class="info-box bg-teal">
+			</a>
+			<a class="info-box bg-teal" ui-sref="base.cream" target="_blank">
 				<span class="info-box-icon"><i class="fa fa-newspaper-o"></i></span>
 				<div class="info-box-content">
 					<span class="info-box-text">今日精华投稿</span>
-					<span class="info-box-number">6</span>
+					<span class="info-box-number" ng-bind="todayData.cream.all"></span>
 
 					<div class="progress">
-						<div class="progress-bar" style="width: 66%"></div>
+						<div class="progress-bar" style="width: {{todayData.cream.pass/todayData.cream.all * 100}}%"></div>
 					</div>
 					<span class="progress-description">
-						已审核4篇
+						已审核{{todayData.cream.pass}}篇
 					</span>
 				</div>
 				<!-- /.info-box-content -->
-			</div>
-			<div class="info-box bg-orange">
+			</a>
+			<a class="info-box bg-orange" ui-sref="base.image" target="_blank">
 				<span class="info-box-icon"><i class="fa fa-picture-o"></i></span>
 				<div class="info-box-content">
 					<span class="info-box-text">今日图片投稿</span>
-					<span class="info-box-number">12</span>
+					<span class="info-box-number" ng-bind="todayData.image.all"></span>
 
 					<div class="progress">
-						<div class="progress-bar" style="width: 22%"></div>
+						<div class="progress-bar" style="width: {{todayData.image.pass/todayData.image.all * 100}}%"></div>
 					</div>
 					<span class="progress-description">
-						已审核2张
+						已审核{{todayData.image.pass}}张
 					</span>
 				</div>
 				<!-- /.info-box-content -->
-			</div>
-			<div class="info-box bg-purple">
+			</a>
+			<a class="info-box bg-purple" ui-sref="base.video" target="_blank">
 				<span class="info-box-icon"><i class="fa fa-video-camera"></i></span>
 				<div class="info-box-content">
 					<span class="info-box-text">今日视频投稿</span>
-					<span class="info-box-number">2</span>
+					<span class="info-box-number" ng-bind="todayData.video.all"></span>
 
 					<div class="progress">
-						<div class="progress-bar" style="width: 100%"></div>
+						<div class="progress-bar" style="width: {{todayData.video.pass/todayData.video.all * 100}}%"></div>
 					</div>
 					<span class="progress-description">
-						已审核2段
+						已审核{{todayData.video.pass}}段
 					</span>
 				</div>
 				<!-- /.info-box-content -->
-			</div>
+			</a>
 		<!-- /.info-box -->
+			<div class="box box-primary direct-chat direct-chat-primary">
+				<div class="box-header with-border">
+					<h3 class="box-title">最新评论</h3>
+
+					<div class="box-tools pull-right">
+						<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+						</button>
+						<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+					</div>
+				</div>
+				<!-- /.box-header -->
+				<div class="box-body">
+				<!-- Conversations are loaded here -->
+					<div class="direct-chat-messages" style="height:300px">
+						<!-- Message. Default to the left -->
+						<div class="direct-chat-msg" ng-repeat="msg in recentComment.data">
+							<div class="direct-chat-info clearfix">
+								<a href="{{Path+'user/'+msg.user.userid}}" class="direct-chat-name pull-left" ng-bind="msg.user.nickname" target="_blank"></a>
+								<a href="{{Path+'game/'+msg.body.id}}" class="direct-chat-name pull-left" style="font-weight:normal;color:#00C0EF;margin-left:10px" target="_blank">@{{msg.body.title}}</a>
+								<span class="direct-chat-timestamp pull-right" ng-bind="msg.create_at | fromNow"></span>
+							</div>
+							<!-- /.direct-chat-info -->
+							<a href="{{Path+'user/'+msg.user.userid}}" target="_blank"><img class="direct-chat-img" ng-src="{{AvatarPath+msg.user.avatar}}" alt="Message User Image"></a>
+							<a href="{{Path+'comment/'+msg.id+'#comment'}}" id="recent-comment" class="direct-chat-text" ng-bind-html="msg.content.content | to_trusted" target="_blank"></a>
+							<!-- /.direct-chat-text -->
+						</div>
+						<!-- /.direct-chat-msg -->
+					</div>
+					<!--/.direct-chat-messages-->
+				</div>
+				<!-- /.box-body -->
+			</div>
 		</div>
 	</div>
 </section>

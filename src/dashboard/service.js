@@ -8,6 +8,30 @@ app.service('DashboardService',['$q',
 				});
 				return deffered.promise;
 			},
+			todayData:function(){
+				var deffered = $q.defer();
+				$.get(ManagePath+'today-data',function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			sevendayData:function(){
+				var deffered = $q.defer();
+				$.get(ManagePath+'sevenday-data',function(data){
+					_.map(data,function(value){
+						value = value.reverse();
+					});
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			recentComment:function(){
+				var deffered = $q.defer();
+				$.get(ManagePath+'recent-comment',function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
 			sevenDayIncome:function(){
 				var deffered = $q.defer();
 				var result = {
