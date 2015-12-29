@@ -38,6 +38,7 @@ app.controller('DashboardCtrl',['$scope','$rootScope','DashboardService',
 								data:data.comment
 							}]
 					};
+				window.aaa = result;
 				$scope.sevenDayData = result;
 				$scope.sevenDayLogin = {
 					labels:$scope.sevenDayIncome.labels,
@@ -67,7 +68,12 @@ app.controller('DashboardCtrl',['$scope','$rootScope','DashboardService',
 		}
 
 		DashboardService.recentComment().then(function(data){
-			console.log(data);
 			$scope.recentComment = data;
 		})
+
+		$scope.commentRefresh = function(){
+			DashboardService.recentComment().then(function(data){
+				$scope.recentComment = data;
+			})			
+		}
 	}]);

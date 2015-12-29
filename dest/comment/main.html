@@ -69,10 +69,10 @@
 						<img class="attachment-img" ng-src="{{comment.body.game.image}}" alt="attachment image" style="width:100px;height:57px" ng-if="comment.body.game.image">
 						<div class="attachment-pushed">
 							<h4 class="attachment-heading" ng-if="comment.type == 1">
-								<a href="{{Path+'/game/'+comment.body.id}}" target="_blank" ng-bind="comment.body.title" style="display: inline-block;text-overflow: ellipsis;overflow: hidden;white-space: nowrap;max-width: 100%;"></a>
+								<a href="{{Path+'game/'+comment.body.id}}" target="_blank" ng-bind="comment.body.title" style="display: inline-block;text-overflow: ellipsis;overflow: hidden;white-space: nowrap;max-width: 100%;"></a>
 							</h4>
 							<h4 class="attachment-heading" ng-if="comment.type == 2">
-								<a href="{{Path+'/post/'+comment.body.id}}" target="_blank" ng-bind="comment.body.title" style="display: inline-block;text-overflow: ellipsis;overflow: hidden;white-space: nowrap;max-width: 100%;"></a>
+								<a href="{{Path+'post/'+comment.body.id}}" target="_blank" ng-bind="comment.body.title" style="display: inline-block;text-overflow: ellipsis;overflow: hidden;white-space: nowrap;max-width: 100%;"></a>
 							</h4>
 							<div class="attachment-text" ng-if="comment.type == 1">
 								首次推荐于<br><span>{{comment.body.create_at | time}}</span>

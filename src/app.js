@@ -3,14 +3,15 @@
  * 
  */
 
-var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch','infinite-scroll','ngFileUpload','textAngular']);
+var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch','infinite-scroll','ngFileUpload','textAngular','ui.bootstrap.datetimepicker']);
 // var BasePath = 'http://dev.u77.com/admin/';
 // var Path = 'http://dev.u77.com';
 var BasePath = 'http://www.u77.com/admin/';
 var Path = 'http://www.u77.com/';
 var AvatarPath = 'http://img.u77.com/avatar/';
 var ManagePath = 'http://manage.u77.com/';
-var ChargePath = 'http://localhost:3000/api/'
+var ChargePath = 'http://dev.u77pay.avosapps.com/api/'
+// var ChargePath = 'http://192.168.0.102:3000/api/'
 app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 	function($stateProvider,$urlRouterProvider,$locationProvider){
 
@@ -246,6 +247,24 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 					'content':{
 						templateUrl:'/static/page/edit.html',
 						controller:'PageEditCtrl'
+					}
+				}
+			})
+			.state('base.analysisFinance',{
+				url:'/analysis/finance',
+				views:{
+					'content':{
+						templateUrl:'/static/analysis/finance.html',
+						controller:'FinanceAnalysisCtrl'
+					}
+				}
+			})
+			.state('base.analysisWeb',{
+				url:'/analysis/web',
+				views:{
+					'content':{
+						templateUrl:'/static/analysis/web.html',
+						controller:'WebAnalysisCtrl'
 					}
 				}
 			})

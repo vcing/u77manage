@@ -146,6 +146,7 @@ app.directive('lineChart',function(){
 		scope:{
 			data:'=lineChart',
 			click:'=click',
+			ratio:'=ratio',
 		},
 		link:function($scope,element,attrs){
 			var _chart;
@@ -153,7 +154,13 @@ app.directive('lineChart',function(){
 				if($scope.data){
 					_chart ? _chart.destroy() : false;
 					var ctx = $(element).get(0).getContext("2d");
-					_chart = new Chart(ctx).Line($scope.data);
+					ctx.canvas.width = $scope.ratio ? $scope.ratio : 2;
+					ctx.canvas.height = 1;
+					_chart = new Chart(ctx).Line($scope.data,{
+						responsive: true,
+						// maintainAspectRatio: false,
+					});
+
 
 					$(element).on('click',function(e){
 						var point = _chart.getPointsAtEvent(e);

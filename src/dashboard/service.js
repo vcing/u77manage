@@ -104,6 +104,13 @@ app.service('DashboardService',['$q',
 									label:key
 								});
 								break;
+							case '卡片怪兽':
+								result.push({
+									value:value,
+									color:"#7d3bab",
+									highlight:"#8d4bbb",
+									label:key
+								})
 						}
 					});
 					deffered.resolve(result);
