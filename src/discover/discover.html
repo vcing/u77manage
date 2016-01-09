@@ -1,0 +1,97 @@
+<section class="content-header">
+	<h1>
+		推荐
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+		<li class="active">推荐</li>
+	</ol>
+</section>
+<section class="content">
+	<div class="row">
+		<div class="col-xs-12" style="margin:15px 0">
+			<div class="btn-group" style="margin:0 10px 10px 0;float:left">
+				<button type="button" class="btn btn-primary btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+					<span ng-if="!options.type && options.type != 0">全部状态</span>
+					<span ng-if="options.type == 1">展示中</span>
+					<span ng-if="options.type == 2">已隐藏</span>
+					<span class="caret"></span>
+					<span class="sr-only">Toggle Dropdown</span>
+				</button>
+				<ul class="dropdown-menu" role="menu">
+					<li><a ng-click="options.type = null;refresh()">全部类型</a></li>
+					<li><a ng-click="options.type = 1;refresh()">展示中</a></li>
+					<li><a ng-click="options.type = 2;refresh()">已隐藏</a></li>
+				</ul>
+			</div>
+			<div class="input-group" style="margin:0 10px 10px 0;float:left;width:200px">
+				<div class="input-group-btn">
+					<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
+						<span ng-if="options.search_type == 'title' || !options.search_type">游戏标题查询</span>
+						<span ng-if="options.search_type == 'discoverId'">发现ID查询</span>
+						<span ng-if="options.search_type == 'nickname'">用户昵称</span>
+						<span ng-if="options.search_type == 'userId'">用户ID查询</span>
+						<span ng-if="options.search_type == 'game'">游戏objectId查询</span>
+						<span class="fa fa-caret-down"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a ng-click="options.search_type = 'title'">游戏标题查询</a></li>
+						<li><a ng-click="options.search_type = 'discoverId'">发现ID查询</a></li>
+						<li><a ng-click="options.search_type = 'nickname'">用户昵称</a></li>
+						<li><a ng-click="options.search_type = 'userId'">用户ID查询</a></li>
+						<li><a ng-click="options.search_type = 'game'">游戏objectId查询</a></li>
+					</ul>
+				</div><!-- /btn-group -->
+				<input type="text" class="form-control" ng-model="options.keywords" ng-keyup="search($event)">
+			</div>
+		</div>
+		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" ng-show="!discover.hide" ng-repeat="discover in discovers">
+			<div class="box box-primary">
+				<div class="box-header with-border">
+					<img ng-src="{{discover.avatar}}" class="img-circle" style="width:40px;height:40px;float:left;">
+					<a class="username" ng-bind="discover.nickname" href="{{Path+'user/'+discover.userId}}" style="display:block;margin-left:50px" target="_blank"></a>
+					<span class="description ng-binding" style="display:block;margin-left:50px" ng-bind="discover.createdAt | timeFromNow"></span>
+					<div class="box-tools pull-right">
+					    <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+					    <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+					</div>
+				</div>
+				<div class="box-body">
+					<a href="{{Path+'discover/'+discover.discoverId}}" target="_blank">
+						<img ng-src="{{discover.cover}}" alt="" class="img-responsive" style="min-width:100%">
+					</a>
+				</div>
+				<div class="box-footer">
+					<ul class="nav nav-pills nav-stacked">
+						<li>
+							<a href="{{Path+'discover/'+discover.discoverId}}" target="_blank" ng-bind="discover.title"></a>
+						</li>
+						<li style="text-align:center">
+							<a href="{{Path+'discover/'+discover.discoverId}}" target="_blank" ng-bind="discover.oneWord" ng-if="discover.oneWord"></a>
+							<a ng-if="!discover.oneWord">
+								<span class="label label-danger" style="font-size:12px;padding:6px">无一句话介绍</span>
+							</a>
+						</li>
+						<li>
+							<a href="{{Path+'discover/'+discover.discoverId}}" target="_blank" style="font-size:16px;text-align:center">
+								<span class="label label-success" ng-if="discover.isLast">展示中</span>
+								<span class="label label-warning" ng-if="!discover.isLast">已隐藏</span>
+							</a>
+						</li>
+						<li style="text-align:right">
+							<a>
+								<span class="btn btn-danger" ng-click="delete(discover)">删除</span>
+								<!-- ui-sref="base.discoverGameWithId({id:discover.game.objectId})" -->
+								<span class="btn btn-primary" ng-click="checkGame(discover)">查看游戏</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-12" style="text-align:center">
+			<a class="btn btn-default" ng-click="prevPage()">上一页</a>
+			<a class="btn btn-default" ng-click="nextPage()">下一页</a>
+		</div>
+	</div>
+</section>

@@ -10,7 +10,8 @@ var BasePath = 'http://www.u77.com/admin/';
 var Path = 'http://www.u77.com/';
 var AvatarPath = 'http://img.u77.com/avatar/';
 var ManagePath = 'http://manage.u77.com/';
-var ChargePath = 'http://dev.u77pay.avosapps.com/api/'
+var ChargePath = 'http://u77pay.avosapps.com/api/';
+var DiscoverPath = 'http://dev.u77discoverd.avosapps.com/api/';
 // var ChargePath = 'http://192.168.0.102:3000/api/'
 app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 	function($stateProvider,$urlRouterProvider,$locationProvider){
@@ -268,7 +269,42 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 					}
 				}
 			})
-			// .state('')
+			.state('base.discoverGame',{
+				url:'/discover/game',
+				views:{
+					'content':{
+						templateUrl:'/static/discover/game.html',
+						controller:'DiscoverGameCtrl'
+					}
+				}
+			})
+			.state('base.discoverGameWithId',{
+				url:'/discover/game/:id',
+				views:{
+					'content':{
+						templateUrl:'/static/discover/game.html',
+						controller:'DiscoverGameCtrl'
+					}
+				}
+			})
+			.state('base.discover',{
+				url:'/discover',
+				views:{
+					'content':{
+						templateUrl:'/static/discover/discover.html',
+						controller:'DiscoverCtrl'
+					}
+				}
+			})
+			.state('base.discoverWithGameId',{
+				url:'/discover/:gameId',
+				views:{
+					'content':{
+						templateUrl:'/static/discover/discover.html',
+						controller:'DiscoverCtrl'
+					}
+				}
+			})
 		$locationProvider.html5Mode(true);
 
 		// $urlRouterProvider.when("", "/dashboard");

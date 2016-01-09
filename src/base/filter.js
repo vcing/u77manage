@@ -20,6 +20,12 @@ app.filter('fromNow',[function(){
 	}
 }]);
 
+app.filter('timeFromNow',[function(){
+  return function(time){
+    return moment(time).fromNow();
+  }
+}])
+
 app.filter('time',[function(){
 	return function(unix){
 		return moment.unix(parseInt(unix)).format("YY年MM月DD日 H:mm");
