@@ -11,10 +11,92 @@
 <section class="content">
 	<div class="row">
 		<div class="col-xs-12" style="margin:15px 0">
-			<div class="from-group">
-				<label>类型:</label>
-				<select class="form-control" ng-options="type.id as type.label for type in typeOptions" ng-model="options.type"></select>
+			<div class="btn-group" style="margin:0 10px 10px 0;float:left">
+				<button type="button" class="btn btn-primary btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+					<span ng-if="!options.type && options.type != 0">全部状态</span>
+					<span ng-if="options.type == 1">Web</span>
+					<span ng-if="options.type == 2">PC</span>
+					<span ng-if="options.type == 3">Android</span>
+					<span ng-if="options.type == 4">iOS</span>
+					<span class="caret"></span>
+					<span class="sr-only">Toggle Dropdown</span>
+				</button>
+				<ul class="dropdown-menu" role="menu">
+					<li><a ng-click="options.type = null;refresh()">全部类型</a></li>
+					<li><a ng-click="options.type = 1;refresh()">Web</a></li>
+					<li><a ng-click="options.type = 2;refresh()">PC</a></li>
+					<li><a ng-click="options.type = 3;refresh()">Android</a></li>
+					<li><a ng-click="options.type = 4;refresh()">iOS</a></li>
+				</ul>
+			</div>
+			<div class="input-group" style="margin:0 10px 10px 0;float:left;width:200px">
+				<div class="input-group-btn">
+					<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
+						<span ng-if="options.search_type == 'title' || !options.search_type">游戏标题查询</span>
+						<span ng-if="options.search_type == 'description'">简介查询</span>
+						<span ng-if="options.search_type == 'originUrl'">原始地址查询</span>
+						<span ng-if="options.search_type == 'u77Id'">u77ID查询</span>
+						<span ng-if="options.search_type == 'objectId'">游戏objectId查询</span>
+						<span class="fa fa-caret-down"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a ng-click="options.search_type = 'title'">游戏标题查询</a></li>
+						<li><a ng-click="options.search_type = 'description'">简介查询</a></li>
+						<li><a ng-click="options.search_type = 'originUrl'">原始地址查询</a></li>
+						<li><a ng-click="options.search_type = 'u77Id'">u77ID查询</a></li>
+						<li><a ng-click="options.search_type = 'objectId'">游戏objectId查询</a></li>
+					</ul>
+				</div><!-- /btn-group -->
+				<input type="text" class="form-control" ng-model="options.keywords" ng-keyup="search($event)">
 			</div>
 		</div>
+		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" ng-show="!game.hide" ng-repeat="game in games">
+			<div class="box box-primary">
+				<div class="box-header with-border">
+					<a class="username" ng-bind="game.title" href="{{game.originUrl}}" style="display:block;" target="_blank"></a>
+					<span class="description ng-binding" style="display:block;" ng-bind="game.createdAt | timeFromNow"></span>
+					<div class="box-tools pull-right">
+					    <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+					    <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+					</div>
+				</div>
+				<div class="box-body">
+					<img ng-src="{{game.img[0].url}}" alt="" class="img-responsive" style="min-width:100%">
+				</div>
+				<div class="box-footer">
+					<ul class="nav nav-pills nav-stacked">
+						<li>
+							<a >推荐次数:{{game.times}}</a>
+						</li>
+						<li>
+							<a ng-if="game.type == 1">类型:Web</a>
+							<a ng-if="game.type == 2">类型:PC</a>
+							<a ng-if="game.type == 3">类型:Android</a>
+							<a ng-if="game.type == 4">类型:iOS</a>
+						</li>
+						<li>
+							<a >
+								u77Id:
+								<input type="text" ng-model="game.u77Id">
+							</a>
+						</li>
+						<li>
+							<a ng-bind-html="game.description | trusted"></a>
+						</li>
+						<li style="text-align:right">
+							<a>
+								<span class="btn btn-primary" ng-click="checkDiscover(game)">查看相关推荐</span>
+								<span class="btn btn-danger" ng-click="delete(game)">删除</span>
+								<span class="btn btn-info" ng-click="save(game)">保存</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-12" style="text-align:center">
+			<a class="btn btn-default" ng-click="prevPage()">上一页</a>
+			<a class="btn btn-default" ng-click="nextPage()">下一页</a>
+		</div>
 	</div>
-</section
+</section>
