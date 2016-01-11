@@ -11,7 +11,7 @@ var Path = 'http://www.u77.com/';
 var AvatarPath = 'http://img.u77.com/avatar/';
 var ManagePath = 'http://manage.u77.com/';
 var ChargePath = 'http://u77pay.avosapps.com/api/';
-var DiscoverPath = 'http://dev.u77discoverd.avosapps.com/api/';
+var DiscoverPath = 'http://u77discover.avosapps.com/api/';
 // var ChargePath = 'http://192.168.0.102:3000/api/'
 app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 	function($stateProvider,$urlRouterProvider,$locationProvider){

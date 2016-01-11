@@ -11,7 +11,7 @@ var Path = 'http://www.u77.com/';
 var AvatarPath = 'http://img.u77.com/avatar/';
 var ManagePath = 'http://manage.u77.com/';
 var ChargePath = 'http://u77pay.avosapps.com/api/';
-var DiscoverPath = 'http://dev.u77discoverd.avosapps.com/api/';
+var DiscoverPath = 'http://u77discover.avosapps.com/api/';
 // var ChargePath = 'http://192.168.0.102:3000/api/'
 app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 	function($stateProvider,$urlRouterProvider,$locationProvider){
@@ -1209,6 +1209,115 @@ app.service('CommentService',['$q',
 			}
 		}
 	}]);
+app.controller('BigEyeCtrl',['$scope','$rootScope','UploadService',
+	function($scope,$rootScope,UploadService){
+		$scope.list = [];
+
+		$.get(ManagePath+'sliders',function(data){
+			$scope.list = JSON.parse(data);
+		});
+
+		$scope.up = function(index){
+			if(index <= 0){
+				return;
+			}
+			var _temp = $scope.list[index-1];
+			$scope.list[index-1] = $scope.list[index];
+			$scope.list[index] = _temp;
+		}
+
+		$scope.down = function(index){
+			if(index >= $scope.list.length - 1){
+				return;
+			}
+			var _temp = $scope.list[index + 1];
+			$scope.list[index + 1] = $scope.list[index];
+			$scope.list[index] = _temp;
+		}
+
+		$scope.left = function(){
+			$scope.slideControl = $scope.slideControl <= 0 ? $scope.list.length - 1 : $scope.slideControl - 1;
+		}
+
+		$scope.right = function(){
+			$scope.slideControl = $scope.slideControl >= $scope.list.length - 1 ? 0 : $scope.slideControl + 1;
+		}
+
+		$scope.submit = function(){
+			$.post(ManagePath+'sliders',{sliders:$scope.list},function(data){
+				if(data != 0){
+					alert('保存成功');
+				}
+			});
+		}
+
+		UploadService.image().then(function(fn){
+			$scope.upload = function($file,slide){
+				fn($file,function(resp){
+					if(resp.status == 200 && resp.statusText == 'OK'){
+						slide.image = resp.data.url;
+					}else{
+						alert('上传失败,请重试');
+					}
+					slide.percentage = null
+				},function(evt){
+					slide.percentage = evt.percentage;
+				});
+			}
+		});
+
+		$scope.slideControl = 0;
+		setInterval(function(){
+			$scope.$apply(function(){
+				if($scope.slideControl < $scope.list.length -1){
+					$scope.slideControl++	
+				}else{
+					$scope.slideControl = 0;
+				}	
+			});
+			
+		},3000)
+	}]);
+
+app.controller('GameExamineCtrl',['$scope','$rootScope','GameService',
+	function($scope,$rootScope,GameService){
+		$scope.options = {
+			status:0
+		}
+		GameService.list($scope.options).then(function(data){
+			$scope.gameList = data;
+		});
+	}]);
+
+app.controller('ReportExamineCtrl',['$scope','$rootScope','ReportService',
+	function($scope,$rootScope,ReportService){
+		ReportService.list().then(function(data){
+			$scope.reportList = data.data;
+		});
+
+	}]);
+// const T_TYPE_COMMENT = 1;			// comment
+// const T_TYPE_POST = 2;				// post
+// const T_TYPE_VIDEO = 3;				// video
+// const T_TYPE_GAMEREC = 4;			// game rec
+
+app.service('DailyGameVilidService',['$http','$q','GameService',
+	function($http,$q,GameService){
+		return {
+			promise:function(){
+				var deffered = $q.defer();
+				var options = {
+					status:0
+				}
+				GameService.list(options).then(function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			}
+		}
+	}]);
+
+
 app.controller('DashboardCtrl',['$scope','$rootScope','DashboardService',
 	function($scope,$rootScope,DashboardService){
 		// 昨日数据
@@ -1409,115 +1518,6 @@ app.service('DashboardService',['$q',
 			}
 		}
 	}]);
-app.controller('BigEyeCtrl',['$scope','$rootScope','UploadService',
-	function($scope,$rootScope,UploadService){
-		$scope.list = [];
-
-		$.get(ManagePath+'sliders',function(data){
-			$scope.list = JSON.parse(data);
-		});
-
-		$scope.up = function(index){
-			if(index <= 0){
-				return;
-			}
-			var _temp = $scope.list[index-1];
-			$scope.list[index-1] = $scope.list[index];
-			$scope.list[index] = _temp;
-		}
-
-		$scope.down = function(index){
-			if(index >= $scope.list.length - 1){
-				return;
-			}
-			var _temp = $scope.list[index + 1];
-			$scope.list[index + 1] = $scope.list[index];
-			$scope.list[index] = _temp;
-		}
-
-		$scope.left = function(){
-			$scope.slideControl = $scope.slideControl <= 0 ? $scope.list.length - 1 : $scope.slideControl - 1;
-		}
-
-		$scope.right = function(){
-			$scope.slideControl = $scope.slideControl >= $scope.list.length - 1 ? 0 : $scope.slideControl + 1;
-		}
-
-		$scope.submit = function(){
-			$.post(ManagePath+'sliders',{sliders:$scope.list},function(data){
-				if(data != 0){
-					alert('保存成功');
-				}
-			});
-		}
-
-		UploadService.image().then(function(fn){
-			$scope.upload = function($file,slide){
-				fn($file,function(resp){
-					if(resp.status == 200 && resp.statusText == 'OK'){
-						slide.image = resp.data.url;
-					}else{
-						alert('上传失败,请重试');
-					}
-					slide.percentage = null
-				},function(evt){
-					slide.percentage = evt.percentage;
-				});
-			}
-		});
-
-		$scope.slideControl = 0;
-		setInterval(function(){
-			$scope.$apply(function(){
-				if($scope.slideControl < $scope.list.length -1){
-					$scope.slideControl++	
-				}else{
-					$scope.slideControl = 0;
-				}	
-			});
-			
-		},3000)
-	}]);
-
-app.controller('GameExamineCtrl',['$scope','$rootScope','GameService',
-	function($scope,$rootScope,GameService){
-		$scope.options = {
-			status:0
-		}
-		GameService.list($scope.options).then(function(data){
-			$scope.gameList = data;
-		});
-	}]);
-
-app.controller('ReportExamineCtrl',['$scope','$rootScope','ReportService',
-	function($scope,$rootScope,ReportService){
-		ReportService.list().then(function(data){
-			$scope.reportList = data.data;
-		});
-
-	}]);
-// const T_TYPE_COMMENT = 1;			// comment
-// const T_TYPE_POST = 2;				// post
-// const T_TYPE_VIDEO = 3;				// video
-// const T_TYPE_GAMEREC = 4;			// game rec
-
-app.service('DailyGameVilidService',['$http','$q','GameService',
-	function($http,$q,GameService){
-		return {
-			promise:function(){
-				var deffered = $q.defer();
-				var options = {
-					status:0
-				}
-				GameService.list(options).then(function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;
-			}
-		}
-	}]);
-
-
 app.controller('DiscoverCtrl',['$rootScope','$scope','$state','DiscoverServer',
 	function($rootScope,$scope,$state,DiscoverServer){
 		
@@ -1733,136 +1733,6 @@ app.service('DiscoverServer',['$q',
 					}
 				})
 				return deffered.promise;
-			}
-		}
-	}]);
-app.controller('PageCtrl',['$scope','$rootScope','PageService',
-	function($scope,$rootScope,PageService){
-		$scope.options = {};
-		$scope.options.search_type = 'id';
-
-		$scope.change_type = function(id){
-			$scope.options.type = id;
-			query();
-		}
-
-		$scope.change_search_type = function(type){
-			$scope.options.search_type = type;
-		}
-
-		$scope.change_status = function(status){
-			$scope.options.status = status;
-			query();
-		}
-
-		$scope.search = function(e){
-			var keycode = window.event?e.keyCode:e.which;
-			if(keycode == 13){
-				query();
-			}
-		}
-
-		function query(page){
-			var _options = _.clone($scope.options);
-			if(page)_options.page = page;
-			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
-			delete _options.search_type;
-			delete _options.keywords;
-			PageService.list(_options).then(function(data){
-				$scope.list = data;
-			});
-		}
-
-		query();
-
-		$scope.pageChange = query;
-
-		$scope.change_page_status = function(page,status){
-			page.status = status;
-			PageService.update(page);
-			alert('操作成功');
-		}
-
-		$scope.delete = function(page){
-			if(!confirm('确认删除该公告吗?'))return;
-			PageService.delete(page.id);
-			page.hide = true;
-		}
-
-	}]);
-
-app.controller('PageEditCtrl',['$scope','$rootScope','$filter','PageService','$stateParams','$state',
-	function($scope,$rootScope,$filter,PageService,$stateParams,$state){
-		PageService.info($stateParams.id).then(function(info){
-			console.log(info);
-			$scope.page = info;
-			$scope.page.create_time = $filter('dateTime')($scope.page.create_at);
-		});
-
-		$scope.submit = function(){
-			$scope.page.create_at = $filter('toUnix')($scope.page.create_time);
-			$scope.page.update_at = $scope.page.create_at;
-			delete $scope.page.create_time;
-			PageService.update($scope.page);
-			alert('修改成功.');
-			$state.go('base.page');
-		}
-	}]);
-
-app.controller('PageNewCtrl',['$scope','$rootScope','$filter','PageService','$stateParams','$state',
-	function($scope,$rootScope,$filter,PageService,$stateParams,$state){
-
-		$scope.page = {
-			tid:$stateParams.id,
-			create_time:moment().format('YYYY/MM/DD HH:mm:ss'),
-		};
-
-		$scope.submit = function(){
-			$scope.page.create_at = $filter('toUnix')($scope.page.create_time);
-			$scope.page.update_at = $scope.page.create_at;
-			delete $scope.page.create_time;
-			PageService.create($scope.page);
-			alert('创建成功.');
-			$state.go('base.page');
-		}
-	}]);
-app.service('PageService',['$q',
-	function($q){
-		return {
-			list:function(options){
-				var deffered = $q.defer();
-				$.get(ManagePath+'page/list',options,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;
-			},
-			create:function(page){
-				var deffered = $q.defer();
-				$.post(ManagePath+'page/create',page,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;	
-			},
-			update:function(page){
-				var deffered = $q.defer();
-				$.post(ManagePath+'page/update',page,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;	
-			},
-			delete:function(id){
-				var deffered = $q.defer();
-				$.get(ManagePath+'page/delete/'+id,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;
-			},
-			info:function(id){
-				var deffered = $q.defer();
-				$.get(ManagePath+'page/info/'+id,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;	
 			}
 		}
 	}]);
@@ -3193,4 +3063,134 @@ app.controller('TagsListCtrl',['$scope','TagService',
 				$scope.tagList[data.type - 1].tags.push(data);
 			});
 		});
+	}]);
+app.controller('PageCtrl',['$scope','$rootScope','PageService',
+	function($scope,$rootScope,PageService){
+		$scope.options = {};
+		$scope.options.search_type = 'id';
+
+		$scope.change_type = function(id){
+			$scope.options.type = id;
+			query();
+		}
+
+		$scope.change_search_type = function(type){
+			$scope.options.search_type = type;
+		}
+
+		$scope.change_status = function(status){
+			$scope.options.status = status;
+			query();
+		}
+
+		$scope.search = function(e){
+			var keycode = window.event?e.keyCode:e.which;
+			if(keycode == 13){
+				query();
+			}
+		}
+
+		function query(page){
+			var _options = _.clone($scope.options);
+			if(page)_options.page = page;
+			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
+			delete _options.search_type;
+			delete _options.keywords;
+			PageService.list(_options).then(function(data){
+				$scope.list = data;
+			});
+		}
+
+		query();
+
+		$scope.pageChange = query;
+
+		$scope.change_page_status = function(page,status){
+			page.status = status;
+			PageService.update(page);
+			alert('操作成功');
+		}
+
+		$scope.delete = function(page){
+			if(!confirm('确认删除该公告吗?'))return;
+			PageService.delete(page.id);
+			page.hide = true;
+		}
+
+	}]);
+
+app.controller('PageEditCtrl',['$scope','$rootScope','$filter','PageService','$stateParams','$state',
+	function($scope,$rootScope,$filter,PageService,$stateParams,$state){
+		PageService.info($stateParams.id).then(function(info){
+			console.log(info);
+			$scope.page = info;
+			$scope.page.create_time = $filter('dateTime')($scope.page.create_at);
+		});
+
+		$scope.submit = function(){
+			$scope.page.create_at = $filter('toUnix')($scope.page.create_time);
+			$scope.page.update_at = $scope.page.create_at;
+			delete $scope.page.create_time;
+			PageService.update($scope.page);
+			alert('修改成功.');
+			$state.go('base.page');
+		}
+	}]);
+
+app.controller('PageNewCtrl',['$scope','$rootScope','$filter','PageService','$stateParams','$state',
+	function($scope,$rootScope,$filter,PageService,$stateParams,$state){
+
+		$scope.page = {
+			tid:$stateParams.id,
+			create_time:moment().format('YYYY/MM/DD HH:mm:ss'),
+		};
+
+		$scope.submit = function(){
+			$scope.page.create_at = $filter('toUnix')($scope.page.create_time);
+			$scope.page.update_at = $scope.page.create_at;
+			delete $scope.page.create_time;
+			PageService.create($scope.page);
+			alert('创建成功.');
+			$state.go('base.page');
+		}
+	}]);
+app.service('PageService',['$q',
+	function($q){
+		return {
+			list:function(options){
+				var deffered = $q.defer();
+				$.get(ManagePath+'page/list',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			create:function(page){
+				var deffered = $q.defer();
+				$.post(ManagePath+'page/create',page,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
+			update:function(page){
+				var deffered = $q.defer();
+				$.post(ManagePath+'page/update',page,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
+			delete:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'page/delete/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			info:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'page/info/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			}
+		}
 	}]);
