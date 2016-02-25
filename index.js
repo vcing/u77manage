@@ -20,6 +20,18 @@ AV.Cloud.useMasterKey();
 // 使用 avoscloud中间件
 app.use(AV.Cloud);
 
+// 跨域支持
+app.all('/api/*', (req, res, next) => {
+  var origin = req.headers.origin;
+  if (config.whiteOrigins.indexOf(origin) !== -1) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    res.header('Access-Control-Allow-Credentials', true);
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, DELETE');
+  }
+  next();
+});
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
 	type: function(req) {
@@ -37,6 +49,9 @@ app.use(cookieSession({
 
 // 静态目录
 app.use('/static',express.static(__dirname + '/dest'));
+
+// api路由
+app.use('/api',api);
 
 // 登陆请求
 app.post('/login',function(req,res,next) {
@@ -72,9 +87,6 @@ app.get('/geetest',function(req,res,next){
 		}
 	});
 });
-
-// api路由
-app.use('/api',api);
 
 // 前端路由
 app.all('/*', function(req, res, next) {
