@@ -37,7 +37,6 @@ app.controller('CommentCtrl',['$scope','$rootScope','$stateParams','CommentServi
 
 		CommentService.list().then(function(data){
 			$scope.list = data;
-			console.log(data);
 		});
 
 		$scope.pageChange = query;
@@ -60,5 +59,18 @@ app.controller('CommentCtrl',['$scope','$rootScope','$stateParams','CommentServi
 			if(confirm('该操作会删除该用户的所有评论! \r\n 确认执行吗？')){
 				CommentService.deleteByUser($scope.userid);	
 			}
+		}
+
+		$scope.chooseUser = function(user){
+			$scope.options.search_type = 'sender';
+			$scope.options.keywords = user.userid;
+			query();
+		}
+
+		$scope.chooseBody = function(comment){
+			$scope.options.type = comment.type;
+			$scope.options.search_type = 'tid';
+			$scope.options.keywords = comment.body.id;
+			query();
 		}
 	}]);

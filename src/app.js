@@ -10,9 +10,10 @@ var BasePath = 'http://www.u77.com/admin/';
 var Path = 'http://www.u77.com/';
 var AvatarPath = 'http://img.u77.com/avatar/';
 var ManagePath = 'http://manage.u77.com/';
-var ChargePath = 'http://u77pay.avosapps.com/api/';
+var ChargePath = 'http://192.168.1.102:3000/api/';
 var DiscoverPath = 'http://u77discover.avosapps.com/api/';
-// var ChargePath = 'http://192.168.0.102:3000/api/'
+// var FinancePath = 'http://192.168.1.102:3000/api/';
+// var ChargePath = 'http://192.168.0.102:3000/api/' 
 app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 	function($stateProvider,$urlRouterProvider,$locationProvider){
 
@@ -91,6 +92,15 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 			})
 			.state('base.gameNew',{
 				url:'/game-new',
+				views:{
+					'content':{
+						templateUrl:'/static/game/game-edit.html',
+						controller:'GameNewCtrl'
+					}
+				}
+			})
+			.state('base.gameNewWithDiscover',{
+				url:'/game-new/:discoverId',
 				views:{
 					'content':{
 						templateUrl:'/static/game/game-edit.html',
@@ -257,6 +267,15 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 					'content':{
 						templateUrl:'/static/analysis/finance.html',
 						controller:'FinanceAnalysisCtrl'
+					}
+				}
+			})
+			.state('base.analysisFinanceNew',{
+				url:'/analysis/finance/new',
+				views:{
+					'content':{
+						templateUrl:'/static/analysis/finance-new.html',
+						controller:'NewFinancePageCtrl'
 					}
 				}
 			})

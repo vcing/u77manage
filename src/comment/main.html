@@ -8,7 +8,7 @@
 	</ol>
 </section>
 <section class="content-header">
-	<div class="row">
+	<div class="row" style="padding:10px">
 		<div class="col-xs-12" style="margin:15px 0">
 			<div class="btn-group" style="margin:0 10px 10px 0;float:left">
 				<button type="button" class="btn btn-success btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -49,7 +49,39 @@
 				</div>
 			</div>
 		</div>
-		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" ng-show="!comment.hide" ng-repeat="comment in list.data">
+		<style>
+		.comment-content img{
+			max-width: 100%;
+		}
+		</style>
+		<div class="col-xs-12" ng-show="!comment.hide" ng-repeat="comment in list.data" style="
+    background: #fff;
+    margin: 15px 0;
+    padding: 15px;
+    box-shadow: 0 0 2px rgba(33,33,33,0.5);
+">
+			<div class="left col-xs-12 col-sm-8">
+				<div class="head row">
+					<a style="color:#999999;font-size:12px" href="{{Path+'comment/'+comment.id+'#comment'}}" target="_blank" class="col-xs-3">#{{comment.id}}</a>
+					<a style="color:#999999;font-size:12px" class="col-xs-9" ng-bind="comment.create_at | dateTime"></a>
+				</div>
+				<div class="col-xs-12 comment-content" ng-bind-html="comment.content.content | to_trusted" style="margin-top:10px;padding:0"></div>
+			</div>
+			<div class="right col-xs-12 col-sm-4">
+				<div class="head row" style="text-align:right">
+					<!-- href="{{Path+'game/'+comment.body.id}}" --><a ng-click="chooseBody(comment)" target="_blank" style="color:#999999;font-size:12px" class="col-xs-6" ng-if="comment.type == 1" ng-bind="comment.body.title"></a>
+					<!-- href="{{Path+'page/'+comment.body.id}}" --><a ng-click="chooseBody(comment)" target="_blank" style="color:#999999;font-size:12px" class="col-xs-6" ng-if="comment.type == 2" ng-bind="comment.body.title"></a>
+					<!-- href="{{Path+'post/'+comment.body.id}}" --><a ng-click="chooseBody(comment)" target="_blank" style="color:#999999;font-size:12px" class="col-xs-6" ng-if="comment.type == 4" ng-bind="comment.body.title"></a>
+					<!-- href="{{Path+'discover/'+comment.body.id}}" --><a ng-click="chooseBody(comment)" ng-click="chooseBody(comment)" target="_blank" style="color:#999999;font-size:12px" class="col-xs-6" ng-if="comment.type == 6" ng-bind="comment.body.title"></a>
+					<a style="color:#999999;font-size:12px;cursor:pointer" class="col-xs-6" ng-click="chooseUser(comment.user)">{{comment.user.nickname}}({{comment.user.userid}})</a>
+				</div>
+				<div class="btn col-xs-12" style="text-align:right">
+					<button class="btn btn-warning" style="padding:2px 10px" ng-click="delete(comment)"><i class="fa fa-user"></i>删除</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" ng-show="!comment.hide" ng-repeat="comment in list.data">
 			<div class="box box-widget">
 				<div class="box-header with-border">
 					<div class="user-block">
@@ -76,19 +108,19 @@
 							</h4>
 							<div class="attachment-text" ng-if="comment.type == 1">
 								首次推荐于<br><span>{{comment.body.create_at | time}}</span>
-							</div><!-- /.attachment-text -->
+							</div>
 							<div class="attachment-text" ng-if="comment.type == 2">
 								发表于 <a href="{{Path+'/game/'+comment.body.game.id}}" target="_blank">{{comment.body.game.title}}</a><br>
 								的精华文章
-							</div><!-- /.attachment-text -->
-						</div><!-- /.attachment-pushed -->
+							</div>
+						</div>
 					</div>
 				</div>
 				<div class="box-footer">
 					<button class="btn btn-warning btn-xs" ng-click="delete(comment)"><i class="fa fa-times"></i> 删除</button>
 				</div>
 			</div>
-		</div>
+		</div> -->
 		<div class="col-xs-12">
 			<div nav-pager='list' page-change="pageChange"></div>
 		</div>

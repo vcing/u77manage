@@ -74,8 +74,8 @@ app.controller('GameListCtrl',['$scope','$rootScope','GameService',
 		}
 	}]);
 
-app.controller('GameNewCtrl',['$scope','$rootScope','GameService','UploadService','$state',
-	function($scope,$rootScope,GameService,UploadService,$state){
+app.controller('GameNewCtrl',['$scope','$rootScope','GameService','UploadService','$state','DiscoverServer',
+	function($scope,$rootScope,GameService,UploadService,$state,DiscoverServer){
 		$scope.game_types = [
 			{id:1,label:'web'},
 			{id:2,label:'PC'},
@@ -95,6 +95,39 @@ app.controller('GameNewCtrl',['$scope','$rootScope','GameService','UploadService
 		];
 
 		$scope.game = {};
+
+		if($state.params.discoverId){
+			DiscoverServer.discoverGet($state.params.discoverId).then(function(result){
+				console.log(result[0]);
+				var _game = result[0];
+				$scope.game = {
+					title:_game.title,
+					image:_game.img[0],
+					userid:_game.userId,
+					content:{
+						content:_game.oneWord || _game.description || _game.game.description,
+						url:_game.game.originUrl,
+					}
+				}
+				switch(_game.game.type){
+					case 1:
+						$scope.game_type = $scope.game_types[0];
+						break;
+					case 2:
+						$scope.game_type = $scope.game_types[1];
+						$scope.game.content.down1 = _game.game.originUrl;
+						break;
+					case 3:
+						$scope.game_type = $scope.game_types[5];
+						$scope.game.content.down1 = _game.game.originUrl;
+						break;
+					case 4:
+						$scope.game_type = $scope.game_types[4];
+						$scope.game.content.down2 = _game.game.originUrl;
+						break;
+				}
+			});
+		}
 
 		UploadService.file().then(function(fn){
 			$scope.uploadFile = function($file){

@@ -110,7 +110,14 @@ app.service('DashboardService',['$q',
 									color:"#7d3bab",
 									highlight:"#8d4bbb",
 									label:key
-								})
+								});
+							case '村长打天下':
+								result.push({
+									value:value,
+									color:'#d74047',
+									highlight:'#d96a5c',
+									label:key
+								});
 						}
 					});
 					deffered.resolve(result);

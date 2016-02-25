@@ -61,7 +61,11 @@ app.controller('DiscoverCtrl',['$rootScope','$scope','$state','DiscoverServer',
 					alert('删除推荐失败,请检查后重试.');
 				}
 			});
-			
+		}
+
+		$scope.create = function(discover){
+			var url = $state.href('base.gameNewWithDiscover',{discoverId:discover.discoverId});
+			window.open(url);
 		}
 
 		$scope.search = function(e){

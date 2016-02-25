@@ -25,6 +25,17 @@ app.service('DiscoverServer',['$q',
 				});
 				return deffered.promise;
 			},
+			discoverGet:function(id){
+				var deffered = $q.defer();
+				$.ajax({
+					url:DiscoverPath+'discover/list?searchType=discoverId&keywords='+id,
+					type:'get',
+					success:function(result){
+						deffered.resolve(result);
+					}
+				});
+				return deffered.promise;
+			},
 			gameList:function(options){
 				var deffered = $q.defer();
 				$.ajax({
