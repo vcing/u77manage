@@ -3,8 +3,9 @@ var cookieSession = require('cookie-session');
 var bodyParser    = require('body-parser');
 var app           = express();
 var AV            = require('leanengine');
-var config		  = require('./config.json');
-var Geetest		  = require('./gt-sdk.js');
+var config        = require('./config.json');
+var Geetest       = require('./gt-sdk.js');
+var api           = require('./api');
 
 
 // 初始化极验sdk
@@ -71,6 +72,9 @@ app.get('/geetest',function(req,res,next){
 		}
 	});
 });
+
+// api路由
+app.use('/api',api);
 
 // 前端路由
 app.all('/*', function(req, res, next) {
