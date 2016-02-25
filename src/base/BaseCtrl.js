@@ -1,5 +1,5 @@
-app.controller('BaseCtrl',['$scope','$rootScope','$state',
-	function($scope,$rootScope,$state){
+app.controller('BaseCtrl',['$scope','$rootScope','$state','AnalysisPageService',
+	function($scope,$rootScope,$state,AnalysisPageService){
 		// 主导航搜索
 		$scope.search = function(){
 			$state.go('base.gameEdit',{id:$scope.gameId});
@@ -12,6 +12,10 @@ app.controller('BaseCtrl',['$scope','$rootScope','$state',
 				$scope.search();
 			}
 		}
+
+		AnalysisPageService.list().then(function(result){
+			$scope.financePages = result;
+		});
 	}]);
 
 app.controller('SingleReportCtrl',['$scope','$rootScope','ReportService','MessageService',

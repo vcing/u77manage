@@ -1,20 +1,23 @@
-app.directive('newChart',function(){
+app.directive('chartEdit',function(){
 	return {
 		restrict:'A',
-		templateUrl:'/static/analysis/new-chart.html',
+		templateUrl:'/static/analysis/chart-edit.html',
 		replace:true,
 		scope:{
-			chart:'=newChart'
+			chart:'=chartEdit'
 		},
-		controller:'NewChartCtrl'
+		controller:'ChartEditCtrl'
 	}
 });
 
-app.directive('showChart',function(){
+app.directive('chartShow',function(){
 	return {
 		restrict:'A',
 		templateUrl:'/static/analysis/chart.html',
 		replace:true,
-		controller:'ShowChartCtrl'
+		scope:{
+			chart:'=chartShow'
+		},
+		controller:'ChartShowCtrl'
 	}
 })

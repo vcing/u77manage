@@ -1,93 +1,16 @@
 <section class="content-header">
-	<h1>
-		财务
+	<h1 >{{title}}
+		<a class="btn btn-sm btn-info" style="margin-left: 60px" ui-sref="base.analysisFinanceEdit({id:id})">编辑</a>
+		<a class="btn btn-sm btn-danger" ng-click="delete()">删除</a>
 	</h1>
 	<ol class="breadcrumb">
 		<li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
 		<li >数据统计</li>
-		<li class="active">财务</li>
+		<li class="active" ng-bind="title"></li>
 	</ol>
 </section>
 <section class="content">
 	<div class="row">
-		<div class="col-xs-12 col-md-8">
-			<div class="box box-danger">
-				<div class="box-header with-border">
-					<h3 class="box-title">交易额</h3>
-					<div class="box-tools pull-right">
-						<div class="btn-group">
-							<a type="button" class="dropdown-toggle label label-primary" data-toggle="dropdown" aria-expanded="false">
-								<span ng-if="!total.gameId && total.gameId != 0">所有游戏</span>
-								<span ng-repeat="game in games" ng-if="total.gameId == game.gameId">{{game.name}}</span>
-								<span class="caret"></span>
-								<span class="sr-only">Toggle Dropdown</span>
-							</a>
-							<ul class="dropdown-menu" role="menu">
-								<li ng-repeat="game in games"><a ng-click="changeGame(game,total)">{{game.name}}</a></li>
-							</ul>
-						</div>
-						<div class="dropdown" style="display:inline">
-							<a class="dropdown-toggle label label-danger" id="dropdown5" role="button" data-toggle="dropdown" data-target="#" href="#">
-								选择时间
-							</a>
-							<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-								<datetimepicker data-ng-model="total.time" data-datetimepicker-config="{ dropdownSelector: '#dropdown5' }"></datetimepicker>
-							</ul>
-						</div>
-
-						<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-						<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-					</div>
-				</div>
-				<div class="box-body">
-					<div class="chart">
-						<canvas line-chart="test" ratio=3></canvas>	
-					</div>
-				</div>
-			</div>
-			<div class="box box-warning">
-				<div class="box-header with-border">
-					<h3 class="box-title">充值人数/平均充值金额</h3>
-					<div class="box-tools pull-right">
-						<a class="label label-danger">详细数据</a>
-						<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-						<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-					</div>
-				</div>
-				<div class="box-body">
-					<div class="chart">
-						<canvas line-chart="test" ratio=3></canvas>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="col-xs-12 col-md-4">
-			<div class="box box-success">
-				<div class="box-header with-border">
-					<h3 class="box-title">对账数据</h3>
-					<div class="box-tools pull-right">
-						<a class="label label-danger">详细数据</a>
-						<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-						<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-					</div>
-				</div>
-				<div class="box-body">
-					
-				</div>
-			</div>
-			<div class="box box-info">
-				<div class="box-header with-border">
-					<h3 class="box-title">游戏收入占比</h3>
-					<div class="box-tools pull-right">
-						<a class="label label-danger">详细数据</a>
-						<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-						<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-					</div>
-				</div>
-				<div class="box-body">
-					
-				</div>
-			</div>
-		</div>
+		<div chart-show="chart" ng-repeat="chart in charts"></div>
 	</div>
 </section>

@@ -3,13 +3,43 @@ app.controller('WebAnalysisCtrl',['$scope','$rootScope',
 
 	}]);
 
-app.controller('NewFinancePageCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
-		$scope.charts = [];
-		$scope.charts.push({});
+app.controller('FinanceEditCtrl',['$scope','$rootScope','$state','AnalysisPageService',
+	function($scope,$rootScope,$state,AnalysisPageService){
+		if($state.params.id){
+			$scope.pageName = '编辑';
+			if($state.params.id == 'test'){
+				var data = '{"title":"test","charts":[{"$$hashKey":"object:5","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"2333"},{"$$hashKey":"object:31","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"23333"},{"$$hashKey":"object:57","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"32222"},{"$$hashKey":"object:83","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"1122"}]}';
+				data = JSON.parse(data);
+				$scope.charts = data.charts;
+				$scope.title = data.title;
+			}else{
+				AnalysisPageService.get($state.params.id).then(function(page){
+					$scope.title = page.title;
+					$scope.charts = JSON.parse(page.data);
+				});
+			}
+		}else{
+			$scope.pageName = '新建';
+			$scope.charts = [];
+			$scope.charts.push({});	
+		}
+		
 
 		$scope.savePage = function(){
-			console.log($scope.charts);
+			var data = {
+				title:$scope.title,
+				data:JSON.stringify($scope.charts),
+				objectId:$state.params.id
+			}
+			if($state.params.id){
+				AnalysisPageService.update(data).then(function(){
+					$state.go('base.analysisFinance',{id:id});
+				});
+			}else{
+				AnalysisPageService.create(data).then(function(id){
+					$state.go('base.analysisFinance',{id:id});
+				})
+			}
 		}
 
 		$scope.addChart = function(){
@@ -17,12 +47,34 @@ app.controller('NewFinancePageCtrl',['$scope','$rootScope',
 		}
 	}]);
 
-app.controller('FinanceAnalysisCtrl',['$scope','$rootScope',function($scope,$rootScope){
+app.controller('FinanceCtrl',['$scope','$rootScope','$state','AnalysisPageService',
+	function($scope,$rootScope,$state,AnalysisPageService){
+		$scope.id = $state.params.id;
+		var data;
+		if($state.params.id == 'test'){
+			data = '{"title":"test","charts":[{"$$hashKey":"object:5","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"2333"},{"$$hashKey":"object:31","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"23333"},{"$$hashKey":"object:57","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"32222"},{"$$hashKey":"object:83","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"1122"}]}';
+			data = JSON.parse(data);
+			$scope.title = data.title;
+			$scope.charts = data.charts;
+		}
+		if($state.params.id){
+			AnalysisPageService.get($state.params.id).then(function(page){
+				data = page;
+				data.charts = JSON.parse(page.data);
+				$scope.title = data.title;
+				$scope.charts = data.charts;
+			});
+		}
 
+		$scope.delete = function(){
+			AnalysisPageService.delete($state.params.id).then(function(result){
+				$state.go('base.dashboard');
+			});
+		}
+		
+	}]);
 
-}]);
-
-app.controller('NewChartCtrl',['$scope','FinanceService',
+app.controller('ChartEditCtrl',['$scope','FinanceService',
 	function($scope,FinanceService){
 		// 配置文件
 		var config = {
@@ -173,16 +225,19 @@ app.controller('NewChartCtrl',['$scope','FinanceService',
 				});	
 			}
 		}
-
-		// 保存图表
-		$scope.saveChart = function(){
-
-		}
 	}]);
 
-app.controller('ShowChartCtrl',['$scope',
-	function($scope){
-
+app.controller('ChartShowCtrl',['$scope','FinanceService',
+	function($scope,FinanceService){
+		$scope.loading = true;
+		if($scope.chart.time != '自定义'){
+			$scope.chart.startDate = moment().subtract($scope.chart.time-1,'days').format('YYYY-MM-DD');
+			$scope.chart.endDate   = moment().format('YYYY-MM-DD');	
+		}
+		FinanceService.query($scope.chart).then(function(result){
+			$scope.loading   = false;
+			$scope.chartData = toChartData(result.axis,$scope.chart.type);
+		});	
 	}]);	
 
 
@@ -216,8 +271,6 @@ function toChartData(data,type){
 			});
 			_i++;
 		});
-		console.log(result);
-
 	}
 	return result;
 }

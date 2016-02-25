@@ -10,7 +10,8 @@ var BasePath = 'http://www.u77.com/admin/';
 var Path = 'http://www.u77.com/';
 var AvatarPath = 'http://img.u77.com/avatar/';
 var ManagePath = 'http://manage.u77.com/';
-var ChargePath = 'http://192.168.1.102:3000/api/';
+var BackEndPath = 'http://192.168.1.104/api/';
+var ChargePath = 'http://192.168.1.104:3000/api/';
 var DiscoverPath = 'http://u77discover.avosapps.com/api/';
 // var FinancePath = 'http://192.168.1.102:3000/api/';
 // var ChargePath = 'http://192.168.0.102:3000/api/' 
@@ -261,21 +262,30 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 					}
 				}
 			})
-			.state('base.analysisFinance',{
-				url:'/analysis/finance',
-				views:{
-					'content':{
-						templateUrl:'/static/analysis/finance.html',
-						controller:'FinanceAnalysisCtrl'
-					}
-				}
-			})
 			.state('base.analysisFinanceNew',{
 				url:'/analysis/finance/new',
 				views:{
 					'content':{
-						templateUrl:'/static/analysis/finance-new.html',
-						controller:'NewFinancePageCtrl'
+						templateUrl:'/static/analysis/finance-edit.html',
+						controller:'FinanceEditCtrl'
+					}
+				}
+			})
+			.state('base.analysisFinanceEdit',{
+				url:'/analysis/finance/edit/:id',
+				views:{
+					'content':{
+						templateUrl:'/static/analysis/finance-edit.html',
+						controller:'FinanceEditCtrl'
+					}
+				}
+			})
+			.state('base.analysisFinance',{
+				url:'/analysis/finance/:id',
+				views:{
+					'content':{
+						templateUrl:'/static/analysis/finance.html',
+						controller:'FinanceCtrl'
 					}
 				}
 			})
