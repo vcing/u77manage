@@ -161,7 +161,6 @@ app.directive('lineChart',function(){
 						// maintainAspectRatio: false,
 					});
 
-
 					$(element).on('click',function(e){
 						var point = _chart.getPointsAtEvent(e);
 						$scope.click ? $scope.click(point) : false ;
@@ -169,7 +168,35 @@ app.directive('lineChart',function(){
 					
 				}
 			});
-			
+		}
+	}
+});
+
+app.directive('barChart',function(){
+	return {
+		restrict:'A',
+		scope:{
+			data:'=barChart'
+		},
+		link:function($scope,element,attrs){
+			var _chart;
+			$scope.$watch('data',function(){
+				if($scope.data){
+					_chart ? _chart.destroy() : false;
+					var ctx = $(element).get(0).getContext("2d");
+					ctx.canvas.width = $scope.ratio ? $scope.ratio : 2;
+					ctx.canvas.height = 1;
+					_chart = new Chart(ctx).Bar($scope.data,{
+						responsive: true,
+						// maintainAspectRatio: false,
+					});
+
+					$(element).on('click',function(e){
+						var point = _chart.getPointsAtEvent(e);
+						$scope.click ? $scope.click(point) : false ;
+					});
+				}
+			})
 		}
 	}
 })

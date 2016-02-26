@@ -21,15 +21,15 @@ AV.Cloud.useMasterKey();
 app.use(AV.Cloud);
 
 // 跨域支持
-app.all('/api/*', (req, res, next) => {
-  var origin = req.headers.origin;
-  if (config.whiteOrigins.indexOf(origin) !== -1) {
-    res.header('Access-Control-Allow-Origin', origin);
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    res.header('Access-Control-Allow-Credentials', true);
-    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, DELETE');
-  }
-  next();
+app.all('/api/*',function(req,res,next){
+	var origin = req.headers.origin;
+	if (config.whiteOrigins.indexOf(origin) !== -1) {
+		res.header('Access-Control-Allow-Origin', origin);
+		res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+		res.header('Access-Control-Allow-Credentials', true);
+		res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, DELETE');
+	}
+	next();
 });
 
 app.use(bodyParser.json());

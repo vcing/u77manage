@@ -67,6 +67,9 @@
 			<div class="chart" ng-if="chart.type == 'pie' && !loading">
 				<canvas pie-chart="chartData"></canvas>	
 			</div>
+			<div class="chart" ng-if="chart.type == 'bar' && !loading">
+				<canvas bar-chart="chartData"></canvas>	
+			</div>
 		</div>
 		<!-- /.box-body -->
 		<div class="box-footer text-center">

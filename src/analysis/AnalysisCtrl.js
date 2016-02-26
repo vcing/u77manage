@@ -156,6 +156,10 @@ app.controller('ChartEditCtrl',['$scope','FinanceService',
 			{
 				name:'饼状图',
 				key:'pie'
+			},
+			{
+				name:'柱状图',
+				key:'bar'
 			}
 		]
 
@@ -271,6 +275,21 @@ function toChartData(data,type){
 			});
 			_i++;
 		});
+	}else if(type == 'bar'){
+		result = {labels:[]};
+		var _data = [];
+		$.map(data,function(value,key){
+			result.labels.push(key);
+			_data.push(value);
+		});
+
+		result.datasets = [{
+			fillColor : "rgba(151,187,205,0.5)",
+			strokeColor : "rgba(151,187,205,1)",
+			pointColor : "rgba(151,187,205,1)",
+			pointStrokeColor : "#fff",
+			data: _data
+		}];
 	}
 	return result;
 }
