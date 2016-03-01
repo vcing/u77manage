@@ -160,6 +160,10 @@ app.controller('ChartEditCtrl',['$scope','FinanceService',
 			{
 				name:'柱状图',
 				key:'bar'
+			},
+			{
+				name:'表格图',
+				key:'table'
 			}
 		]
 
@@ -290,6 +294,8 @@ function toChartData(data,type){
 			pointStrokeColor : "#fff",
 			data: _data
 		}];
+	}else if(type == 'table'){
+		result = data;
 	}
 	return result;
 }

@@ -23,6 +23,7 @@ app.controller('TagsListCtrl',['$scope','TagService',
 
 		$scope.$watch('tagsCacheList',function(){
 			$scope.selectedList = $scope.tagsCacheList ? JSON.parse($scope.tagsCacheList) : [];	
+
 		});
 		
 		$scope.add = function(tag){

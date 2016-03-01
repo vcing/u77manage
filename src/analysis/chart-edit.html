@@ -70,6 +70,9 @@
 			<div class="chart" ng-if="chart.type == 'bar' && !loading">
 				<canvas bar-chart="chartData"></canvas>	
 			</div>
+			<div class="chart" ng-if="chart.type == 'table' && !loading">
+				<table table-chart="chartData"></table>
+			</div>
 		</div>
 		<!-- /.box-body -->
 		<div class="box-footer text-center">

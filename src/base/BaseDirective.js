@@ -199,7 +199,7 @@ app.directive('barChart',function(){
 			})
 		}
 	}
-})
+});
 
 app.directive('pieChart',function(){
 	return {
@@ -217,6 +217,25 @@ app.directive('pieChart',function(){
 				}
 			});
 			
+		}
+	}
+});
+
+app.directive('tableChart',function(){
+	return {
+		restrict:'A',
+		scope:{
+			data:'=tableChart'
+		},
+		link:function($scope,element,attrs){
+			var _chart;
+			$scope.$watch('data',function(){
+				$scope.data
+				$.map($scope.data,function(value,key){
+					console.log(value);
+				});
+				$(element);
+			});
 		}
 	}
 })

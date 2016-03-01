@@ -383,502 +383,6 @@ app.run(['$rootScope','$state','UploadService',
 
 // ---------------------------------------------------------------------------------------------
 
-app.controller('WebAnalysisCtrl',['$scope','$rootScope',
-	function($scope,$rootScope){
-
-	}]);
-
-app.controller('FinanceEditCtrl',['$scope','$rootScope','$state','AnalysisPageService',
-	function($scope,$rootScope,$state,AnalysisPageService){
-		if($state.params.id){
-			$scope.pageName = '编辑';
-			if($state.params.id == 'test'){
-				var data = '{"title":"test","charts":[{"$$hashKey":"object:5","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"2333"},{"$$hashKey":"object:31","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"23333"},{"$$hashKey":"object:57","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"32222"},{"$$hashKey":"object:83","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"1122"}]}';
-				data = JSON.parse(data);
-				$scope.charts = data.charts;
-				$scope.title = data.title;
-			}else{
-				AnalysisPageService.get($state.params.id).then(function(page){
-					$scope.title = page.title;
-					$scope.charts = JSON.parse(page.data);
-				});
-			}
-		}else{
-			$scope.pageName = '新建';
-			$scope.charts = [];
-			$scope.charts.push({});	
-		}
-		
-
-		$scope.savePage = function(){
-			var data = {
-				title:$scope.title,
-				data:JSON.stringify($scope.charts),
-				objectId:$state.params.id
-			}
-			if($state.params.id){
-				AnalysisPageService.update(data).then(function(){
-					$state.go('base.analysisFinance',{id:id});
-				});
-			}else{
-				AnalysisPageService.create(data).then(function(id){
-					$state.go('base.analysisFinance',{id:id});
-				})
-			}
-		}
-
-		$scope.addChart = function(){
-			$scope.charts.push({});
-		}
-	}]);
-
-app.controller('FinanceCtrl',['$scope','$rootScope','$state','AnalysisPageService',
-	function($scope,$rootScope,$state,AnalysisPageService){
-		$scope.id = $state.params.id;
-		var data;
-		if($state.params.id == 'test'){
-			data = '{"title":"test","charts":[{"$$hashKey":"object:5","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"2333"},{"$$hashKey":"object:31","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"23333"},{"$$hashKey":"object:57","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"32222"},{"$$hashKey":"object:83","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"1122"}]}';
-			data = JSON.parse(data);
-			$scope.title = data.title;
-			$scope.charts = data.charts;
-		}
-		if($state.params.id){
-			AnalysisPageService.get($state.params.id).then(function(page){
-				data = page;
-				data.charts = JSON.parse(page.data);
-				$scope.title = data.title;
-				$scope.charts = data.charts;
-			});
-		}
-
-		$scope.delete = function(){
-			AnalysisPageService.delete($state.params.id).then(function(result){
-				$state.go('base.dashboard');
-			});
-		}
-		
-	}]);
-
-app.controller('ChartEditCtrl',['$scope','FinanceService',
-	function($scope,FinanceService){
-		// 配置文件
-		var config = {
-			"mxwk":{
-				"name":"冒险与挖矿",
-				"servers":[1,2,3,4,5,6,7,8]
-			},
-			"czdtx":{
-				"name":"村长打天下"
-			},
-			"czdtx800ux":{
-				"name":"村长打天下800ux"
-			},
-			"kpgs":{
-				"name":"卡片怪兽"
-			},
-			"dhd":{
-				"name":"大皇帝",
-				"servers":[1,2]
-			},
-			"djmy2":{
-				"name":"刀剑魔药2",
-				"platforms":["3dm","17173","u77","178"]
-			},
-			"xxd":{
-				"name":"仙侠道",
-				"servers":[1,2]
-			},
-			"yzh":{
-				"name":"玉之魂"
-			}
-		}
-		// 初始化选项
-		$scope.gameConfig   = [];
-		$scope.servers      = [];
-		$scope.platforms     = [];
-		$scope.showPlatform = true;
-		$scope.showServers  = true;
-		$scope.times = [1,3,7,15,30,'自定义'];
-		$scope.widths = [3,4,5,6,7,8,9,10,11,12];
-		$scope.xConfig = [
-			{
-				name:'时间',
-				key:'time'
-			},
-			{
-				name:'额度',
-				key:'amount'
-			},
-			{
-				name:'渠道',
-				key:'platform'
-			},
-			{
-				name:'区服',
-				key:'server'
-			}
-		];
-
-		$scope.yConfig = [
-			{
-				name:'金额',
-				key:'money'
-			},
-			{
-				name:'充值人数',
-				key:'human'
-			},
-			{
-				name:'充值次数',
-				key:'count'
-			}
-		];
-		$scope.chartConfig = [
-			{
-				name:'线形图',
-				key:'line'
-			},
-			{
-				name:'饼状图',
-				key:'pie'
-			},
-			{
-				name:'柱状图',
-				key:'bar'
-			}
-		]
-
-		// 格式化配置文件
-		$.map(config,function(value,key){
-			$scope.gameConfig.push({
-				name_en:key,
-				name:value.name,
-				servers:value.servers
-			});
-		});
-
-		// 初始化状态
-		$scope.isEdit = true;
-
-		// 初始化chart
-		$scope.chart.width = $scope.chart.width || 6 ;
-		$scope.chart.time  = $scope.chart.time || $scope.times[1];
-		$scope.chart.x     = $scope.chart.x || $scope.xConfig[0].key;
-		$scope.chart.xtime = $scope.chart.xtime || $scope.times[0];
-		$scope.chart.y     = $scope.chart.y || $scope.yConfig[0].key;
-		$scope.chart.type  = $scope.chart.type || $scope.chartConfig[0].key;
-
-		// 选游戏范围
-		$scope.$watch('chart.game',function(n){
-			if(!$scope.chart.game){
-				$scope.platforms    = [];
-				$scope.servers      = [];
-				$scope.showPlatform = true;
-				$scope.showServers  = true;
-				return;
-			}
-
-			if(config[$scope.chart.game].platforms){
-				$scope.platforms    = config[$scope.chart.game].platforms;
-				$scope.showPlatform = true;
-			}else{
-				$scope.platforms    = [];
-				$scope.showPlatform = false;
-			}
-			
-			if(config[$scope.chart.game].servers){
-				$scope.servers     = config[$scope.chart.game].servers;
-				$scope.showServers = true;
-			}else{
-				$scope.servers     = [];
-				$scope.showServers = false;
-			}
-		});
-
-		// 时间范围选择
-		$scope.$watch('chart.time',function(time){
-			if(time != '自定义'){
-				$scope.chart.startDate = moment().subtract(time-1,'days').format('YYYY-MM-DD');
-				$scope.chart.endDate   = moment().format('YYYY-MM-DD');	
-			}
-		});
-
-		// 切换图表/显示
-		$scope.showChart = function(){
-			$scope.isEdit  = !$scope.isEdit;
-			$scope.loading = true;
-			if(!$scope.isEdit){
-				FinanceService.query($scope.chart).then(function(result){
-					$scope.loading   = false;
-					$scope.chartData = toChartData(result.axis,$scope.chart.type);
-				});	
-			}
-		}
-	}]);
-
-app.controller('ChartShowCtrl',['$scope','FinanceService',
-	function($scope,FinanceService){
-		$scope.loading = true;
-		if($scope.chart.time != '自定义'){
-			$scope.chart.startDate = moment().subtract($scope.chart.time-1,'days').format('YYYY-MM-DD');
-			$scope.chart.endDate   = moment().format('YYYY-MM-DD');	
-		}
-		FinanceService.query($scope.chart).then(function(result){
-			$scope.loading   = false;
-			$scope.chartData = toChartData(result.axis,$scope.chart.type);
-		});	
-	}]);	
-
-
-function toChartData(data,type){
-	var result;
-	if(type == 'line'){
-		result = {labels:[]};
-		var _data = [];
-		$.map(data,function(value,key){
-			result.labels.push(key);
-			_data.push(value);
-		});
-
-		result.datasets = [{
-			fillColor : "rgba(151,187,205,0.5)",
-			strokeColor : "rgba(151,187,205,1)",
-			pointColor : "rgba(151,187,205,1)",
-			pointStrokeColor : "#fff",
-			data: _data
-		}];
-	}else if(type == 'pie'){
-		// 计算颜色
-		var colors = getColors(data);
-		result = [];
-		var _i = 0;
-		$.map(data,function(value,key){
-			result.push({
-				value:value,
-				label:key,
-				color:'#'+colors[_i]
-			});
-			_i++;
-		});
-	}else if(type == 'bar'){
-		result = {labels:[]};
-		var _data = [];
-		$.map(data,function(value,key){
-			result.labels.push(key);
-			_data.push(value);
-		});
-
-		result.datasets = [{
-			fillColor : "rgba(151,187,205,0.5)",
-			strokeColor : "rgba(151,187,205,1)",
-			pointColor : "rgba(151,187,205,1)",
-			pointStrokeColor : "#fff",
-			data: _data
-		}];
-	}
-	return result;
-}
-
-function getColors(data){
-	var _count = 1;
-	var _full = parseInt('eeeeee',16);
-	var colors = [];
-	$.map(data,function(value,key){
-		_count++;
-	});
-	for(var i = 1;i<_count;i++){
-		var _color = ((_full/_count)*i).toString(16);
-		_color = _color.indexOf('.') != -1 ? _color.split('.')[0] : _color;
-		colors.push(_color);
-	}
-	return colors;
-}
-app.directive('chartEdit',function(){
-	return {
-		restrict:'A',
-		templateUrl:'/static/analysis/chart-edit.html',
-		replace:true,
-		scope:{
-			chart:'=chartEdit'
-		},
-		controller:'ChartEditCtrl'
-	}
-});
-
-app.directive('chartShow',function(){
-	return {
-		restrict:'A',
-		templateUrl:'/static/analysis/chart.html',
-		replace:true,
-		scope:{
-			chart:'=chartShow'
-		},
-		controller:'ChartShowCtrl'
-	}
-})
-app.service('FinanceService',['$q',
-	function($q){
-		return {
-			query:function(chart){
-				var deffered = $q.defer();
-				$.get(ChargePath+'analysis/income',chart,function(result){
-					deffered.resolve(result);
-				});
-				return deffered.promise;
-			},
-			getConfig:function(chart){
-				var deffered = $q.defer();
-				return deffered.promise;
-			}
-		}
-	}]);
-
-app.service('AnalysisPageService',['$q',
-	function($q){
-		return {
-			list:function(){
-				var deffered = $q.defer();
-				$.get(BackEndPath + 'page',function(result){
-					deffered.resolve(result);
-				});
-				return deffered.promise;
-			},
-			create:function(page){
-				var deffered = $q.defer();
-				$.post(BackEndPath + 'page',page,function(result){
-					deffered.resolve(result);
-				});
-				return deffered.promise;
-			},
-			update:function(page){
-				var deffered = $q.defer();
-				$.post(BackEndPath + 'page/'+page.objectId,page,function(result){
-					deffered.resolve(result);
-				});
-				return deffered.promise;	
-			},
-			get:function(id){
-				var deffered = $q.defer();
-				$.get(BackEndPath + 'page/' + id,function(result){
-					deffered.resolve(result);
-				});
-				return deffered.promise;
-			},
-			delete:function(id){
-				var deffered = $q.defer();
-				$.ajax({
-					url: BackEndPath + 'page/' + id,
-					type: 'DELETE',
-					success: function(result) {
-						deffered.resolve(result);
-					}
-				});
-				return deffered.promise;	
-			}
-		}
-	}]);
-app.controller('CommentCtrl',['$scope','$rootScope','$stateParams','CommentService',
-	function($scope,$rootScope,$stateParams,CommentService){
-		$scope.options = {};
-		$scope.options.search_type = 'id';
-
-		$scope.change_type = function(id){
-			$scope.options.type = id;
-			query();
-		}
-
-		$scope.change_search_type = function(type){
-			$scope.options.search_type = type;
-		}
-
-		$scope.change_status = function(status){
-			$scope.options.type = status;
-			query();
-		}
-
-		$scope.search = function(e){
-			var keycode = window.event?e.keyCode:e.which;
-			if(keycode == 13){
-				query();
-			}
-		}
-
-		function query(page){
-			var _options = _.clone($scope.options);
-			if(page)_options.page = page;
-			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
-			delete _options.search_type;
-			delete _options.keywords;
-			CommentService.list(_options).then(function(data){
-				$scope.list = data;
-			});
-		}
-
-		CommentService.list().then(function(data){
-			$scope.list = data;
-		});
-
-		$scope.pageChange = query;
-
-		$scope.change_notice_status = function(comment,status){
-			comment.status = status;
-			CommentService.update(comment);
-		}
-
-		$scope.delete = function(comment){
-			if(confirm('确定删除改评论?')){
-				CommentService._delete(comment.id);
-				comment.content.content = "该评论已删除";	
-			}
-			// comment.hide = true;
-		}
-
-
-		$scope.deleteByUser = function(){
-			if(confirm('该操作会删除该用户的所有评论! \r\n 确认执行吗？')){
-				CommentService.deleteByUser($scope.userid);	
-			}
-		}
-
-		$scope.chooseUser = function(user){
-			$scope.options.search_type = 'sender';
-			$scope.options.keywords = user.userid;
-			query();
-		}
-
-		$scope.chooseBody = function(comment){
-			$scope.options.type = comment.type;
-			$scope.options.search_type = 'tid';
-			$scope.options.keywords = comment.body.id;
-			query();
-		}
-	}]);
-app.service('CommentService',['$q',
-	function($q){
-		return {
-			list:function(options){
-				var deffered = $q.defer();
-				$.get(ManagePath + 'comment/list',options,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;
-			},
-			_delete:function(id){
-				var deffered = $q.defer();
-				$.get(ManagePath + 'comment/delete/'+id,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;	
-			},
-			deleteByUser:function(id){
-				var deffered = $q.defer();
-				$.get(ManagePath + 'comment/deletebyuser/'+id,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;	
-			}
-		}
-	}]);
 app.controller('BaseCtrl',['$scope','$rootScope','$state','AnalysisPageService',
 	function($scope,$rootScope,$state,AnalysisPageService){
 		// 主导航搜索
@@ -1261,7 +765,7 @@ app.directive('barChart',function(){
 			})
 		}
 	}
-})
+});
 
 app.directive('pieChart',function(){
 	return {
@@ -1279,6 +783,21 @@ app.directive('pieChart',function(){
 				}
 			});
 			
+		}
+	}
+});
+
+app.directive('tableChart',function(){
+	return {
+		restrict:'A',
+		scope:{
+			data:'=tableChart'
+		},
+		link:function($scope,element,attrs){
+			var _chart;
+			$scope.$watch('data',function(){
+				console.log($scope.data);
+			});
 		}
 	}
 })
@@ -1623,6 +1142,406 @@ app.service('MessageService',['$q','$uibModal',
 			}
 		}
 	}]);
+app.controller('WebAnalysisCtrl',['$scope','$rootScope',
+	function($scope,$rootScope){
+
+	}]);
+
+app.controller('FinanceEditCtrl',['$scope','$rootScope','$state','AnalysisPageService',
+	function($scope,$rootScope,$state,AnalysisPageService){
+		if($state.params.id){
+			$scope.pageName = '编辑';
+			if($state.params.id == 'test'){
+				var data = '{"title":"test","charts":[{"$$hashKey":"object:5","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"2333"},{"$$hashKey":"object:31","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"23333"},{"$$hashKey":"object:57","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"32222"},{"$$hashKey":"object:83","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"1122"}]}';
+				data = JSON.parse(data);
+				$scope.charts = data.charts;
+				$scope.title = data.title;
+			}else{
+				AnalysisPageService.get($state.params.id).then(function(page){
+					$scope.title = page.title;
+					$scope.charts = JSON.parse(page.data);
+				});
+			}
+		}else{
+			$scope.pageName = '新建';
+			$scope.charts = [];
+			$scope.charts.push({});	
+		}
+		
+
+		$scope.savePage = function(){
+			var data = {
+				title:$scope.title,
+				data:JSON.stringify($scope.charts),
+				objectId:$state.params.id
+			}
+			if($state.params.id){
+				AnalysisPageService.update(data).then(function(){
+					$state.go('base.analysisFinance',{id:id});
+				});
+			}else{
+				AnalysisPageService.create(data).then(function(id){
+					$state.go('base.analysisFinance',{id:id});
+				})
+			}
+		}
+
+		$scope.addChart = function(){
+			$scope.charts.push({});
+		}
+	}]);
+
+app.controller('FinanceCtrl',['$scope','$rootScope','$state','AnalysisPageService',
+	function($scope,$rootScope,$state,AnalysisPageService){
+		$scope.id = $state.params.id;
+		var data;
+		if($state.params.id == 'test'){
+			data = '{"title":"test","charts":[{"$$hashKey":"object:5","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"2333"},{"$$hashKey":"object:31","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"23333"},{"$$hashKey":"object:57","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"32222"},{"$$hashKey":"object:83","width":6,"time":3,"x":"time","xtime":1,"y":"money","type":"line","startDate":"2016-02-23","endDate":"2016-02-25","title":"1122"}]}';
+			data = JSON.parse(data);
+			$scope.title = data.title;
+			$scope.charts = data.charts;
+		}
+		if($state.params.id){
+			AnalysisPageService.get($state.params.id).then(function(page){
+				data = page;
+				data.charts = JSON.parse(page.data);
+				$scope.title = data.title;
+				$scope.charts = data.charts;
+			});
+		}
+
+		$scope.delete = function(){
+			AnalysisPageService.delete($state.params.id).then(function(result){
+				$state.go('base.dashboard');
+			});
+		}
+		
+	}]);
+
+app.controller('ChartEditCtrl',['$scope','FinanceService',
+	function($scope,FinanceService){
+		// 配置文件
+		var config = {
+			"mxwk":{
+				"name":"冒险与挖矿",
+				"servers":[1,2,3,4,5,6,7,8]
+			},
+			"czdtx":{
+				"name":"村长打天下"
+			},
+			"czdtx800ux":{
+				"name":"村长打天下800ux"
+			},
+			"kpgs":{
+				"name":"卡片怪兽"
+			},
+			"dhd":{
+				"name":"大皇帝",
+				"servers":[1,2]
+			},
+			"djmy2":{
+				"name":"刀剑魔药2",
+				"platforms":["3dm","17173","u77","178"]
+			},
+			"xxd":{
+				"name":"仙侠道",
+				"servers":[1,2]
+			},
+			"yzh":{
+				"name":"玉之魂"
+			}
+		}
+		// 初始化选项
+		$scope.gameConfig   = [];
+		$scope.servers      = [];
+		$scope.platforms     = [];
+		$scope.showPlatform = true;
+		$scope.showServers  = true;
+		$scope.times = [1,3,7,15,30,'自定义'];
+		$scope.widths = [3,4,5,6,7,8,9,10,11,12];
+		$scope.xConfig = [
+			{
+				name:'时间',
+				key:'time'
+			},
+			{
+				name:'额度',
+				key:'amount'
+			},
+			{
+				name:'渠道',
+				key:'platform'
+			},
+			{
+				name:'区服',
+				key:'server'
+			}
+		];
+
+		$scope.yConfig = [
+			{
+				name:'金额',
+				key:'money'
+			},
+			{
+				name:'充值人数',
+				key:'human'
+			},
+			{
+				name:'充值次数',
+				key:'count'
+			}
+		];
+		$scope.chartConfig = [
+			{
+				name:'线形图',
+				key:'line'
+			},
+			{
+				name:'饼状图',
+				key:'pie'
+			},
+			{
+				name:'柱状图',
+				key:'bar'
+			},
+			{
+				name:'表格图',
+				key:'table'
+			}
+		]
+
+		// 格式化配置文件
+		$.map(config,function(value,key){
+			$scope.gameConfig.push({
+				name_en:key,
+				name:value.name,
+				servers:value.servers
+			});
+		});
+
+		// 初始化状态
+		$scope.isEdit = true;
+
+		// 初始化chart
+		$scope.chart.width = $scope.chart.width || 6 ;
+		$scope.chart.time  = $scope.chart.time || $scope.times[1];
+		$scope.chart.x     = $scope.chart.x || $scope.xConfig[0].key;
+		$scope.chart.xtime = $scope.chart.xtime || $scope.times[0];
+		$scope.chart.y     = $scope.chart.y || $scope.yConfig[0].key;
+		$scope.chart.type  = $scope.chart.type || $scope.chartConfig[0].key;
+
+		// 选游戏范围
+		$scope.$watch('chart.game',function(n){
+			if(!$scope.chart.game){
+				$scope.platforms    = [];
+				$scope.servers      = [];
+				$scope.showPlatform = true;
+				$scope.showServers  = true;
+				return;
+			}
+
+			if(config[$scope.chart.game].platforms){
+				$scope.platforms    = config[$scope.chart.game].platforms;
+				$scope.showPlatform = true;
+			}else{
+				$scope.platforms    = [];
+				$scope.showPlatform = false;
+			}
+			
+			if(config[$scope.chart.game].servers){
+				$scope.servers     = config[$scope.chart.game].servers;
+				$scope.showServers = true;
+			}else{
+				$scope.servers     = [];
+				$scope.showServers = false;
+			}
+		});
+
+		// 时间范围选择
+		$scope.$watch('chart.time',function(time){
+			if(time != '自定义'){
+				$scope.chart.startDate = moment().subtract(time-1,'days').format('YYYY-MM-DD');
+				$scope.chart.endDate   = moment().format('YYYY-MM-DD');	
+			}
+		});
+
+		// 切换图表/显示
+		$scope.showChart = function(){
+			$scope.isEdit  = !$scope.isEdit;
+			$scope.loading = true;
+			if(!$scope.isEdit){
+				FinanceService.query($scope.chart).then(function(result){
+					$scope.loading   = false;
+					$scope.chartData = toChartData(result.axis,$scope.chart.type);
+				});	
+			}
+		}
+	}]);
+
+app.controller('ChartShowCtrl',['$scope','FinanceService',
+	function($scope,FinanceService){
+		$scope.loading = true;
+		if($scope.chart.time != '自定义'){
+			$scope.chart.startDate = moment().subtract($scope.chart.time-1,'days').format('YYYY-MM-DD');
+			$scope.chart.endDate   = moment().format('YYYY-MM-DD');	
+		}
+		FinanceService.query($scope.chart).then(function(result){
+			$scope.loading   = false;
+			$scope.chartData = toChartData(result.axis,$scope.chart.type);
+		});	
+	}]);	
+
+
+function toChartData(data,type){
+	var result;
+	if(type == 'line'){
+		result = {labels:[]};
+		var _data = [];
+		$.map(data,function(value,key){
+			result.labels.push(key);
+			_data.push(value);
+		});
+
+		result.datasets = [{
+			fillColor : "rgba(151,187,205,0.5)",
+			strokeColor : "rgba(151,187,205,1)",
+			pointColor : "rgba(151,187,205,1)",
+			pointStrokeColor : "#fff",
+			data: _data
+		}];
+	}else if(type == 'pie'){
+		// 计算颜色
+		var colors = getColors(data);
+		result = [];
+		var _i = 0;
+		$.map(data,function(value,key){
+			result.push({
+				value:value,
+				label:key,
+				color:'#'+colors[_i]
+			});
+			_i++;
+		});
+	}else if(type == 'bar'){
+		result = {labels:[]};
+		var _data = [];
+		$.map(data,function(value,key){
+			result.labels.push(key);
+			_data.push(value);
+		});
+
+		result.datasets = [{
+			fillColor : "rgba(151,187,205,0.5)",
+			strokeColor : "rgba(151,187,205,1)",
+			pointColor : "rgba(151,187,205,1)",
+			pointStrokeColor : "#fff",
+			data: _data
+		}];
+	}else if(type == 'table'){
+		result = data;
+	}
+	return result;
+}
+
+function getColors(data){
+	var _count = 1;
+	var _full = parseInt('eeeeee',16);
+	var colors = [];
+	$.map(data,function(value,key){
+		_count++;
+	});
+	for(var i = 1;i<_count;i++){
+		var _color = ((_full/_count)*i).toString(16);
+		_color = _color.indexOf('.') != -1 ? _color.split('.')[0] : _color;
+		colors.push(_color);
+	}
+	return colors;
+}
+app.directive('chartEdit',function(){
+	return {
+		restrict:'A',
+		templateUrl:'/static/analysis/chart-edit.html',
+		replace:true,
+		scope:{
+			chart:'=chartEdit'
+		},
+		controller:'ChartEditCtrl'
+	}
+});
+
+app.directive('chartShow',function(){
+	return {
+		restrict:'A',
+		templateUrl:'/static/analysis/chart.html',
+		replace:true,
+		scope:{
+			chart:'=chartShow'
+		},
+		controller:'ChartShowCtrl'
+	}
+})
+app.service('FinanceService',['$q',
+	function($q){
+		return {
+			query:function(chart){
+				var deffered = $q.defer();
+				$.get(ChargePath+'analysis/income',chart,function(result){
+					deffered.resolve(result);
+				});
+				return deffered.promise;
+			},
+			getConfig:function(chart){
+				var deffered = $q.defer();
+				return deffered.promise;
+			}
+		}
+	}]);
+
+app.service('AnalysisPageService',['$q',
+	function($q){
+		return {
+			list:function(){
+				var deffered = $q.defer();
+				$.get(BackEndPath + 'page',function(result){
+					deffered.resolve(result);
+				});
+				return deffered.promise;
+			},
+			create:function(page){
+				var deffered = $q.defer();
+				$.post(BackEndPath + 'page',page,function(result){
+					deffered.resolve(result);
+				});
+				return deffered.promise;
+			},
+			update:function(page){
+				var deffered = $q.defer();
+				$.post(BackEndPath + 'page/'+page.objectId,page,function(result){
+					deffered.resolve(result);
+				});
+				return deffered.promise;	
+			},
+			get:function(id){
+				var deffered = $q.defer();
+				$.get(BackEndPath + 'page/' + id,function(result){
+					deffered.resolve(result);
+				});
+				return deffered.promise;
+			},
+			delete:function(id){
+				var deffered = $q.defer();
+				$.ajax({
+					url: BackEndPath + 'page/' + id,
+					type: 'DELETE',
+					success: function(result) {
+						deffered.resolve(result);
+					}
+				});
+				return deffered.promise;	
+			}
+		}
+	}]);
 app.controller('BigEyeCtrl',['$scope','$rootScope','UploadService',
 	function($scope,$rootScope,UploadService){
 		$scope.list = [];
@@ -1939,6 +1858,108 @@ app.service('DashboardService',['$q',
 			}
 		}
 	}]);
+app.controller('CommentCtrl',['$scope','$rootScope','$stateParams','CommentService',
+	function($scope,$rootScope,$stateParams,CommentService){
+		$scope.options = {};
+		$scope.options.search_type = 'id';
+
+		$scope.change_type = function(id){
+			$scope.options.type = id;
+			query();
+		}
+
+		$scope.change_search_type = function(type){
+			$scope.options.search_type = type;
+		}
+
+		$scope.change_status = function(status){
+			$scope.options.type = status;
+			query();
+		}
+
+		$scope.search = function(e){
+			var keycode = window.event?e.keyCode:e.which;
+			if(keycode == 13){
+				query();
+			}
+		}
+
+		function query(page){
+			var _options = _.clone($scope.options);
+			if(page)_options.page = page;
+			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
+			delete _options.search_type;
+			delete _options.keywords;
+			CommentService.list(_options).then(function(data){
+				$scope.list = data;
+			});
+		}
+
+		CommentService.list().then(function(data){
+			$scope.list = data;
+		});
+
+		$scope.pageChange = query;
+
+		$scope.change_notice_status = function(comment,status){
+			comment.status = status;
+			CommentService.update(comment);
+		}
+
+		$scope.delete = function(comment){
+			if(confirm('确定删除改评论?')){
+				CommentService._delete(comment.id);
+				comment.content.content = "该评论已删除";	
+			}
+			// comment.hide = true;
+		}
+
+
+		$scope.deleteByUser = function(){
+			if(confirm('该操作会删除该用户的所有评论! \r\n 确认执行吗？')){
+				CommentService.deleteByUser($scope.userid);	
+			}
+		}
+
+		$scope.chooseUser = function(user){
+			$scope.options.search_type = 'sender';
+			$scope.options.keywords = user.userid;
+			query();
+		}
+
+		$scope.chooseBody = function(comment){
+			$scope.options.type = comment.type;
+			$scope.options.search_type = 'tid';
+			$scope.options.keywords = comment.body.id;
+			query();
+		}
+	}]);
+app.service('CommentService',['$q',
+	function($q){
+		return {
+			list:function(options){
+				var deffered = $q.defer();
+				$.get(ManagePath + 'comment/list',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			_delete:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath + 'comment/delete/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
+			deleteByUser:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath + 'comment/deletebyuser/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			}
+		}
+	}]);
 app.controller('DiscoverCtrl',['$rootScope','$scope','$state','DiscoverServer',
 	function($rootScope,$scope,$state,DiscoverServer){
 		
@@ -2169,136 +2190,6 @@ app.service('DiscoverServer',['$q',
 					}
 				})
 				return deffered.promise;
-			}
-		}
-	}]);
-app.controller('PageCtrl',['$scope','$rootScope','PageService',
-	function($scope,$rootScope,PageService){
-		$scope.options = {};
-		$scope.options.search_type = 'id';
-
-		$scope.change_type = function(id){
-			$scope.options.type = id;
-			query();
-		}
-
-		$scope.change_search_type = function(type){
-			$scope.options.search_type = type;
-		}
-
-		$scope.change_status = function(status){
-			$scope.options.status = status;
-			query();
-		}
-
-		$scope.search = function(e){
-			var keycode = window.event?e.keyCode:e.which;
-			if(keycode == 13){
-				query();
-			}
-		}
-
-		function query(page){
-			var _options = _.clone($scope.options);
-			if(page)_options.page = page;
-			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
-			delete _options.search_type;
-			delete _options.keywords;
-			PageService.list(_options).then(function(data){
-				$scope.list = data;
-			});
-		}
-
-		query();
-
-		$scope.pageChange = query;
-
-		$scope.change_page_status = function(page,status){
-			page.status = status;
-			PageService.update(page);
-			alert('操作成功');
-		}
-
-		$scope.delete = function(page){
-			if(!confirm('确认删除该公告吗?'))return;
-			PageService.delete(page.id);
-			page.hide = true;
-		}
-
-	}]);
-
-app.controller('PageEditCtrl',['$scope','$rootScope','$filter','PageService','$stateParams','$state',
-	function($scope,$rootScope,$filter,PageService,$stateParams,$state){
-		PageService.info($stateParams.id).then(function(info){
-			console.log(info);
-			$scope.page = info;
-			$scope.page.create_time = $filter('dateTime')($scope.page.create_at);
-		});
-
-		$scope.submit = function(){
-			$scope.page.create_at = $filter('toUnix')($scope.page.create_time);
-			$scope.page.update_at = $scope.page.create_at;
-			delete $scope.page.create_time;
-			PageService.update($scope.page);
-			alert('修改成功.');
-			$state.go('base.page');
-		}
-	}]);
-
-app.controller('PageNewCtrl',['$scope','$rootScope','$filter','PageService','$stateParams','$state',
-	function($scope,$rootScope,$filter,PageService,$stateParams,$state){
-
-		$scope.page = {
-			tid:$stateParams.id,
-			create_time:moment().format('YYYY/MM/DD HH:mm:ss'),
-		};
-
-		$scope.submit = function(){
-			$scope.page.create_at = $filter('toUnix')($scope.page.create_time);
-			$scope.page.update_at = $scope.page.create_at;
-			delete $scope.page.create_time;
-			PageService.create($scope.page);
-			alert('创建成功.');
-			$state.go('base.page');
-		}
-	}]);
-app.service('PageService',['$q',
-	function($q){
-		return {
-			list:function(options){
-				var deffered = $q.defer();
-				$.get(ManagePath+'page/list',options,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;
-			},
-			create:function(page){
-				var deffered = $q.defer();
-				$.post(ManagePath+'page/create',page,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;	
-			},
-			update:function(page){
-				var deffered = $q.defer();
-				$.post(ManagePath+'page/update',page,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;	
-			},
-			delete:function(id){
-				var deffered = $q.defer();
-				$.get(ManagePath+'page/delete/'+id,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;
-			},
-			info:function(id){
-				var deffered = $q.defer();
-				$.get(ManagePath+'page/info/'+id,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;	
 			}
 		}
 	}]);
@@ -3608,6 +3499,7 @@ app.controller('TagsListCtrl',['$scope','TagService',
 
 		$scope.$watch('tagsCacheList',function(){
 			$scope.selectedList = $scope.tagsCacheList ? JSON.parse($scope.tagsCacheList) : [];	
+
 		});
 		
 		$scope.add = function(tag){
@@ -3662,4 +3554,134 @@ app.controller('TagsListCtrl',['$scope','TagService',
 				$scope.tagList[data.type - 1].tags.push(data);
 			});
 		});
+	}]);
+app.controller('PageCtrl',['$scope','$rootScope','PageService',
+	function($scope,$rootScope,PageService){
+		$scope.options = {};
+		$scope.options.search_type = 'id';
+
+		$scope.change_type = function(id){
+			$scope.options.type = id;
+			query();
+		}
+
+		$scope.change_search_type = function(type){
+			$scope.options.search_type = type;
+		}
+
+		$scope.change_status = function(status){
+			$scope.options.status = status;
+			query();
+		}
+
+		$scope.search = function(e){
+			var keycode = window.event?e.keyCode:e.which;
+			if(keycode == 13){
+				query();
+			}
+		}
+
+		function query(page){
+			var _options = _.clone($scope.options);
+			if(page)_options.page = page;
+			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
+			delete _options.search_type;
+			delete _options.keywords;
+			PageService.list(_options).then(function(data){
+				$scope.list = data;
+			});
+		}
+
+		query();
+
+		$scope.pageChange = query;
+
+		$scope.change_page_status = function(page,status){
+			page.status = status;
+			PageService.update(page);
+			alert('操作成功');
+		}
+
+		$scope.delete = function(page){
+			if(!confirm('确认删除该公告吗?'))return;
+			PageService.delete(page.id);
+			page.hide = true;
+		}
+
+	}]);
+
+app.controller('PageEditCtrl',['$scope','$rootScope','$filter','PageService','$stateParams','$state',
+	function($scope,$rootScope,$filter,PageService,$stateParams,$state){
+		PageService.info($stateParams.id).then(function(info){
+			console.log(info);
+			$scope.page = info;
+			$scope.page.create_time = $filter('dateTime')($scope.page.create_at);
+		});
+
+		$scope.submit = function(){
+			$scope.page.create_at = $filter('toUnix')($scope.page.create_time);
+			$scope.page.update_at = $scope.page.create_at;
+			delete $scope.page.create_time;
+			PageService.update($scope.page);
+			alert('修改成功.');
+			$state.go('base.page');
+		}
+	}]);
+
+app.controller('PageNewCtrl',['$scope','$rootScope','$filter','PageService','$stateParams','$state',
+	function($scope,$rootScope,$filter,PageService,$stateParams,$state){
+
+		$scope.page = {
+			tid:$stateParams.id,
+			create_time:moment().format('YYYY/MM/DD HH:mm:ss'),
+		};
+
+		$scope.submit = function(){
+			$scope.page.create_at = $filter('toUnix')($scope.page.create_time);
+			$scope.page.update_at = $scope.page.create_at;
+			delete $scope.page.create_time;
+			PageService.create($scope.page);
+			alert('创建成功.');
+			$state.go('base.page');
+		}
+	}]);
+app.service('PageService',['$q',
+	function($q){
+		return {
+			list:function(options){
+				var deffered = $q.defer();
+				$.get(ManagePath+'page/list',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			create:function(page){
+				var deffered = $q.defer();
+				$.post(ManagePath+'page/create',page,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
+			update:function(page){
+				var deffered = $q.defer();
+				$.post(ManagePath+'page/update',page,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
+			delete:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'page/delete/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			info:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'page/info/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			}
+		}
 	}]);
