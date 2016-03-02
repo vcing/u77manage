@@ -74,8 +74,8 @@ app.controller('FinanceCtrl',['$scope','$rootScope','$state','AnalysisPageServic
 		
 	}]);
 
-app.controller('ChartEditCtrl',['$scope','FinanceService',
-	function($scope,FinanceService){
+app.controller('ChartEditCtrl',['$scope','AnalysisService',
+	function($scope,AnalysisService){
 		// 配置文件
 		var config = {
 			"mxwk":{
@@ -146,6 +146,14 @@ app.controller('ChartEditCtrl',['$scope','FinanceService',
 			{
 				name:'充值次数',
 				key:'count'
+			},
+			{
+				name:'平均付费金额',
+				key:'averageOfPay',
+			},
+			{
+				name:'付费率',
+				key:'percentOfPay',
 			}
 		];
 		$scope.chartConfig = [
@@ -214,6 +222,22 @@ app.controller('ChartEditCtrl',['$scope','FinanceService',
 			}
 		});
 
+		$scope.$watch('chart.y',function(n){
+			if($scope.chart.y == 'percentOfPay' || $scope.chart.y == 'averageOfPay'){
+				if(!$scope.chart.game){
+					alert('请先选择游戏后 才能选择平均付费或付费率');
+					$scope.chart.y = 'money';
+					return false;
+				}
+				$scope.chart.x        = 'time';
+				$scope.chart.platform = null;
+				$scope.chart.server   = null;
+				$scope.xDisable       = true;
+			}else{
+				$scope.xDisable = false;
+			}
+		});
+
 		// 时间范围选择
 		$scope.$watch('chart.time',function(time){
 			if(time != '自定义'){
@@ -227,7 +251,7 @@ app.controller('ChartEditCtrl',['$scope','FinanceService',
 			$scope.isEdit  = !$scope.isEdit;
 			$scope.loading = true;
 			if(!$scope.isEdit){
-				FinanceService.query($scope.chart).then(function(result){
+				AnalysisService.query($scope.chart).then(function(result){
 					$scope.loading   = false;
 					$scope.chartData = toChartData(result.axis,$scope.chart.type);
 				});	
@@ -235,14 +259,14 @@ app.controller('ChartEditCtrl',['$scope','FinanceService',
 		}
 	}]);
 
-app.controller('ChartShowCtrl',['$scope','FinanceService',
-	function($scope,FinanceService){
+app.controller('ChartShowCtrl',['$scope','AnalysisService',
+	function($scope,AnalysisService){
 		$scope.loading = true;
 		if($scope.chart.time != '自定义'){
 			$scope.chart.startDate = moment().subtract($scope.chart.time-1,'days').format('YYYY-MM-DD');
 			$scope.chart.endDate   = moment().format('YYYY-MM-DD');	
 		}
-		FinanceService.query($scope.chart).then(function(result){
+		AnalysisService.query($scope.chart).then(function(result){
 			$scope.loading   = false;
 			$scope.chartData = toChartData(result.axis,$scope.chart.type);
 		});	

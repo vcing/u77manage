@@ -1,11 +1,17 @@
-app.service('FinanceService',['$q',
+app.service('AnalysisService',['$q',
 	function($q){
 		return {
 			query:function(chart){
 				var deffered = $q.defer();
-				$.get(ChargePath+'analysis/income',chart,function(result){
-					deffered.resolve(result);
-				});
+				if(chart.y == 'money' || chart.y == 'humen' || chart.y == 'count'){
+					$.get(ChargePath+'analysis/income',chart,function(result){
+						deffered.resolve(result);
+					});
+				}else{
+					$.get(AnalysisPath+'analysis',chart,function(result){
+						deffered.resolve(result);
+					});
+				}
 				return deffered.promise;
 			},
 			getConfig:function(chart){

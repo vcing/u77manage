@@ -39,7 +39,7 @@
 
 			<div class="form-group">
 				<label>X轴</label>
-				<select class="form-control" ng-options="x.key as x.name for x in xConfig" ng-model="chart.x"></select>
+				<select class="form-control" ng-options="x.key as x.name for x in xConfig" ng-model="chart.x" ng-disabled="xDisable"></select>
 				<div class="input-group" ng-if="chart.x == 'time'">
 					<input type="text" class="form-control" ng-model="chart.xtime">
 					<span class="input-group-addon">天</span>	
