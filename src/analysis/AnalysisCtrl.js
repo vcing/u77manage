@@ -152,6 +152,14 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 				key:'averageOfPay',
 			},
 			{
+				name:'付费玩家平均付费金额',
+				key:'averageOfHuman'
+			},
+			{
+				name:'付费玩家平均每次付费金额',
+				key:'averageOfCount'
+			},
+			{
 				name:'付费率',
 				key:'percentOfPay',
 			},
