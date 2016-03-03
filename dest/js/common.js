@@ -538,6 +538,14 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 				key:'averageOfPay',
 			},
 			{
+				name:'付费玩家平均付费金额',
+				key:'averageOfHuman'
+			},
+			{
+				name:'付费玩家平均每次付费金额',
+				key:'averageOfCount'
+			},
+			{
 				name:'付费率',
 				key:'percentOfPay',
 			},
@@ -761,7 +769,7 @@ app.service('AnalysisService',['$q',
 		return {
 			query:function(chart){
 				var deffered = $q.defer();
-				if(chart.y == 'money' || chart.y == 'humen' || chart.y == 'count'){
+				if(chart.y == 'money' || chart.y == 'humen' || chart.y == 'count' || chart.y == 'averageOfHuman' || chart.y == 'averageOfCount'){
 					$.get(ChargePath+'analysis/income',chart,function(result){
 						deffered.resolve(result);
 					});
@@ -823,115 +831,6 @@ app.service('AnalysisPageService',['$q',
 			}
 		}
 	}]);
-app.controller('BigEyeCtrl',['$scope','$rootScope','UploadService',
-	function($scope,$rootScope,UploadService){
-		$scope.list = [];
-
-		$.get(ManagePath+'sliders',function(data){
-			$scope.list = JSON.parse(data);
-		});
-
-		$scope.up = function(index){
-			if(index <= 0){
-				return;
-			}
-			var _temp = $scope.list[index-1];
-			$scope.list[index-1] = $scope.list[index];
-			$scope.list[index] = _temp;
-		}
-
-		$scope.down = function(index){
-			if(index >= $scope.list.length - 1){
-				return;
-			}
-			var _temp = $scope.list[index + 1];
-			$scope.list[index + 1] = $scope.list[index];
-			$scope.list[index] = _temp;
-		}
-
-		$scope.left = function(){
-			$scope.slideControl = $scope.slideControl <= 0 ? $scope.list.length - 1 : $scope.slideControl - 1;
-		}
-
-		$scope.right = function(){
-			$scope.slideControl = $scope.slideControl >= $scope.list.length - 1 ? 0 : $scope.slideControl + 1;
-		}
-
-		$scope.submit = function(){
-			$.post(ManagePath+'sliders',{sliders:$scope.list},function(data){
-				if(data != 0){
-					alert('保存成功');
-				}
-			});
-		}
-
-		UploadService.image().then(function(fn){
-			$scope.upload = function($file,slide){
-				fn($file,function(resp){
-					if(resp.status == 200 && resp.statusText == 'OK'){
-						slide.image = resp.data.url;
-					}else{
-						alert('上传失败,请重试');
-					}
-					slide.percentage = null
-				},function(evt){
-					slide.percentage = evt.percentage;
-				});
-			}
-		});
-
-		$scope.slideControl = 0;
-		setInterval(function(){
-			$scope.$apply(function(){
-				if($scope.slideControl < $scope.list.length -1){
-					$scope.slideControl++	
-				}else{
-					$scope.slideControl = 0;
-				}	
-			});
-			
-		},3000)
-	}]);
-
-app.controller('GameExamineCtrl',['$scope','$rootScope','GameService',
-	function($scope,$rootScope,GameService){
-		$scope.options = {
-			status:0
-		}
-		GameService.list($scope.options).then(function(data){
-			$scope.gameList = data;
-		});
-	}]);
-
-app.controller('ReportExamineCtrl',['$scope','$rootScope','ReportService',
-	function($scope,$rootScope,ReportService){
-		ReportService.list().then(function(data){
-			$scope.reportList = data.data;
-		});
-
-	}]);
-// const T_TYPE_COMMENT = 1;			// comment
-// const T_TYPE_POST = 2;				// post
-// const T_TYPE_VIDEO = 3;				// video
-// const T_TYPE_GAMEREC = 4;			// game rec
-
-app.service('DailyGameVilidService',['$http','$q','GameService',
-	function($http,$q,GameService){
-		return {
-			promise:function(){
-				var deffered = $q.defer();
-				var options = {
-					status:0
-				}
-				GameService.list(options).then(function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;
-			}
-		}
-	}]);
-
-
 app.controller('BaseCtrl',['$scope','$rootScope','$state','AnalysisPageService',
 	function($scope,$rootScope,$state,AnalysisPageService){
 		// 主导航搜索
@@ -1797,6 +1696,322 @@ app.service('CommentService',['$q',
 			}
 		}
 	}]);
+app.controller('BigEyeCtrl',['$scope','$rootScope','UploadService',
+	function($scope,$rootScope,UploadService){
+		$scope.list = [];
+
+		$.get(ManagePath+'sliders',function(data){
+			$scope.list = JSON.parse(data);
+		});
+
+		$scope.up = function(index){
+			if(index <= 0){
+				return;
+			}
+			var _temp = $scope.list[index-1];
+			$scope.list[index-1] = $scope.list[index];
+			$scope.list[index] = _temp;
+		}
+
+		$scope.down = function(index){
+			if(index >= $scope.list.length - 1){
+				return;
+			}
+			var _temp = $scope.list[index + 1];
+			$scope.list[index + 1] = $scope.list[index];
+			$scope.list[index] = _temp;
+		}
+
+		$scope.left = function(){
+			$scope.slideControl = $scope.slideControl <= 0 ? $scope.list.length - 1 : $scope.slideControl - 1;
+		}
+
+		$scope.right = function(){
+			$scope.slideControl = $scope.slideControl >= $scope.list.length - 1 ? 0 : $scope.slideControl + 1;
+		}
+
+		$scope.submit = function(){
+			$.post(ManagePath+'sliders',{sliders:$scope.list},function(data){
+				if(data != 0){
+					alert('保存成功');
+				}
+			});
+		}
+
+		UploadService.image().then(function(fn){
+			$scope.upload = function($file,slide){
+				fn($file,function(resp){
+					if(resp.status == 200 && resp.statusText == 'OK'){
+						slide.image = resp.data.url;
+					}else{
+						alert('上传失败,请重试');
+					}
+					slide.percentage = null
+				},function(evt){
+					slide.percentage = evt.percentage;
+				});
+			}
+		});
+
+		$scope.slideControl = 0;
+		setInterval(function(){
+			$scope.$apply(function(){
+				if($scope.slideControl < $scope.list.length -1){
+					$scope.slideControl++	
+				}else{
+					$scope.slideControl = 0;
+				}	
+			});
+			
+		},3000)
+	}]);
+
+app.controller('GameExamineCtrl',['$scope','$rootScope','GameService',
+	function($scope,$rootScope,GameService){
+		$scope.options = {
+			status:0
+		}
+		GameService.list($scope.options).then(function(data){
+			$scope.gameList = data;
+		});
+	}]);
+
+app.controller('ReportExamineCtrl',['$scope','$rootScope','ReportService',
+	function($scope,$rootScope,ReportService){
+		ReportService.list().then(function(data){
+			$scope.reportList = data.data;
+		});
+
+	}]);
+// const T_TYPE_COMMENT = 1;			// comment
+// const T_TYPE_POST = 2;				// post
+// const T_TYPE_VIDEO = 3;				// video
+// const T_TYPE_GAMEREC = 4;			// game rec
+
+app.service('DailyGameVilidService',['$http','$q','GameService',
+	function($http,$q,GameService){
+		return {
+			promise:function(){
+				var deffered = $q.defer();
+				var options = {
+					status:0
+				}
+				GameService.list(options).then(function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			}
+		}
+	}]);
+
+
+app.controller('DashboardCtrl',['$scope','$rootScope','DashboardService',
+	function($scope,$rootScope,DashboardService){
+		// 昨日数据
+		DashboardService.yesterdayData().then(function(data){
+			$scope.yesterdayData = data;
+		});
+
+		DashboardService.todayData().then(function(data){
+			$scope.todayData = data;
+		});
+
+		
+
+		// 七日收入
+		DashboardService.sevenDayIncome().then(function(data){
+			$scope.sevenDayIncome = data;
+
+			DashboardService.sevendayData().then(function(data){
+				var result = {
+						labels:$scope.sevenDayIncome.labels,
+						datasets:[{
+								label:"新用户",
+					            fillColor: "rgba(220,220,220,0.2)",
+		                        strokeColor: "rgba(220,220,220,1)",
+		                        pointColor: "rgba(220,220,220,1)",
+		                        pointStrokeColor: "#fff",
+		                        pointHighlightFill: "#fff",
+		                        pointHighlightStroke: "rgba(220,220,220,1)",
+								data:data.newUser
+							},{
+								label:"评论",
+								fillColor: "rgba(151,187,205,0.2)",
+					            strokeColor: "rgba(151,187,205,1)",
+					            pointColor: "rgba(151,187,205,1)",
+					            pointStrokeColor: "#fff",
+					            pointHighlightFill: "#fff",
+					            pointHighlightStroke: "rgba(151,187,205,1)",
+								data:data.comment
+							}]
+					};
+				window.aaa = result;
+				$scope.sevenDayData = result;
+				$scope.sevenDayLogin = {
+					labels:$scope.sevenDayIncome.labels,
+					datasets:[{
+								label:"登录数",
+					            fillColor: "rgba(151,187,205,0.2)",
+					            strokeColor: "rgba(151,187,205,1)",
+					            pointColor: "rgba(151,187,205,1)",
+					            pointStrokeColor: "#fff",
+					            pointHighlightFill: "#fff",
+					            pointHighlightStroke: "rgba(151,187,205,1)",
+								data:data.loginCount
+							}]
+				}
+			});
+		});
+
+		DashboardService.dayIncome().then(function(data){
+			$scope.dayIncome = data;
+		})
+
+		$scope.lineChartClick = function(e){
+			DashboardService.dayIncome(e[0].label).then(function(data){
+				$scope.dayIncome = data;
+				$scope.selectDayIncome = e[0].label;
+			});
+		}
+
+		DashboardService.recentComment().then(function(data){
+			$scope.recentComment = data;
+		})
+
+		$scope.commentRefresh = function(){
+			DashboardService.recentComment().then(function(data){
+				$scope.recentComment = data;
+			})			
+		}
+	}]);
+app.service('DashboardService',['$q',
+	function($q){
+		return {
+			yesterdayData:function(){
+				var deffered = $q.defer();
+				$.get(ManagePath+'yesterday-data',function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			todayData:function(){
+				var deffered = $q.defer();
+				$.get(ManagePath+'today-data',function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			sevendayData:function(){
+				var deffered = $q.defer();
+				$.get(ManagePath+'sevenday-data',function(data){
+					_.map(data,function(value){
+						value = value.reverse();
+					});
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			recentComment:function(){
+				var deffered = $q.defer();
+				$.get(ManagePath+'recent-comment',function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
+			sevenDayIncome:function(){
+				var deffered = $q.defer();
+				var result = {
+					labels:[],
+					datasets:[{
+							fillColor: "#d2d6de",
+				            strokeColor: "#dd4b39",
+				            pointColor: "#ff7701",
+				            pointStrokeColor: "#fff",
+				            pointHighlightFill: "#fff",
+				            pointHighlightStroke: "#f39c12",
+							data:[]
+						}]
+				};
+				$.get(ChargePath+'analysis/seven-day-income',function(data){
+					_.map(data,function(value,key){
+						result.labels.push(key);
+						result.datasets[0].data.push(value);
+					});
+					result.labels = result.labels.reverse();
+					result.datasets[0].data = result.datasets[0].data.reverse();
+					deffered.resolve(result);
+				});
+				return deffered.promise;
+			},
+			dayIncome:function(day){
+				var deffered = $q.defer();
+				var result = [];
+				day = day ? day : '';
+				$.get(ChargePath+'analysis/day-income/'+day,function(data){
+					_.map(data,function(value,key){
+						switch(key){
+							case '仙侠道':
+								result.push({
+									value:value,
+									color:"#555299",
+									highlight:"#605ca8",
+									label:key
+								});
+								break;
+							case '玉之魂':
+								result.push({
+									value:value,
+									color:"#008d4c",
+									highlight:"#00a65a",
+									label:key
+								});
+								break;
+							case '大皇帝':
+								result.push({
+									value:value,
+									color: "#FDB45C",
+									highlight: "#FFC870",
+									label:key
+								});
+								break;
+							case '冒险与挖矿':
+								result.push({
+									value:value,
+									color:"#F7464A",
+			        				highlight: "#FF5A5E",
+									label:key
+								});
+								break;
+							case '刀剑魔药2':
+								result.push({
+									value:value,
+									color: "#46BFBD",
+									highlight: "#5AD3D1",
+									label:key
+								});
+								break;
+							case '卡片怪兽':
+								result.push({
+									value:value,
+									color:"#7d3bab",
+									highlight:"#8d4bbb",
+									label:key
+								});
+							case '村长打天下':
+								result.push({
+									value:value,
+									color:'#d74047',
+									highlight:'#d96a5c',
+									label:key
+								});
+						}
+					});
+					deffered.resolve(result);
+				});
+				return deffered.promise;
+			}
+		}
+	}]);
 app.controller('DiscoverCtrl',['$rootScope','$scope','$state','DiscoverServer',
 	function($rootScope,$scope,$state,DiscoverServer){
 		
@@ -2027,343 +2242,6 @@ app.service('DiscoverServer',['$q',
 					}
 				})
 				return deffered.promise;
-			}
-		}
-	}]);
-app.controller('DashboardCtrl',['$scope','$rootScope','DashboardService',
-	function($scope,$rootScope,DashboardService){
-		// 昨日数据
-		DashboardService.yesterdayData().then(function(data){
-			$scope.yesterdayData = data;
-		});
-
-		DashboardService.todayData().then(function(data){
-			$scope.todayData = data;
-		});
-
-		
-
-		// 七日收入
-		DashboardService.sevenDayIncome().then(function(data){
-			$scope.sevenDayIncome = data;
-
-			DashboardService.sevendayData().then(function(data){
-				var result = {
-						labels:$scope.sevenDayIncome.labels,
-						datasets:[{
-								label:"新用户",
-					            fillColor: "rgba(220,220,220,0.2)",
-		                        strokeColor: "rgba(220,220,220,1)",
-		                        pointColor: "rgba(220,220,220,1)",
-		                        pointStrokeColor: "#fff",
-		                        pointHighlightFill: "#fff",
-		                        pointHighlightStroke: "rgba(220,220,220,1)",
-								data:data.newUser
-							},{
-								label:"评论",
-								fillColor: "rgba(151,187,205,0.2)",
-					            strokeColor: "rgba(151,187,205,1)",
-					            pointColor: "rgba(151,187,205,1)",
-					            pointStrokeColor: "#fff",
-					            pointHighlightFill: "#fff",
-					            pointHighlightStroke: "rgba(151,187,205,1)",
-								data:data.comment
-							}]
-					};
-				window.aaa = result;
-				$scope.sevenDayData = result;
-				$scope.sevenDayLogin = {
-					labels:$scope.sevenDayIncome.labels,
-					datasets:[{
-								label:"登录数",
-					            fillColor: "rgba(151,187,205,0.2)",
-					            strokeColor: "rgba(151,187,205,1)",
-					            pointColor: "rgba(151,187,205,1)",
-					            pointStrokeColor: "#fff",
-					            pointHighlightFill: "#fff",
-					            pointHighlightStroke: "rgba(151,187,205,1)",
-								data:data.loginCount
-							}]
-				}
-			});
-		});
-
-		DashboardService.dayIncome().then(function(data){
-			$scope.dayIncome = data;
-		})
-
-		$scope.lineChartClick = function(e){
-			DashboardService.dayIncome(e[0].label).then(function(data){
-				$scope.dayIncome = data;
-				$scope.selectDayIncome = e[0].label;
-			});
-		}
-
-		DashboardService.recentComment().then(function(data){
-			$scope.recentComment = data;
-		})
-
-		$scope.commentRefresh = function(){
-			DashboardService.recentComment().then(function(data){
-				$scope.recentComment = data;
-			})			
-		}
-	}]);
-app.service('DashboardService',['$q',
-	function($q){
-		return {
-			yesterdayData:function(){
-				var deffered = $q.defer();
-				$.get(ManagePath+'yesterday-data',function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;
-			},
-			todayData:function(){
-				var deffered = $q.defer();
-				$.get(ManagePath+'today-data',function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;
-			},
-			sevendayData:function(){
-				var deffered = $q.defer();
-				$.get(ManagePath+'sevenday-data',function(data){
-					_.map(data,function(value){
-						value = value.reverse();
-					});
-					deffered.resolve(data);
-				});
-				return deffered.promise;
-			},
-			recentComment:function(){
-				var deffered = $q.defer();
-				$.get(ManagePath+'recent-comment',function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;	
-			},
-			sevenDayIncome:function(){
-				var deffered = $q.defer();
-				var result = {
-					labels:[],
-					datasets:[{
-							fillColor: "#d2d6de",
-				            strokeColor: "#dd4b39",
-				            pointColor: "#ff7701",
-				            pointStrokeColor: "#fff",
-				            pointHighlightFill: "#fff",
-				            pointHighlightStroke: "#f39c12",
-							data:[]
-						}]
-				};
-				$.get(ChargePath+'analysis/seven-day-income',function(data){
-					_.map(data,function(value,key){
-						result.labels.push(key);
-						result.datasets[0].data.push(value);
-					});
-					result.labels = result.labels.reverse();
-					result.datasets[0].data = result.datasets[0].data.reverse();
-					deffered.resolve(result);
-				});
-				return deffered.promise;
-			},
-			dayIncome:function(day){
-				var deffered = $q.defer();
-				var result = [];
-				day = day ? day : '';
-				$.get(ChargePath+'analysis/day-income/'+day,function(data){
-					_.map(data,function(value,key){
-						switch(key){
-							case '仙侠道':
-								result.push({
-									value:value,
-									color:"#555299",
-									highlight:"#605ca8",
-									label:key
-								});
-								break;
-							case '玉之魂':
-								result.push({
-									value:value,
-									color:"#008d4c",
-									highlight:"#00a65a",
-									label:key
-								});
-								break;
-							case '大皇帝':
-								result.push({
-									value:value,
-									color: "#FDB45C",
-									highlight: "#FFC870",
-									label:key
-								});
-								break;
-							case '冒险与挖矿':
-								result.push({
-									value:value,
-									color:"#F7464A",
-			        				highlight: "#FF5A5E",
-									label:key
-								});
-								break;
-							case '刀剑魔药2':
-								result.push({
-									value:value,
-									color: "#46BFBD",
-									highlight: "#5AD3D1",
-									label:key
-								});
-								break;
-							case '卡片怪兽':
-								result.push({
-									value:value,
-									color:"#7d3bab",
-									highlight:"#8d4bbb",
-									label:key
-								});
-							case '村长打天下':
-								result.push({
-									value:value,
-									color:'#d74047',
-									highlight:'#d96a5c',
-									label:key
-								});
-						}
-					});
-					deffered.resolve(result);
-				});
-				return deffered.promise;
-			}
-		}
-	}]);
-app.controller('PageCtrl',['$scope','$rootScope','PageService',
-	function($scope,$rootScope,PageService){
-		$scope.options = {};
-		$scope.options.search_type = 'id';
-
-		$scope.change_type = function(id){
-			$scope.options.type = id;
-			query();
-		}
-
-		$scope.change_search_type = function(type){
-			$scope.options.search_type = type;
-		}
-
-		$scope.change_status = function(status){
-			$scope.options.status = status;
-			query();
-		}
-
-		$scope.search = function(e){
-			var keycode = window.event?e.keyCode:e.which;
-			if(keycode == 13){
-				query();
-			}
-		}
-
-		function query(page){
-			var _options = _.clone($scope.options);
-			if(page)_options.page = page;
-			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
-			delete _options.search_type;
-			delete _options.keywords;
-			PageService.list(_options).then(function(data){
-				$scope.list = data;
-			});
-		}
-
-		query();
-
-		$scope.pageChange = query;
-
-		$scope.change_page_status = function(page,status){
-			page.status = status;
-			PageService.update(page);
-			alert('操作成功');
-		}
-
-		$scope.delete = function(page){
-			if(!confirm('确认删除该公告吗?'))return;
-			PageService.delete(page.id);
-			page.hide = true;
-		}
-
-	}]);
-
-app.controller('PageEditCtrl',['$scope','$rootScope','$filter','PageService','$stateParams','$state',
-	function($scope,$rootScope,$filter,PageService,$stateParams,$state){
-		PageService.info($stateParams.id).then(function(info){
-			console.log(info);
-			$scope.page = info;
-			$scope.page.create_time = $filter('dateTime')($scope.page.create_at);
-		});
-
-		$scope.submit = function(){
-			$scope.page.create_at = $filter('toUnix')($scope.page.create_time);
-			$scope.page.update_at = $scope.page.create_at;
-			delete $scope.page.create_time;
-			PageService.update($scope.page);
-			alert('修改成功.');
-			$state.go('base.page');
-		}
-	}]);
-
-app.controller('PageNewCtrl',['$scope','$rootScope','$filter','PageService','$stateParams','$state',
-	function($scope,$rootScope,$filter,PageService,$stateParams,$state){
-
-		$scope.page = {
-			tid:$stateParams.id,
-			create_time:moment().format('YYYY/MM/DD HH:mm:ss'),
-		};
-
-		$scope.submit = function(){
-			$scope.page.create_at = $filter('toUnix')($scope.page.create_time);
-			$scope.page.update_at = $scope.page.create_at;
-			delete $scope.page.create_time;
-			PageService.create($scope.page);
-			alert('创建成功.');
-			$state.go('base.page');
-		}
-	}]);
-app.service('PageService',['$q',
-	function($q){
-		return {
-			list:function(options){
-				var deffered = $q.defer();
-				$.get(ManagePath+'page/list',options,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;
-			},
-			create:function(page){
-				var deffered = $q.defer();
-				$.post(ManagePath+'page/create',page,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;	
-			},
-			update:function(page){
-				var deffered = $q.defer();
-				$.post(ManagePath+'page/update',page,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;	
-			},
-			delete:function(id){
-				var deffered = $q.defer();
-				$.get(ManagePath+'page/delete/'+id,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;
-			},
-			info:function(id){
-				var deffered = $q.defer();
-				$.get(ManagePath+'page/info/'+id,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;	
 			}
 		}
 	}]);
@@ -3728,4 +3606,134 @@ app.controller('TagsListCtrl',['$scope','TagService',
 				$scope.tagList[data.type - 1].tags.push(data);
 			});
 		});
+	}]);
+app.controller('PageCtrl',['$scope','$rootScope','PageService',
+	function($scope,$rootScope,PageService){
+		$scope.options = {};
+		$scope.options.search_type = 'id';
+
+		$scope.change_type = function(id){
+			$scope.options.type = id;
+			query();
+		}
+
+		$scope.change_search_type = function(type){
+			$scope.options.search_type = type;
+		}
+
+		$scope.change_status = function(status){
+			$scope.options.status = status;
+			query();
+		}
+
+		$scope.search = function(e){
+			var keycode = window.event?e.keyCode:e.which;
+			if(keycode == 13){
+				query();
+			}
+		}
+
+		function query(page){
+			var _options = _.clone($scope.options);
+			if(page)_options.page = page;
+			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
+			delete _options.search_type;
+			delete _options.keywords;
+			PageService.list(_options).then(function(data){
+				$scope.list = data;
+			});
+		}
+
+		query();
+
+		$scope.pageChange = query;
+
+		$scope.change_page_status = function(page,status){
+			page.status = status;
+			PageService.update(page);
+			alert('操作成功');
+		}
+
+		$scope.delete = function(page){
+			if(!confirm('确认删除该公告吗?'))return;
+			PageService.delete(page.id);
+			page.hide = true;
+		}
+
+	}]);
+
+app.controller('PageEditCtrl',['$scope','$rootScope','$filter','PageService','$stateParams','$state',
+	function($scope,$rootScope,$filter,PageService,$stateParams,$state){
+		PageService.info($stateParams.id).then(function(info){
+			console.log(info);
+			$scope.page = info;
+			$scope.page.create_time = $filter('dateTime')($scope.page.create_at);
+		});
+
+		$scope.submit = function(){
+			$scope.page.create_at = $filter('toUnix')($scope.page.create_time);
+			$scope.page.update_at = $scope.page.create_at;
+			delete $scope.page.create_time;
+			PageService.update($scope.page);
+			alert('修改成功.');
+			$state.go('base.page');
+		}
+	}]);
+
+app.controller('PageNewCtrl',['$scope','$rootScope','$filter','PageService','$stateParams','$state',
+	function($scope,$rootScope,$filter,PageService,$stateParams,$state){
+
+		$scope.page = {
+			tid:$stateParams.id,
+			create_time:moment().format('YYYY/MM/DD HH:mm:ss'),
+		};
+
+		$scope.submit = function(){
+			$scope.page.create_at = $filter('toUnix')($scope.page.create_time);
+			$scope.page.update_at = $scope.page.create_at;
+			delete $scope.page.create_time;
+			PageService.create($scope.page);
+			alert('创建成功.');
+			$state.go('base.page');
+		}
+	}]);
+app.service('PageService',['$q',
+	function($q){
+		return {
+			list:function(options){
+				var deffered = $q.defer();
+				$.get(ManagePath+'page/list',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			create:function(page){
+				var deffered = $q.defer();
+				$.post(ManagePath+'page/create',page,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
+			update:function(page){
+				var deffered = $q.defer();
+				$.post(ManagePath+'page/update',page,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
+			delete:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'page/delete/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			info:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath+'page/info/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			}
+		}
 	}]);
