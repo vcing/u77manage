@@ -170,6 +170,14 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 			{
 				name:'注册人数',
 				key:'register'
+			},
+			{
+				name:'留存人数',
+				key:'retention'
+			},
+			{
+				name:'留存百分比',
+				key:'percentOfRetention'
 			}
 		];
 		$scope.chartConfig = [
@@ -239,7 +247,12 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 		});
 
 		$scope.$watch('chart.y',function(n){
-			if($scope.chart.y == 'percentOfPay' || $scope.chart.y == 'averageOfPay' || $scope.chart.y == 'login' || $scope.chart.y == 'register'){
+			if($scope.chart.y == 'percentOfPay' ||
+			   $scope.chart.y == 'averageOfPay' ||
+			   $scope.chart.y == 'login' ||
+			   $scope.chart.y == 'register' ||
+			   $scope.chart.y == 'retention' ||
+			   $scope.chart.y == 'percentOfRetention'){
 				if(!$scope.chart.game){
 					alert('请先选择游戏后 才能选择平均付费或付费率');
 					$scope.chart.y = 'money';
