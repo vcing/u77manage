@@ -3,7 +3,7 @@ app.service('AnalysisService',['$q',
 		return {
 			query:function(chart){
 				var deffered = $q.defer();
-				if(chart.y == 'money' || chart.y == 'humen' || chart.y == 'count' || chart.y == 'averageOfHuman' || chart.y == 'averageOfCount'){
+				if(chart.y == 'money' || chart.y == 'human' || chart.y == 'count' || chart.y == 'averageOfHuman' || chart.y == 'averageOfCount'){
 					$.get(ChargePath+'analysis/income',chart,function(result){
 						deffered.resolve(result);
 					});
