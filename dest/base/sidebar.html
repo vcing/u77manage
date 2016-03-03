@@ -99,16 +99,11 @@
 					<i class="fa fa-angle-left pull-right"></i>
 				</a>
 				<ul class="treeview-menu">
-					<li><a ui-sref="base.analysisWeb"><i class="fa fa-circle-o"></i>网站</a></li>
-					<!-- <li><a ui-sref="base.analysisFinance"><i class="fa fa-circle-o"></i>财务</a></li> -->
+					<li ng-repeat="page in financePages">
+						<a ui-sref="base.analysisFinance({id:page.objectId})"><i class="fa fa-circle-o"></i>{{page.title}}</a>
+					</li>
 					<li>
-						<a href="#"><i class="fa fa-circle-o"></i>财务<i class="fa fa-angle-left pull-right"></i></a>
-						<ul class="treeview-menu">
-							<li>
-								<a ng-repeat="page in financePages" ui-sref="base.analysisFinance({id:page.objectId})"><i class="fa fa-circle-o"></i>{{page.title}}</a>
-								<a ui-sref="base.analysisFinanceNew"><i class="fa fa-circle-o"></i>新增图表</a>
-							</li>
-						</ul>
+						<a ui-sref="base.analysisFinanceNew"><i class="fa fa-circle-o"></i>新增图表</a>
 					</li>
 				</ul>
 			</li>

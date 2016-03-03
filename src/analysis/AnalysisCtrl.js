@@ -154,6 +154,14 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 			{
 				name:'付费率',
 				key:'percentOfPay',
+			},
+			{
+				name:'活跃人数',
+				key:'login'
+			},
+			{
+				name:'注册人数',
+				key:'register'
 			}
 		];
 		$scope.chartConfig = [
@@ -223,7 +231,7 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 		});
 
 		$scope.$watch('chart.y',function(n){
-			if($scope.chart.y == 'percentOfPay' || $scope.chart.y == 'averageOfPay'){
+			if($scope.chart.y == 'percentOfPay' || $scope.chart.y == 'averageOfPay' || $scope.chart.y == 'login' || $scope.chart.y == 'register'){
 				if(!$scope.chart.game){
 					alert('请先选择游戏后 才能选择平均付费或付费率');
 					$scope.chart.y = 'money';
@@ -269,6 +277,7 @@ app.controller('ChartShowCtrl',['$scope','AnalysisService',
 		AnalysisService.query($scope.chart).then(function(result){
 			$scope.loading   = false;
 			$scope.chartData = toChartData(result.axis,$scope.chart.type);
+			$scope.other = result;
 		});	
 	}]);	
 
