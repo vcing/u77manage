@@ -18,8 +18,22 @@
                 </span>
             </div>
 		</div>
-		<div class="col-xs-12" style="height: 40px"></div>
-		<div chart-edit="chart" ng-repeat="chart in charts"></div>
+		<div class="col-xs-12" style="margin-top:20px">
+			<div class="nav-tabs-custom">
+				<ul class="nav nav-tabs">
+					<li ng-repeat="(key,tab) in tabs" ng-class="{true:'active',false:''}[currentTab == key]">
+						<a ng-click="active(key)">
+							<input type="text" placeholder="请输入tab名称" ng-model="tab.title">
+						</a>
+						<a ng-if="key != 0" ng-click="deleteTab(key)" style="position: absolute;top: 12px;padding:0;right: 0;"><i class="fa fa-times"></i></a>
+					</li>
+					<li>
+						<a ng-click="newTab()">添加tab</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div chart-edit="chart" delete-chart="deleteChart" key="key" ng-repeat="(key,chart) in tabs[currentTab].charts"></div>
 		<div class="col-xs-12 col-sm-6" style="text-align: center;padding:100px;border:1px dashed #ccc;cursor: pointer;" ng-click="addChart()">
 			<span style="text-align: center;font-size:24px">
 				<i class="fa fa-plus"></i>

@@ -4,7 +4,9 @@ app.directive('chartEdit',function(){
 		templateUrl:'/static/analysis/chart-edit.html',
 		replace:true,
 		scope:{
-			chart:'=chartEdit'
+			chart:'=chartEdit',
+			deleteChart:'=deleteChart',
+			key:'=key'
 		},
 		controller:'ChartEditCtrl'
 	}

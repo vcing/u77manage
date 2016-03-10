@@ -15,35 +15,64 @@ app.controller('FinanceEditCtrl',['$scope','$rootScope','$state','AnalysisPageSe
 			}else{
 				AnalysisPageService.get($state.params.id).then(function(page){
 					$scope.title = page.title;
-					$scope.charts = JSON.parse(page.data);
+					$scope.tabs = JSON.parse(page.data);
+					$scope.currentTab = 0;
 				});
 			}
 		}else{
 			$scope.pageName = '新建';
-			$scope.charts = [];
-			$scope.charts.push({});	
+			$scope.currentTab = 0;
+			$scope.tabs = [{
+				title:'',
+				charts:[]
+			}];
+		}
+
+		$scope.active = function(key) {
+			$scope.currentTab = key;
+		}
+
+		$scope.newTab = function() {
+			$scope.tabs.push({
+				title:'',
+				charts:[]
+			});
+			$scope.currentTab = $scope.tabs.length-1;
+		}
+
+		// 删除tab
+		$scope.deleteTab = function(key){
+			if($scope.currentTab == key){
+				$scope.currentTab = key - 1;
+			}
+			$scope.tabs.splice(key,1);
+		}
+
+		// 删除表
+		$scope.deleteChart = function(key){
+			$scope.tabs[$scope.currentTab].charts.splice(key,1);
 		}
 		
 
 		$scope.savePage = function(){
 			var data = {
 				title:$scope.title,
-				data:JSON.stringify($scope.charts),
+				data:JSON.stringify($scope.tabs),
 				objectId:$state.params.id
 			}
 			if($state.params.id){
 				AnalysisPageService.update(data).then(function(){
-					$state.go('base.analysisFinance',{id:id});
+					$state.go('base.analysisFinance',{id:$state.params.id});
 				});
 			}else{
 				AnalysisPageService.create(data).then(function(id){
-					$state.go('base.analysisFinance',{id:id});
+					$state.go('base.analysisFinance',{id:$state.params.id});
 				})
 			}
 		}
 
 		$scope.addChart = function(){
-			$scope.charts.push({});
+			$scope.tabs[$scope.currentTab].charts.push({});
 		}
 	}]);
 
@@ -62,8 +91,13 @@ app.controller('FinanceCtrl',['$scope','$rootScope','$state','AnalysisPageServic
 				data = page;
 				data.charts = JSON.parse(page.data);
 				$scope.title = data.title;
-				$scope.charts = data.charts;
+				$scope.tabs = data.charts;
+				$scope.currentTab = 0;
 			});
+		}
+
+		$scope.active = function(key) {
+			$scope.currentTab = key;
 		}
 
 		$scope.delete = function(){

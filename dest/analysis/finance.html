@@ -11,6 +11,15 @@
 </section>
 <section class="content">
 	<div class="row">
-		<div chart-show="chart" ng-repeat="chart in charts"></div>
+		<div class="col-xs-12" style="margin-top:20px">
+			<div class="nav-tabs-custom">
+				<ul class="nav nav-tabs">
+					<li ng-repeat="(key,tab) in tabs" ng-class="{true:'active',false:''}[currentTab == key]">
+						<a ng-click="active(key)" ng-bind="tab.title"></a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div chart-show="chart" ng-repeat="chart in tabs[currentTab].charts"></div>
 	</div>
 </section>
