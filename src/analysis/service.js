@@ -65,3 +65,24 @@ app.service('AnalysisPageService',['$q',
 			}
 		}
 	}]);
+
+app.service('SaveService',['$q','$uibModal',
+	function($q,$uibModal){
+		return {
+			create:function(options){
+				var modalInstance = $uibModal.open({
+					animation:true,
+					templateUrl:'/static/analysis/save.html',
+					controller:'SaveCtrl',
+					size:'md',
+					resolve:{
+						options:function(){
+							return options;
+						}
+					}
+				});
+
+				return modalInstance.result;
+			}
+		}
+	}]);

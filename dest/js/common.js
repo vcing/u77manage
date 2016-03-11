@@ -15,7 +15,7 @@ var ChargePath = 'http://u77pay.leanapp.cn/api/';
 var AnalysisPath = 'http://u77userrecord.leanapp.cn/api/';
 var DiscoverPath = 'http://u77discover.avosapps.com/api/';
 // var FinancePath = 'http://192.168.1.102:3000/api/';
-// var ChargePath = 'http://192.168.0.102:3000/api/' 
+// var ChargePath = 'http://192.168.1.102:3000/api/' 
 app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 	function($stateProvider,$urlRouterProvider,$locationProvider){
 
@@ -389,8 +389,8 @@ app.controller('WebAnalysisCtrl',['$scope','$rootScope',
 
 	}]);
 
-app.controller('FinanceEditCtrl',['$scope','$rootScope','$state','AnalysisPageService',
-	function($scope,$rootScope,$state,AnalysisPageService){
+app.controller('FinanceEditCtrl',['$scope','$rootScope','$state','AnalysisPageService','SaveService',
+	function($scope,$rootScope,$state,AnalysisPageService,SaveService){
 		if($state.params.id){
 			$scope.pageName = '编辑';
 			if($state.params.id == 'test'){
@@ -452,9 +452,47 @@ app.controller('FinanceEditCtrl',['$scope','$rootScope','$state','AnalysisPageSe
 				});
 			}else{
 				AnalysisPageService.create(data).then(function(id){
-					$state.go('base.analysisFinance',{id:$state.params.id});
+					$state.go('base.analysisFinance',{id:id});
 				})
 			}
+		}
+
+		function outputTab() {
+			var data = _.clone($scope.tabs[$scope.currentTab]);
+			delete data.$$hashKey;
+			data.charts.forEach(function(chart){
+				delete chart.$$hashKey;
+			});
+			return JSON.stringify(data);
+		}
+
+		function inputTab(data) {
+			$scope.tabs[$scope.currentTab] = JSON.parse(data);
+		}
+
+		function outputPage() {
+			var data = _.clone($scope.tabs);
+			data.forEach(function(tab){
+				delete tab.$$hashKey;
+				tab.charts.forEach(function(chart){
+					delete chart.$$hashKey;
+				});
+			});
+			
+			return JSON.stringify($scope.tabs);
+		}
+
+		function inputPage(data) {
+			$scope.tabs = JSON.parse(data);
+		}
+
+		$scope.showSave = function() {
+			SaveService.create({
+				outputPage:outputPage,
+				inputPage:inputPage,
+				outputTab:outputTab,
+				inputTab:inputTab
+			});
 		}
 
 		$scope.addChart = function(){
@@ -551,6 +589,10 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 			{
 				name:'区服',
 				key:'server'
+			},
+			{
+				name:'游戏',
+				key:'game'
 			}
 		];
 
@@ -568,16 +610,16 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 				key:'count'
 			},
 			{
-				name:'平均付费金额',
-				key:'averageOfPay',
-			},
-			{
 				name:'付费玩家平均付费金额',
 				key:'averageOfHuman'
 			},
 			{
 				name:'付费玩家平均每次付费金额',
 				key:'averageOfCount'
+			},
+			{
+				name:'平均付费金额',
+				key:'averageOfPay',
 			},
 			{
 				name:'付费率',
@@ -664,6 +706,19 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 				$scope.servers     = [];
 				$scope.showServers = false;
 			}
+
+			if($scope.chart.game){
+				if($scope.chart.x == 'game'){
+					alert('x轴无法选择为游戏');
+					$scope.chart.x = 'time';
+				}
+			// 	$scope.xConfig.splice(4,1);
+			// }else if($scope.chart.xConfig == 4){
+			// 	$scope.xConfig.push({
+			// 		name:'游戏',
+			// 		key:'game'
+			// 	})
+			}
 		});
 
 		$scope.$watch('chart.y',function(n){
@@ -678,7 +733,7 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 					$scope.chart.y = 'money';
 					return false;
 				}
-				$scope.chart.x        = 'time';
+				$scope.chart.x        = 'time';z
 				$scope.chart.platform = null;
 				$scope.chart.server   = null;
 				$scope.xDisable       = true;
@@ -695,6 +750,53 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 			}
 		});
 
+		$scope.$watch('chart.x',function(x){
+			if(x == 'game'){
+				$scope.yConfig.splice(5,6);
+			}else if($scope.yConfig.length == 5){
+				var _config = [{
+									name:'平均付费金额',
+									key:'averageOfPay',
+								},
+								{
+									name:'付费率',
+									key:'percentOfPay',
+								},
+								{
+									name:'活跃人数',
+									key:'login'
+								},
+								{
+									name:'注册人数',
+									key:'register'
+								},
+								{
+									name:'留存人数',
+									key:'retention'
+								},
+								{
+									name:'留存百分比',
+									key:'percentOfRetention'
+								}];
+				_config.forEach(function(_y){
+					$scope.yConfig.push(_y);
+				});
+			}
+
+			if($scope.chart.game){
+				if($scope.chart.x == 'game'){
+					alert('x轴无法选择为游戏');
+					$scope.chart.x = 'time';
+				}
+			// 	$scope.xConfig.splice(4,1);
+			// }else if($scope.chart.xConfig == 4){
+			// 	$scope.xConfig.push({
+			// 		name:'游戏',
+			// 		key:'game'
+			// 	})
+			}
+		})
+
 		// 切换图表/显示
 		$scope.showChart = function(){
 			$scope.isEdit  = !$scope.isEdit;
@@ -706,6 +808,8 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 				});	
 			}
 		}
+
+
 	}]);
 
 app.controller('ChartShowCtrl',['$scope','AnalysisService',
@@ -720,7 +824,27 @@ app.controller('ChartShowCtrl',['$scope','AnalysisService',
 			$scope.chartData = toChartData(result.axis,$scope.chart.type);
 			$scope.other = result;
 		});	
-	}]);	
+	}]);
+
+app.controller('SaveCtrl',['$scope','$rootScope','$uibModalInstance','options',
+	function($scope,$rootScope,$uibModalInstance,options){
+		console.log(options);
+		$scope.outputTab = function() {
+			$scope.data = options.outputTab();
+		}
+
+		$scope.outputPage = function() {
+			$scope.data = options.outputPage();
+		}
+
+		$scope.inputTab = function() {
+			options.inputTab($scope.data);
+		}
+
+		$scope.inputPage = function() {
+			options.inputPage($scope.data);
+		}
+	}]);
 
 
 function toChartData(data,type){
@@ -877,6 +1001,27 @@ app.service('AnalysisPageService',['$q',
 					}
 				});
 				return deffered.promise;	
+			}
+		}
+	}]);
+
+app.service('SaveService',['$q','$uibModal',
+	function($q,$uibModal){
+		return {
+			create:function(options){
+				var modalInstance = $uibModal.open({
+					animation:true,
+					templateUrl:'/static/analysis/save.html',
+					controller:'SaveCtrl',
+					size:'md',
+					resolve:{
+						options:function(){
+							return options;
+						}
+					}
+				});
+
+				return modalInstance.result;
 			}
 		}
 	}]);
@@ -1181,27 +1326,60 @@ app.directive('navPager',function(){
 })
 
 
+// app.directive('contenteditable', function() {
+//         return {
+//             require: 'ngModel',
+//             link: function(scope, elm, attrs, ctrl) {
+//                 // view -> model
+//                 elm.bind('blur', function() {
+//                     scope.$apply(function() {
+//                         ctrl.$setViewValue(elm.html());
+//                     });
+//                 });
+
+//                 // model -> view
+//                 ctrl.$render = function() {
+//                     elm.html(ctrl.$viewValue);
+//                 };
+
+//                 // load init value from DOM
+//                 ctrl.$setViewValue(elm.html());
+//             }
+//         };
+//     });
+
+
 app.directive('contenteditable', function() {
-        return {
-            require: 'ngModel',
-            link: function(scope, elm, attrs, ctrl) {
-                // view -> model
-                elm.bind('blur', function() {
-                    scope.$apply(function() {
-                        ctrl.$setViewValue(elm.html());
-                    });
-                });
+    return {
+      restrict: 'A', // only activate on element attribute
+      require: '?ngModel', // get a hold of NgModelController
+      link: function(scope, element, attrs, ngModel) {
+        if(!ngModel) return; // do nothing if no ng-model
 
-                // model -> view
-                ctrl.$render = function() {
-                    elm.html(ctrl.$viewValue);
-                };
-
-                // load init value from DOM
-                ctrl.$setViewValue(elm.html());
-            }
+        // Specify how UI should be updated
+        ngModel.$render = function() {
+          element.html(ngModel.$viewValue || '');
         };
-    });
+
+        // Listen for change events to enable binding
+        element.on('blur keyup change', function() {
+          scope.$apply(read);
+        });
+        read(); // initialize
+
+        // Write data to the model
+        function read() {
+          var html = element.html();
+          // When we clear the content editable the browser leaves a <br> behind
+          // If strip-br attribute is provided then we strip this out
+          if( attrs.stripBr && html == '<br>' ) {
+            html = '';
+          }
+          ngModel.$setViewValue(html);
+        }
+      }
+    };
+  });
 
 app.directive('lineChart',function(){
 	return {
