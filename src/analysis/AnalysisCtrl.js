@@ -152,7 +152,7 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 		var config = {
 			"mxwk":{
 				"name":"冒险与挖矿",
-				"servers":[1,2,3,4,5,6,7,8]
+				"servers":[1,2,3,4,5,6,7,8,9]
 			},
 			"czdtx":{
 				"name":"村长打天下"

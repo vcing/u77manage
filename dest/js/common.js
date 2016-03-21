@@ -538,7 +538,7 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 		var config = {
 			"mxwk":{
 				"name":"冒险与挖矿",
-				"servers":[1,2,3,4,5,6,7,8]
+				"servers":[1,2,3,4,5,6,7,8,9]
 			},
 			"czdtx":{
 				"name":"村长打天下"
@@ -1821,108 +1821,6 @@ app.service('MessageService',['$q','$uibModal',
 			}
 		}
 	}]);
-app.controller('CommentCtrl',['$scope','$rootScope','$stateParams','CommentService',
-	function($scope,$rootScope,$stateParams,CommentService){
-		$scope.options = {};
-		$scope.options.search_type = 'id';
-
-		$scope.change_type = function(id){
-			$scope.options.type = id;
-			query();
-		}
-
-		$scope.change_search_type = function(type){
-			$scope.options.search_type = type;
-		}
-
-		$scope.change_status = function(status){
-			$scope.options.type = status;
-			query();
-		}
-
-		$scope.search = function(e){
-			var keycode = window.event?e.keyCode:e.which;
-			if(keycode == 13){
-				query();
-			}
-		}
-
-		function query(page){
-			var _options = _.clone($scope.options);
-			if(page)_options.page = page;
-			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
-			delete _options.search_type;
-			delete _options.keywords;
-			CommentService.list(_options).then(function(data){
-				$scope.list = data;
-			});
-		}
-
-		CommentService.list().then(function(data){
-			$scope.list = data;
-		});
-
-		$scope.pageChange = query;
-
-		$scope.change_notice_status = function(comment,status){
-			comment.status = status;
-			CommentService.update(comment);
-		}
-
-		$scope.delete = function(comment){
-			if(confirm('确定删除改评论?')){
-				CommentService._delete(comment.id);
-				comment.content.content = "该评论已删除";	
-			}
-			// comment.hide = true;
-		}
-
-
-		$scope.deleteByUser = function(){
-			if(confirm('该操作会删除该用户的所有评论! \r\n 确认执行吗？')){
-				CommentService.deleteByUser($scope.userid);	
-			}
-		}
-
-		$scope.chooseUser = function(user){
-			$scope.options.search_type = 'sender';
-			$scope.options.keywords = user.userid;
-			query();
-		}
-
-		$scope.chooseBody = function(comment){
-			$scope.options.type = comment.type;
-			$scope.options.search_type = 'tid';
-			$scope.options.keywords = comment.body.id;
-			query();
-		}
-	}]);
-app.service('CommentService',['$q',
-	function($q){
-		return {
-			list:function(options){
-				var deffered = $q.defer();
-				$.get(ManagePath + 'comment/list',options,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;
-			},
-			_delete:function(id){
-				var deffered = $q.defer();
-				$.get(ManagePath + 'comment/delete/'+id,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;	
-			},
-			deleteByUser:function(id){
-				var deffered = $q.defer();
-				$.get(ManagePath + 'comment/deletebyuser/'+id,function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;	
-			}
-		}
-	}]);
 app.controller('BigEyeCtrl',['$scope','$rootScope','UploadService',
 	function($scope,$rootScope,UploadService){
 		$scope.list = [];
@@ -2239,236 +2137,105 @@ app.service('DashboardService',['$q',
 			}
 		}
 	}]);
-app.controller('DiscoverCtrl',['$rootScope','$scope','$state','DiscoverServer',
-	function($rootScope,$scope,$state,DiscoverServer){
-		
-		$scope.refresh = function(){
-			var options = {
-				page:$scope.options.currentPage,
-			}
-			if($scope.options.keywords){
-				options.searchType = $scope.options.search_type || 'title';
-				options.keywords = $scope.options.keywords;
-			};
-			
-			switch($scope.options.type){
-				case 1:
-					options.isLast = 'true';
-					break;
-				case 2:
-					options.isLast = 'false';
-					break;
-				default:
-					delete options.isLast;
-					break;
-			}
-			DiscoverServer.discoverList(options).then(function(result){
-				$scope.discovers = result;
-			});			
+app.controller('CommentCtrl',['$scope','$rootScope','$stateParams','CommentService',
+	function($scope,$rootScope,$stateParams,CommentService){
+		$scope.options = {};
+		$scope.options.search_type = 'id';
+
+		$scope.change_type = function(id){
+			$scope.options.type = id;
+			query();
 		}
 
-		$scope.nextPage = function(){
-			if($scope.discovers.length < 20){
-				alert('已经是最后一页了');
-			}else{
-				$scope.options.currentPage++;
-				$scope.refresh();
-			}
+		$scope.change_search_type = function(type){
+			$scope.options.search_type = type;
 		}
 
-		$scope.prevPage = function(){
-			if($scope.options.currentPage <= 1){
-				alert('已经是第一页了');
-			}else{
-				$scope.options.currentPage--;
-				$scope.refresh();
-			}
-		}
-
-		$scope.checkGame = function(discover){
-			var url = $state.href('base.discoverGameWithId',{id:discover.game.objectId});
-			window.open(url);
-		}
-
-		$scope.delete = function(discover){
-			if(!confirm('确定删除该条推荐吗?')){
-				return ;
-			}
-			DiscoverServer.discoverDelete(discover).then(function(result){
-				if(result.status == 0){
-					discover.hide = true;
-					alert('删除推荐成功.');
-				}else{
-					alert('删除推荐失败,请检查后重试.');
-				}
-			});
-		}
-
-		$scope.create = function(discover){
-			var url = $state.href('base.gameNewWithDiscover',{discoverId:discover.discoverId});
-			window.open(url);
+		$scope.change_status = function(status){
+			$scope.options.type = status;
+			query();
 		}
 
 		$scope.search = function(e){
 			var keycode = window.event?e.keyCode:e.which;
 			if(keycode == 13){
-				$scope.refresh();
+				query();
 			}
 		}
 
-		$scope.options = {
-			currentPage:1
+		function query(page){
+			var _options = _.clone($scope.options);
+			if(page)_options.page = page;
+			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
+			delete _options.search_type;
+			delete _options.keywords;
+			CommentService.list(_options).then(function(data){
+				$scope.list = data;
+			});
 		}
-		if($state.params.gameId){
-			$scope.options.search_type = 'game';
-			$scope.options.keywords = $state.params.gameId;
+
+		CommentService.list().then(function(data){
+			$scope.list = data;
+		});
+
+		$scope.pageChange = query;
+
+		$scope.change_notice_status = function(comment,status){
+			comment.status = status;
+			CommentService.update(comment);
 		}
-		$scope.refresh();
+
+		$scope.delete = function(comment){
+			if(confirm('确定删除改评论?')){
+				CommentService._delete(comment.id);
+				comment.content.content = "该评论已删除";	
+			}
+			// comment.hide = true;
+		}
+
+
+		$scope.deleteByUser = function(){
+			if(confirm('该操作会删除该用户的所有评论! \r\n 确认执行吗？')){
+				CommentService.deleteByUser($scope.userid);	
+			}
+		}
+
+		$scope.chooseUser = function(user){
+			$scope.options.search_type = 'sender';
+			$scope.options.keywords = user.userid;
+			query();
+		}
+
+		$scope.chooseBody = function(comment){
+			$scope.options.type = comment.type;
+			$scope.options.search_type = 'tid';
+			$scope.options.keywords = comment.body.id;
+			query();
+		}
 	}]);
-app.controller('DiscoverGameCtrl',['$scope','$state','DiscoverServer',
-	function($scope,$state,DiscoverServer){
-		$scope.refresh = function(){
-			DiscoverServer.gameList($scope.options).then(function(result){
-				$scope.games = result;
-			});
-		}
-
-		$scope.nextPage = function(){
-			if($scope.games.length < 20){
-				alert('已经是最后一页了');
-			}else{
-				$scope.options.page++;
-				$scope.refresh();
-			}
-		}
-
-		$scope.prevPage = function(){
-			if($scope.options.page <= 1){
-				alert('已经是第一页了');
-			}else{
-				$scope.options.page--;
-				$scope.refresh();
-			}
-		}
-
-		$scope.save = function(game){
-			var _game = {
-				u77Id:game.u77Id,
-				objectId:game.objectId
-			}
-			DiscoverServer.gameUpdate(_game).then(function(result){
-				if(result.status == 0){
-					alert('修改游戏成功');
-				}else{
-					alert('修改游戏失败,请检查后重试');
-				}
-			});
-		}
-
-		$scope.checkDiscover = function(game){
-			var url = $state.href('base.discoverWithGameId',{gameId:game.objectId});
-			window.open(url);
-		}
-
-		$scope.delete = function(game){
-			DiscoverServer.gameDelete(game).then(function(result){
-				if(result.status == 0){
-					game.hide = true;
-					alert('删除游戏成功');
-				}else{
-					alert('删除游戏失败,请检查后重试');
-				}
-			});
-		}
-
-		$scope.search = function(e){
-			var keycode = window.event?e.keyCode:e.which;
-			if(keycode == 13){
-				$scope.refresh();
-			}
-		}
-
-		$scope.options = {
-			page:1
-		};
-		if($state.params.id){
-			$scope.options.searchType = "objectId";
-			$scope.options.keywords = $state.params.id;
-		}
-		$scope.refresh();
-	}]);
-app.service('DiscoverServer',['$q',
+app.service('CommentService',['$q',
 	function($q){
 		return {
-			discoverList:function(options){
-				options.debug = true;
+			list:function(options){
 				var deffered = $q.defer();
-				$.ajax({
-					url:DiscoverPath + 'discover/list',
-					data:options,
-					type:'get',
-					success:function(result){
-						deffered.resolve(result);
-					}
-				});
-				return deffered.promise
-			},
-			discoverDelete:function(discover){
-				var deffered = $q.defer();
-				$.ajax({
-					url:DiscoverPath+'discover/'+discover.objectId,
-					type:'delete',
-					success:function(result){
-						deffered.resolve(result);
-					}
+				$.get(ManagePath + 'comment/list',options,function(data){
+					deffered.resolve(data);
 				});
 				return deffered.promise;
 			},
-			discoverGet:function(id){
+			_delete:function(id){
 				var deffered = $q.defer();
-				$.ajax({
-					url:DiscoverPath+'discover/list?searchType=discoverId&keywords='+id,
-					type:'get',
-					success:function(result){
-						deffered.resolve(result);
-					}
+				$.get(ManagePath + 'comment/delete/'+id,function(data){
+					deffered.resolve(data);
 				});
-				return deffered.promise;
+				return deffered.promise;	
 			},
-			gameList:function(options){
+			deleteByUser:function(id){
 				var deffered = $q.defer();
-				$.ajax({
-					url:DiscoverPath + 'game/list',
-					data:options,
-					type:'get',
-					success:function(result){
-						deffered.resolve(result);
-					}
+				$.get(ManagePath + 'comment/deletebyuser/'+id,function(data){
+					deffered.resolve(data);
 				});
-				return deffered.promise;
-			},
-			gameDelete:function(game){
-				var deffered = $q.defer();
-				$.ajax({
-					url:DiscoverPath+'game/'+game.objectId,
-					type:'delete',
-					success:function(result){
-						deffered.resolve(result);
-					}
-				});
-				return deffered.promise;
-			},
-			gameUpdate:function(game){
-				var deffered = $q.defer();
-				$.ajax({
-					url:DiscoverPath+'game/'+game.objectId,
-					data:game,
-					type:'post',
-					success:function(result){
-						deffered.resolve(result);
-					}
-				})
-				return deffered.promise;
+				return deffered.promise;	
 			}
 		}
 	}]);
@@ -3961,6 +3728,239 @@ app.service('PageService',['$q',
 					deffered.resolve(data);
 				});
 				return deffered.promise;	
+			}
+		}
+	}]);
+app.controller('DiscoverCtrl',['$rootScope','$scope','$state','DiscoverServer',
+	function($rootScope,$scope,$state,DiscoverServer){
+		
+		$scope.refresh = function(){
+			var options = {
+				page:$scope.options.currentPage,
+			}
+			if($scope.options.keywords){
+				options.searchType = $scope.options.search_type || 'title';
+				options.keywords = $scope.options.keywords;
+			};
+			
+			switch($scope.options.type){
+				case 1:
+					options.isLast = 'true';
+					break;
+				case 2:
+					options.isLast = 'false';
+					break;
+				default:
+					delete options.isLast;
+					break;
+			}
+			DiscoverServer.discoverList(options).then(function(result){
+				$scope.discovers = result;
+			});			
+		}
+
+		$scope.nextPage = function(){
+			if($scope.discovers.length < 20){
+				alert('已经是最后一页了');
+			}else{
+				$scope.options.currentPage++;
+				$scope.refresh();
+			}
+		}
+
+		$scope.prevPage = function(){
+			if($scope.options.currentPage <= 1){
+				alert('已经是第一页了');
+			}else{
+				$scope.options.currentPage--;
+				$scope.refresh();
+			}
+		}
+
+		$scope.checkGame = function(discover){
+			var url = $state.href('base.discoverGameWithId',{id:discover.game.objectId});
+			window.open(url);
+		}
+
+		$scope.delete = function(discover){
+			if(!confirm('确定删除该条推荐吗?')){
+				return ;
+			}
+			DiscoverServer.discoverDelete(discover).then(function(result){
+				if(result.status == 0){
+					discover.hide = true;
+					alert('删除推荐成功.');
+				}else{
+					alert('删除推荐失败,请检查后重试.');
+				}
+			});
+		}
+
+		$scope.create = function(discover){
+			var url = $state.href('base.gameNewWithDiscover',{discoverId:discover.discoverId});
+			window.open(url);
+		}
+
+		$scope.search = function(e){
+			var keycode = window.event?e.keyCode:e.which;
+			if(keycode == 13){
+				$scope.refresh();
+			}
+		}
+
+		$scope.options = {
+			currentPage:1
+		}
+		if($state.params.gameId){
+			$scope.options.search_type = 'game';
+			$scope.options.keywords = $state.params.gameId;
+		}
+		$scope.refresh();
+	}]);
+app.controller('DiscoverGameCtrl',['$scope','$state','DiscoverServer',
+	function($scope,$state,DiscoverServer){
+		$scope.refresh = function(){
+			DiscoverServer.gameList($scope.options).then(function(result){
+				$scope.games = result;
+			});
+		}
+
+		$scope.nextPage = function(){
+			if($scope.games.length < 20){
+				alert('已经是最后一页了');
+			}else{
+				$scope.options.page++;
+				$scope.refresh();
+			}
+		}
+
+		$scope.prevPage = function(){
+			if($scope.options.page <= 1){
+				alert('已经是第一页了');
+			}else{
+				$scope.options.page--;
+				$scope.refresh();
+			}
+		}
+
+		$scope.save = function(game){
+			var _game = {
+				u77Id:game.u77Id,
+				objectId:game.objectId
+			}
+			DiscoverServer.gameUpdate(_game).then(function(result){
+				if(result.status == 0){
+					alert('修改游戏成功');
+				}else{
+					alert('修改游戏失败,请检查后重试');
+				}
+			});
+		}
+
+		$scope.checkDiscover = function(game){
+			var url = $state.href('base.discoverWithGameId',{gameId:game.objectId});
+			window.open(url);
+		}
+
+		$scope.delete = function(game){
+			DiscoverServer.gameDelete(game).then(function(result){
+				if(result.status == 0){
+					game.hide = true;
+					alert('删除游戏成功');
+				}else{
+					alert('删除游戏失败,请检查后重试');
+				}
+			});
+		}
+
+		$scope.search = function(e){
+			var keycode = window.event?e.keyCode:e.which;
+			if(keycode == 13){
+				$scope.refresh();
+			}
+		}
+
+		$scope.options = {
+			page:1
+		};
+		if($state.params.id){
+			$scope.options.searchType = "objectId";
+			$scope.options.keywords = $state.params.id;
+		}
+		$scope.refresh();
+	}]);
+app.service('DiscoverServer',['$q',
+	function($q){
+		return {
+			discoverList:function(options){
+				options.debug = true;
+				var deffered = $q.defer();
+				$.ajax({
+					url:DiscoverPath + 'discover/list',
+					data:options,
+					type:'get',
+					success:function(result){
+						deffered.resolve(result);
+					}
+				});
+				return deffered.promise
+			},
+			discoverDelete:function(discover){
+				var deffered = $q.defer();
+				$.ajax({
+					url:DiscoverPath+'discover/'+discover.objectId,
+					type:'delete',
+					success:function(result){
+						deffered.resolve(result);
+					}
+				});
+				return deffered.promise;
+			},
+			discoverGet:function(id){
+				var deffered = $q.defer();
+				$.ajax({
+					url:DiscoverPath+'discover/list?searchType=discoverId&keywords='+id,
+					type:'get',
+					success:function(result){
+						deffered.resolve(result);
+					}
+				});
+				return deffered.promise;
+			},
+			gameList:function(options){
+				var deffered = $q.defer();
+				$.ajax({
+					url:DiscoverPath + 'game/list',
+					data:options,
+					type:'get',
+					success:function(result){
+						deffered.resolve(result);
+					}
+				});
+				return deffered.promise;
+			},
+			gameDelete:function(game){
+				var deffered = $q.defer();
+				$.ajax({
+					url:DiscoverPath+'game/'+game.objectId,
+					type:'delete',
+					success:function(result){
+						deffered.resolve(result);
+					}
+				});
+				return deffered.promise;
+			},
+			gameUpdate:function(game){
+				var deffered = $q.defer();
+				$.ajax({
+					url:DiscoverPath+'game/'+game.objectId,
+					data:game,
+					type:'post',
+					success:function(result){
+						deffered.resolve(result);
+					}
+				})
+				return deffered.promise;
 			}
 		}
 	}]);
