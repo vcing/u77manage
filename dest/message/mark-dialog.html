@@ -1,0 +1,15 @@
+<div class="modal-header">
+	<h3 class="modal-title" >反馈处理结果</h3>
+</div>
+<div class="modal-body">
+	<select class="form-control" ng-options="type.key as type.name for type in types" ng-model="type">
+		<option value="">请选择反馈类型</option>
+	</select>
+	<div contenteditable style="min-height: 200px;width: 100%;border: 1px solid #e5e5e5;padding:5px" ng-model="result" placeholder="处理结果"></div>
+</div>
+<div class="modal-footer">
+	<div class="btn-group">
+		<button type="button" class="btn btn-primary" ng-click="submit()">保存</button>
+		<button type="button" class="btn btn-warning" ng-click="cancel()">取消</button>
+	</div>
+</div>

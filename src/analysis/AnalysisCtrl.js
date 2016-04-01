@@ -160,6 +160,9 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 			"czdtx800ux":{
 				"name":"村长打天下800ux"
 			},
+			"kzlr800ux":{
+				"name":"空之利刃800ux"
+			},
 			"kpgs":{
 				"name":"卡片怪兽"
 			},
@@ -442,7 +445,6 @@ app.controller('ChartShowCtrl',['$scope','AnalysisService',
 
 app.controller('SaveCtrl',['$scope','$rootScope','$uibModalInstance','options',
 	function($scope,$rootScope,$uibModalInstance,options){
-		console.log(options);
 		$scope.outputTab = function() {
 			$scope.data = options.outputTab();
 		}

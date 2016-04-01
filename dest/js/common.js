@@ -3,6 +3,20 @@
  * 
  */
 
+// 手动启动
+$(function(){
+	$.get('/api/user/profile',function(data){
+		if(data.username){
+			window.user = data;
+			window.user.clientId = encodeURIComponent(data.userId+"__"+data.nickname+"__"+data.avatar);
+			angular.bootstrap(document.getElementById('bootstrap'),['u77manage']);
+		}else{
+			window.location.href = '/login';
+		}
+	});
+	
+});
+
 var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch','infinite-scroll','ngFileUpload','textAngular','ui.bootstrap.datetimepicker']);
 // var BasePath = 'http://dev.u77.com/admin/';
 // var Path = 'http://dev.u77.com';
@@ -14,8 +28,20 @@ var BackEndPath = 'http://u77admin.leanapp.cn/api/';
 var ChargePath = 'http://u77pay.leanapp.cn/api/';
 var AnalysisPath = 'http://u77userrecord.leanapp.cn/api/';
 var DiscoverPath = 'http://u77discover.avosapps.com/api/';
+var MessagePath = 'http://dev.u77message_dev.leanapp.cn/api/'
+// var MessagePath = 'http://localhost:888/api/'
 // var FinancePath = 'http://192.168.1.102:3000/api/';
-// var ChargePath = 'http://192.168.1.102:3000/api/' 
+// var ChargePath = 'http://192.168.1.102:3000/api/' ;
+
+
+
+var sysMessageConvId = "56fba2ffdaeb3a63ca5affa3"; //系统消息转发的普通房间
+var recentConvId = "56fb44737db2a200509263b9"; //最近联系人房间
+var sysConvId = "56fb9bc5128fe10050cb25bc"; //系统对话房间
+
+
+
+
 app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 	function($stateProvider,$urlRouterProvider,$locationProvider){
 
@@ -335,6 +361,15 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 					}
 				}
 			})
+			.state('base.message',{
+				url:'/message',
+				views:{
+					'content':{
+						templateUrl:'/static/message/message.html',
+						controller:'MessageCtrl'
+					}
+				}
+			})
 		$locationProvider.html5Mode(true);
 
 		// $urlRouterProvider.when("", "/dashboard");
@@ -342,15 +377,18 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 
 		// 时间本地化
 		moment.locale('zh-cn');
+
+		
 	}]);
 
-app.run(['$rootScope','$state','UploadService',
-	function($rootScope,$state,UploadService){
+app.run(['$rootScope','$state','$q','UploadService','RealtimeService',
+	function($rootScope,$state,$q,UploadService,RealtimeService){
 		$rootScope.loading = true;
 		$rootScope.BasePath = BasePath;
 		$rootScope.Path = Path;
 		$rootScope.AvatarPath = AvatarPath;
 		$rootScope.ManagePath = ManagePath;
+		$rootScope.user = window.user;
 		UploadService.post().then(function(fn){
 			window.uploadPostImage = function($file){
 				fn($file,function(resp){
@@ -358,8 +396,14 @@ app.run(['$rootScope','$state','UploadService',
 				});
 			}
 		});
-		
-	}])
+
+
+
+		// 用户处理
+		// UserService().then(function(data){
+		// 	$rootScope.user = data;
+		// });
+	}]);
 
 
 // app.config(function($provide){
@@ -545,6 +589,9 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 			},
 			"czdtx800ux":{
 				"name":"村长打天下800ux"
+			},
+			"kzlr800ux":{
+				"name":"空之利刃800ux"
 			},
 			"kpgs":{
 				"name":"卡片怪兽"
@@ -828,7 +875,6 @@ app.controller('ChartShowCtrl',['$scope','AnalysisService',
 
 app.controller('SaveCtrl',['$scope','$rootScope','$uibModalInstance','options',
 	function($scope,$rootScope,$uibModalInstance,options){
-		console.log(options);
 		$scope.outputTab = function() {
 			$scope.data = options.outputTab();
 		}
@@ -1025,8 +1071,110 @@ app.service('SaveService',['$q','$uibModal',
 			}
 		}
 	}]);
-app.controller('BaseCtrl',['$scope','$rootScope','$state','AnalysisPageService',
-	function($scope,$rootScope,$state,AnalysisPageService){
+app.controller('CommentCtrl',['$scope','$rootScope','$stateParams','CommentService',
+	function($scope,$rootScope,$stateParams,CommentService){
+		$scope.options = {};
+		$scope.options.search_type = 'id';
+
+		$scope.change_type = function(id){
+			$scope.options.type = id;
+			query();
+		}
+
+		$scope.change_search_type = function(type){
+			$scope.options.search_type = type;
+		}
+
+		$scope.change_status = function(status){
+			$scope.options.type = status;
+			query();
+		}
+
+		$scope.search = function(e){
+			var keycode = window.event?e.keyCode:e.which;
+			if(keycode == 13){
+				query();
+			}
+		}
+
+		function query(page){
+			var _options = _.clone($scope.options);
+			if(page)_options.page = page;
+			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
+			delete _options.search_type;
+			delete _options.keywords;
+			CommentService.list(_options).then(function(data){
+				$scope.list = data;
+			});
+		}
+
+		CommentService.list().then(function(data){
+			$scope.list = data;
+		});
+
+		$scope.pageChange = query;
+
+		$scope.change_notice_status = function(comment,status){
+			comment.status = status;
+			CommentService.update(comment);
+		}
+
+		$scope.delete = function(comment){
+			if(confirm('确定删除改评论?')){
+				CommentService._delete(comment.id);
+				comment.content.content = "该评论已删除";	
+			}
+			// comment.hide = true;
+		}
+
+
+		$scope.deleteByUser = function(){
+			if(confirm('该操作会删除该用户的所有评论! \r\n 确认执行吗？')){
+				CommentService.deleteByUser($scope.userid);	
+			}
+		}
+
+		$scope.chooseUser = function(user){
+			$scope.options.search_type = 'sender';
+			$scope.options.keywords = user.userid;
+			query();
+		}
+
+		$scope.chooseBody = function(comment){
+			$scope.options.type = comment.type;
+			$scope.options.search_type = 'tid';
+			$scope.options.keywords = comment.body.id;
+			query();
+		}
+	}]);
+app.service('CommentService',['$q',
+	function($q){
+		return {
+			list:function(options){
+				var deffered = $q.defer();
+				$.get(ManagePath + 'comment/list',options,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			_delete:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath + 'comment/delete/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			},
+			deleteByUser:function(id){
+				var deffered = $q.defer();
+				$.get(ManagePath + 'comment/deletebyuser/'+id,function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;	
+			}
+		}
+	}]);
+app.controller('BaseCtrl',['$scope','$rootScope','$state','AnalysisPageService','UserService','RealtimeService','$q',
+	function($scope,$rootScope,$state,AnalysisPageService,UserService,RealtimeService,$q){
 		// 主导航搜索
 		$scope.search = function(){
 			$state.go('base.gameEdit',{id:$scope.gameId});
@@ -1043,6 +1191,124 @@ app.controller('BaseCtrl',['$scope','$rootScope','$state','AnalysisPageService',
 		AnalysisPageService.list().then(function(result){
 			$scope.financePages = result;
 		});
+
+		$scope.logout = function() {
+			UserService.logout().then(function(data){
+				window.location.href = '/login';
+			});
+		}
+
+		// 消息系统初始化连接
+		RealtimeService.init().then(function(realtime){
+			$rootScope.realtime = realtime;
+			var deffered = $q.defer();
+			realtime.conv(sysMessageConvId,function(conv){
+				if(conv){
+					deffered.resolve(conv);
+				}else{
+					deffered.reject({
+						status:101,
+						msg:'查询房间出错'
+					});
+				}
+			});
+			var _deffered = $q.defer();
+			realtime.conv(recentConvId,function(conv){
+				if(conv){
+					_deffered.resolve(conv);
+				}else{
+					_deffered.reject({
+						status:101,
+						msg:'查询房间出错'
+					});
+				}
+			});
+			var promises = [deffered.promise,_deffered.promise];
+			return $q.all(promises);
+		})
+		// 加入房间
+		.then(function(convs){
+			$rootScope.sysConv = convs[0];
+			$rootScope.recentConv = convs[1];
+			var deffered = $q.defer();
+			// 加入系统对话转发房间
+			$rootScope.sysConv.join(function() {
+				deffered.resolve($rootScope.sysConv);
+			});
+
+			// 加入最近联系人房间
+			var _deffered = $q.defer();
+			$rootScope.recentConv.join(function() {
+				_deffered.resolve($rootScope.recentConv);
+			});
+
+			return $q.all([deffered.promise,_deffered.promise]);
+		})
+		// 同步消息
+		.then(asyncSysLogs)
+		// 消息系统事件初始化注册
+		.then(function(){
+			$rootScope.sysConv.receive(function(msg){
+				receiveMessage(msg);
+			});
+			$rootScope.recentConv.receive(function(msg){
+				asyncSysLogs();
+			});
+		},function(err){
+			alert('实时通讯,消息系统出错,请刷新重试');
+		});
+
+		function asyncSysLogs() {
+			var deffered = $q.defer();
+			$rootScope.sysConv.log({limit:100},function(msgs){
+				console.log(msgs);
+				$rootScope.$apply(function(){
+					$rootScope.sysConvLogs = [];	
+				});
+				_.map(msgs,function(msg){
+					receiveMessage(msg);
+				});
+				deffered.resolve();
+			});
+
+			return deffered.promise;
+		}
+
+		$rootScope.asyncSysLogs = asyncSysLogs;
+
+		function receiveMessage(msg){
+			var _isFirst = true;
+			var _msgs = $rootScope.sysConvLogs || [];
+			_.map(_msgs,function(user,index){
+				if(user.clientId == msg.fromPeerId){
+					user.messages.push(msg);
+					var _user = _.clone(user);
+					_msgs.splice(index,1);
+					_msgs.unshift(user);
+					_isFirst = false;
+				}
+			});	
+			if(_isFirst){
+				var clientId = msg.fromPeerId;
+				msg.fromPeerId = decodeURIComponent(msg.fromPeerId);
+				var _infos = msg.fromPeerId.split('__');
+				_msgs.unshift({
+					clientId:clientId,
+					userId:_infos[0],
+					nickname:_infos[1],
+					avatar:_infos[2],
+					messages:[msg]
+				});
+			}
+			$rootScope.$apply(function(){
+				$rootScope.sysConvLogs = _msgs;	
+			})
+			if($rootScope.msgCount){
+				$rootScope.msgCount++
+			}else{
+				$rootScope.msgCount = 1;
+			}
+		}
 	}]);
 
 app.controller('SingleReportCtrl',['$scope','$rootScope','ReportService','MessageService',
@@ -1514,6 +1780,12 @@ app.filter('time',[function(){
 	}
 }])
 
+app.filter('cTime',[function(){
+  return function(str){
+    return moment(str).format("YY年MM月DD日 H:mm"); 
+  }
+}])
+
 app.filter('dateTime',[function(){
   return function(unix){
     return moment.unix(parseInt(unix)).format("YYYY/MM/DD H:mm:ss");
@@ -1821,115 +2093,25 @@ app.service('MessageService',['$q','$uibModal',
 			}
 		}
 	}]);
-app.controller('BigEyeCtrl',['$scope','$rootScope','UploadService',
-	function($scope,$rootScope,UploadService){
-		$scope.list = [];
-
-		$.get(ManagePath+'sliders',function(data){
-			$scope.list = JSON.parse(data);
-		});
-
-		$scope.up = function(index){
-			if(index <= 0){
-				return;
-			}
-			var _temp = $scope.list[index-1];
-			$scope.list[index-1] = $scope.list[index];
-			$scope.list[index] = _temp;
-		}
-
-		$scope.down = function(index){
-			if(index >= $scope.list.length - 1){
-				return;
-			}
-			var _temp = $scope.list[index + 1];
-			$scope.list[index + 1] = $scope.list[index];
-			$scope.list[index] = _temp;
-		}
-
-		$scope.left = function(){
-			$scope.slideControl = $scope.slideControl <= 0 ? $scope.list.length - 1 : $scope.slideControl - 1;
-		}
-
-		$scope.right = function(){
-			$scope.slideControl = $scope.slideControl >= $scope.list.length - 1 ? 0 : $scope.slideControl + 1;
-		}
-
-		$scope.submit = function(){
-			$.post(ManagePath+'sliders',{sliders:$scope.list},function(data){
-				if(data != 0){
-					alert('保存成功');
-				}
-			});
-		}
-
-		UploadService.image().then(function(fn){
-			$scope.upload = function($file,slide){
-				fn($file,function(resp){
-					if(resp.status == 200 && resp.statusText == 'OK'){
-						slide.image = resp.data.url;
-					}else{
-						alert('上传失败,请重试');
-					}
-					slide.percentage = null
-				},function(evt){
-					slide.percentage = evt.percentage;
-				});
-			}
-		});
-
-		$scope.slideControl = 0;
-		setInterval(function(){
-			$scope.$apply(function(){
-				if($scope.slideControl < $scope.list.length -1){
-					$scope.slideControl++	
-				}else{
-					$scope.slideControl = 0;
-				}	
-			});
-			
-		},3000)
-	}]);
-
-app.controller('GameExamineCtrl',['$scope','$rootScope','GameService',
-	function($scope,$rootScope,GameService){
-		$scope.options = {
-			status:0
-		}
-		GameService.list($scope.options).then(function(data){
-			$scope.gameList = data;
-		});
-	}]);
-
-app.controller('ReportExamineCtrl',['$scope','$rootScope','ReportService',
-	function($scope,$rootScope,ReportService){
-		ReportService.list().then(function(data){
-			$scope.reportList = data.data;
-		});
-
-	}]);
-// const T_TYPE_COMMENT = 1;			// comment
-// const T_TYPE_POST = 2;				// post
-// const T_TYPE_VIDEO = 3;				// video
-// const T_TYPE_GAMEREC = 4;			// game rec
-
-app.service('DailyGameVilidService',['$http','$q','GameService',
-	function($http,$q,GameService){
+app.service('UserService',['$q',
+	function($q){
 		return {
-			promise:function(){
+			profile:function() {
 				var deffered = $q.defer();
-				var options = {
-					status:0
-				}
-				GameService.list(options).then(function(data){
+				$.get('/api/user/profile',function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			},
+			logout:function() {
+				var deffered = $q.defer();
+				$.get('/api/user/logout',function(data){
 					deffered.resolve(data);
 				});
 				return deffered.promise;
 			}
 		}
 	}]);
-
-
 app.controller('DashboardCtrl',['$scope','$rootScope','DashboardService',
 	function($scope,$rootScope,DashboardService){
 		// 昨日数据
@@ -2137,105 +2319,345 @@ app.service('DashboardService',['$q',
 			}
 		}
 	}]);
-app.controller('CommentCtrl',['$scope','$rootScope','$stateParams','CommentService',
-	function($scope,$rootScope,$stateParams,CommentService){
-		$scope.options = {};
-		$scope.options.search_type = 'id';
+app.controller('BigEyeCtrl',['$scope','$rootScope','UploadService',
+	function($scope,$rootScope,UploadService){
+		$scope.list = [];
 
-		$scope.change_type = function(id){
-			$scope.options.type = id;
-			query();
+		$.get(ManagePath+'sliders',function(data){
+			$scope.list = JSON.parse(data);
+		});
+
+		$scope.up = function(index){
+			if(index <= 0){
+				return;
+			}
+			var _temp = $scope.list[index-1];
+			$scope.list[index-1] = $scope.list[index];
+			$scope.list[index] = _temp;
 		}
 
-		$scope.change_search_type = function(type){
-			$scope.options.search_type = type;
+		$scope.down = function(index){
+			if(index >= $scope.list.length - 1){
+				return;
+			}
+			var _temp = $scope.list[index + 1];
+			$scope.list[index + 1] = $scope.list[index];
+			$scope.list[index] = _temp;
 		}
 
-		$scope.change_status = function(status){
-			$scope.options.type = status;
-			query();
+		$scope.left = function(){
+			$scope.slideControl = $scope.slideControl <= 0 ? $scope.list.length - 1 : $scope.slideControl - 1;
+		}
+
+		$scope.right = function(){
+			$scope.slideControl = $scope.slideControl >= $scope.list.length - 1 ? 0 : $scope.slideControl + 1;
+		}
+
+		$scope.submit = function(){
+			$.post(ManagePath+'sliders',{sliders:$scope.list},function(data){
+				if(data != 0){
+					alert('保存成功');
+				}
+			});
+		}
+
+		UploadService.image().then(function(fn){
+			$scope.upload = function($file,slide){
+				fn($file,function(resp){
+					if(resp.status == 200 && resp.statusText == 'OK'){
+						slide.image = resp.data.url;
+					}else{
+						alert('上传失败,请重试');
+					}
+					slide.percentage = null
+				},function(evt){
+					slide.percentage = evt.percentage;
+				});
+			}
+		});
+
+		$scope.slideControl = 0;
+		setInterval(function(){
+			$scope.$apply(function(){
+				if($scope.slideControl < $scope.list.length -1){
+					$scope.slideControl++	
+				}else{
+					$scope.slideControl = 0;
+				}	
+			});
+			
+		},3000)
+	}]);
+
+app.controller('GameExamineCtrl',['$scope','$rootScope','GameService',
+	function($scope,$rootScope,GameService){
+		$scope.options = {
+			status:0
+		}
+		GameService.list($scope.options).then(function(data){
+			$scope.gameList = data;
+		});
+	}]);
+
+app.controller('ReportExamineCtrl',['$scope','$rootScope','ReportService',
+	function($scope,$rootScope,ReportService){
+		ReportService.list().then(function(data){
+			$scope.reportList = data.data;
+		});
+
+	}]);
+// const T_TYPE_COMMENT = 1;			// comment
+// const T_TYPE_POST = 2;				// post
+// const T_TYPE_VIDEO = 3;				// video
+// const T_TYPE_GAMEREC = 4;			// game rec
+
+app.service('DailyGameVilidService',['$http','$q','GameService',
+	function($http,$q,GameService){
+		return {
+			promise:function(){
+				var deffered = $q.defer();
+				var options = {
+					status:0
+				}
+				GameService.list(options).then(function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			}
+		}
+	}]);
+
+
+app.controller('DiscoverCtrl',['$rootScope','$scope','$state','DiscoverServer',
+	function($rootScope,$scope,$state,DiscoverServer){
+		
+		$scope.refresh = function(){
+			var options = {
+				page:$scope.options.currentPage,
+			}
+			if($scope.options.keywords){
+				options.searchType = $scope.options.search_type || 'title';
+				options.keywords = $scope.options.keywords;
+			};
+			
+			switch($scope.options.type){
+				case 1:
+					options.isLast = 'true';
+					break;
+				case 2:
+					options.isLast = 'false';
+					break;
+				default:
+					delete options.isLast;
+					break;
+			}
+			DiscoverServer.discoverList(options).then(function(result){
+				$scope.discovers = result;
+			});			
+		}
+
+		$scope.nextPage = function(){
+			if($scope.discovers.length < 20){
+				alert('已经是最后一页了');
+			}else{
+				$scope.options.currentPage++;
+				$scope.refresh();
+			}
+		}
+
+		$scope.prevPage = function(){
+			if($scope.options.currentPage <= 1){
+				alert('已经是第一页了');
+			}else{
+				$scope.options.currentPage--;
+				$scope.refresh();
+			}
+		}
+
+		$scope.checkGame = function(discover){
+			var url = $state.href('base.discoverGameWithId',{id:discover.game.objectId});
+			window.open(url);
+		}
+
+		$scope.delete = function(discover){
+			if(!confirm('确定删除该条推荐吗?')){
+				return ;
+			}
+			DiscoverServer.discoverDelete(discover).then(function(result){
+				if(result.status == 0){
+					discover.hide = true;
+					alert('删除推荐成功.');
+				}else{
+					alert('删除推荐失败,请检查后重试.');
+				}
+			});
+		}
+
+		$scope.create = function(discover){
+			var url = $state.href('base.gameNewWithDiscover',{discoverId:discover.discoverId});
+			window.open(url);
 		}
 
 		$scope.search = function(e){
 			var keycode = window.event?e.keyCode:e.which;
 			if(keycode == 13){
-				query();
+				$scope.refresh();
 			}
 		}
 
-		function query(page){
-			var _options = _.clone($scope.options);
-			if(page)_options.page = page;
-			if(_options['keywords'])_options[_options['search_type']] = _options['keywords'];
-			delete _options.search_type;
-			delete _options.keywords;
-			CommentService.list(_options).then(function(data){
-				$scope.list = data;
+		$scope.options = {
+			currentPage:1
+		}
+		if($state.params.gameId){
+			$scope.options.search_type = 'game';
+			$scope.options.keywords = $state.params.gameId;
+		}
+		$scope.refresh();
+	}]);
+app.controller('DiscoverGameCtrl',['$scope','$state','DiscoverServer',
+	function($scope,$state,DiscoverServer){
+		$scope.refresh = function(){
+			DiscoverServer.gameList($scope.options).then(function(result){
+				$scope.games = result;
 			});
 		}
 
-		CommentService.list().then(function(data){
-			$scope.list = data;
-		});
-
-		$scope.pageChange = query;
-
-		$scope.change_notice_status = function(comment,status){
-			comment.status = status;
-			CommentService.update(comment);
-		}
-
-		$scope.delete = function(comment){
-			if(confirm('确定删除改评论?')){
-				CommentService._delete(comment.id);
-				comment.content.content = "该评论已删除";	
-			}
-			// comment.hide = true;
-		}
-
-
-		$scope.deleteByUser = function(){
-			if(confirm('该操作会删除该用户的所有评论! \r\n 确认执行吗？')){
-				CommentService.deleteByUser($scope.userid);	
+		$scope.nextPage = function(){
+			if($scope.games.length < 20){
+				alert('已经是最后一页了');
+			}else{
+				$scope.options.page++;
+				$scope.refresh();
 			}
 		}
 
-		$scope.chooseUser = function(user){
-			$scope.options.search_type = 'sender';
-			$scope.options.keywords = user.userid;
-			query();
+		$scope.prevPage = function(){
+			if($scope.options.page <= 1){
+				alert('已经是第一页了');
+			}else{
+				$scope.options.page--;
+				$scope.refresh();
+			}
 		}
 
-		$scope.chooseBody = function(comment){
-			$scope.options.type = comment.type;
-			$scope.options.search_type = 'tid';
-			$scope.options.keywords = comment.body.id;
-			query();
+		$scope.save = function(game){
+			var _game = {
+				u77Id:game.u77Id,
+				objectId:game.objectId
+			}
+			DiscoverServer.gameUpdate(_game).then(function(result){
+				if(result.status == 0){
+					alert('修改游戏成功');
+				}else{
+					alert('修改游戏失败,请检查后重试');
+				}
+			});
 		}
+
+		$scope.checkDiscover = function(game){
+			var url = $state.href('base.discoverWithGameId',{gameId:game.objectId});
+			window.open(url);
+		}
+
+		$scope.delete = function(game){
+			DiscoverServer.gameDelete(game).then(function(result){
+				if(result.status == 0){
+					game.hide = true;
+					alert('删除游戏成功');
+				}else{
+					alert('删除游戏失败,请检查后重试');
+				}
+			});
+		}
+
+		$scope.search = function(e){
+			var keycode = window.event?e.keyCode:e.which;
+			if(keycode == 13){
+				$scope.refresh();
+			}
+		}
+
+		$scope.options = {
+			page:1
+		};
+		if($state.params.id){
+			$scope.options.searchType = "objectId";
+			$scope.options.keywords = $state.params.id;
+		}
+		$scope.refresh();
 	}]);
-app.service('CommentService',['$q',
+app.service('DiscoverServer',['$q',
 	function($q){
 		return {
-			list:function(options){
+			discoverList:function(options){
+				options.debug = true;
 				var deffered = $q.defer();
-				$.get(ManagePath + 'comment/list',options,function(data){
-					deffered.resolve(data);
+				$.ajax({
+					url:DiscoverPath + 'discover/list',
+					data:options,
+					type:'get',
+					success:function(result){
+						deffered.resolve(result);
+					}
+				});
+				return deffered.promise
+			},
+			discoverDelete:function(discover){
+				var deffered = $q.defer();
+				$.ajax({
+					url:DiscoverPath+'discover/'+discover.objectId,
+					type:'delete',
+					success:function(result){
+						deffered.resolve(result);
+					}
 				});
 				return deffered.promise;
 			},
-			_delete:function(id){
+			discoverGet:function(id){
 				var deffered = $q.defer();
-				$.get(ManagePath + 'comment/delete/'+id,function(data){
-					deffered.resolve(data);
+				$.ajax({
+					url:DiscoverPath+'discover/list?searchType=discoverId&keywords='+id,
+					type:'get',
+					success:function(result){
+						deffered.resolve(result);
+					}
 				});
-				return deffered.promise;	
+				return deffered.promise;
 			},
-			deleteByUser:function(id){
+			gameList:function(options){
 				var deffered = $q.defer();
-				$.get(ManagePath + 'comment/deletebyuser/'+id,function(data){
-					deffered.resolve(data);
+				$.ajax({
+					url:DiscoverPath + 'game/list',
+					data:options,
+					type:'get',
+					success:function(result){
+						deffered.resolve(result);
+					}
 				});
-				return deffered.promise;	
+				return deffered.promise;
+			},
+			gameDelete:function(game){
+				var deffered = $q.defer();
+				$.ajax({
+					url:DiscoverPath+'game/'+game.objectId,
+					type:'delete',
+					success:function(result){
+						deffered.resolve(result);
+					}
+				});
+				return deffered.promise;
+			},
+			gameUpdate:function(game){
+				var deffered = $q.defer();
+				$.ajax({
+					url:DiscoverPath+'game/'+game.objectId,
+					data:game,
+					type:'post',
+					success:function(result){
+						deffered.resolve(result);
+					}
+				})
+				return deffered.promise;
 			}
 		}
 	}]);
@@ -3601,6 +4023,164 @@ app.controller('TagsListCtrl',['$scope','TagService',
 			});
 		});
 	}]);
+app.controller('MessageCtrl',['$scope','$rootScope','RealtimeService',
+	function($scope,$rootScope,RealtimeService){
+		$scope.openList = true;
+		$scope.openDialog = function(user){
+			RealtimeService.getDialog(user).then(function(msgs){
+				$scope.currentDialogUser = user;
+				$scope.currentDialogUser.messages = msgs;
+				$scope.openList = false;
+			});
+		}
+
+		var convId = sysConvId;
+		$scope.sendMessage = function(){
+			if(!$scope.currentDialogUser)alert('请先选择用户.');
+			if($scope.msgText.trim() == '' || !$scope.msgText)alert('请输入内容');
+			RealtimeService.sendMessage({
+				convId:convId,
+				from:$rootScope.user.clientId,
+				to:$scope.currentDialogUser.clientId,
+				type:1,
+				msg:$scope.msgText
+			}).then(function(result){
+				if(result.status == 100){
+					return RealtimeService.getDialog($scope.currentDialogUser);
+				}else{
+					alert(result.msg);
+					var deffered = $q.defer();
+					deffered.reject();
+					return deffered.promise;
+				}
+			}).then(function(msgs){
+				if(!msgs)return;
+				$scope.currentDialogUser.messages = msgs;
+			})
+		}
+
+		$scope.mark = function() {
+			var _result;
+			RealtimeService.markDialog($scope.currentDialogUser)
+			.then(function(result){
+				_result = result;
+				return RealtimeService.deleteUserMessages($scope.currentDialogUser.clientId,sysMessageConvId);
+			})
+			.then(function(result){
+				if(result.status == 100){
+					// $rootScope.recentConv.send(_result,function() {
+					// 	$rootScope.asyncSysLogs();
+					// });
+				}else{
+					alert(result.msg);
+				}
+			});
+		}
+
+		$scope.test = function() {
+			console.log($scope.currentDialogUser);
+		}
+	}]);
+
+app.controller('MarkDialogCtrl',['$scope','$rootScope','$uibModalInstance','currentDialogUser',
+	function($scope,$rootScope,$uibModalInstance,currentDialogUser){
+		$scope.types = [{
+			key:1,
+			name:'游戏举报'
+		},{
+			key:2,
+			name:'评论举报'
+		}];
+
+		$scope.submit = function() {
+			var result = {
+				from:currentDialogUser.clientId,
+				dealer:user.clientId,
+				type:$scope.type,
+				result:$scope.result				
+			};
+			$uibModalInstance.close(result);
+		}
+
+		$scope.cancel = function() {
+			$uibModalInstance.dismiss('cancel');
+		}
+	}]);
+app.service('RealtimeService',['$q','$uibModal',
+	function($q,$uibModal){
+		return {
+			// 初始化实时通讯
+			init:function() {
+				var deffered = $q.defer();
+				$.get('/api/user/realtime',function(data){
+					if(data.appId){
+						data.clientId = window.user.userId + '__' + window.user.nickname + '__' + window.user.avatar;
+						data.clientId = encodeURIComponent(data.clientId);
+						var _realtime = AV.realtime(data,function(realtime){
+							deffered.resolve(_realtime);
+						});
+					}else{
+						alert(data.msg);
+						window.location.href = '/login';
+					}
+				});
+				return deffered.promise;
+			},
+			getDialog:function(user) {
+				console.log(user);
+				var deffered = $q.defer();
+				$.get(MessagePath + 'message',{
+					clientId:user.clientId,
+					convId:window.sysConvId,
+					limit:100
+				},function(results){
+					results = JSON.parse(results);
+					_.map(results,function(msg,index){
+						var _data = JSON.parse(msg.data);
+						results[index].msg = {
+							text:_data._lctext,
+							type:_data._lctype,
+							attrs:_data._lcattrs
+						}
+					});
+					results = results.reverse();
+					deffered.resolve(results);
+				});
+				return deffered.promise;
+			},
+			sendMessage:function(options) {
+				var deffered = $q.defer();
+				$.post(MessagePath + 'message',options,function(results){
+					deffered.resolve(results);
+				});
+				return deffered.promise;
+			},
+			deleteUserMessages:function(clientId,convId) {
+				var deffered = $q.defer();
+				$.get(MessagePath + 'message/delete',{
+					clientId:clientId,
+					convId:convId
+				},function(result){
+					deffered.resolve(result);
+				});
+				return deffered.promise;
+			},
+			markDialog:function(currentDialogUser) {
+				var modalInstance = $uibModal.open({
+					animation:true,
+					templateUrl:'/static/message/mark-dialog.html',
+					controller:'MarkDialogCtrl',
+					size:'md',
+					resolve:{
+						currentDialogUser:function(){
+							return currentDialogUser;
+						}
+					}
+				});
+				return modalInstance.result;
+			}
+		}
+	}]);
 app.controller('PageCtrl',['$scope','$rootScope','PageService',
 	function($scope,$rootScope,PageService){
 		$scope.options = {};
@@ -3728,239 +4308,6 @@ app.service('PageService',['$q',
 					deffered.resolve(data);
 				});
 				return deffered.promise;	
-			}
-		}
-	}]);
-app.controller('DiscoverCtrl',['$rootScope','$scope','$state','DiscoverServer',
-	function($rootScope,$scope,$state,DiscoverServer){
-		
-		$scope.refresh = function(){
-			var options = {
-				page:$scope.options.currentPage,
-			}
-			if($scope.options.keywords){
-				options.searchType = $scope.options.search_type || 'title';
-				options.keywords = $scope.options.keywords;
-			};
-			
-			switch($scope.options.type){
-				case 1:
-					options.isLast = 'true';
-					break;
-				case 2:
-					options.isLast = 'false';
-					break;
-				default:
-					delete options.isLast;
-					break;
-			}
-			DiscoverServer.discoverList(options).then(function(result){
-				$scope.discovers = result;
-			});			
-		}
-
-		$scope.nextPage = function(){
-			if($scope.discovers.length < 20){
-				alert('已经是最后一页了');
-			}else{
-				$scope.options.currentPage++;
-				$scope.refresh();
-			}
-		}
-
-		$scope.prevPage = function(){
-			if($scope.options.currentPage <= 1){
-				alert('已经是第一页了');
-			}else{
-				$scope.options.currentPage--;
-				$scope.refresh();
-			}
-		}
-
-		$scope.checkGame = function(discover){
-			var url = $state.href('base.discoverGameWithId',{id:discover.game.objectId});
-			window.open(url);
-		}
-
-		$scope.delete = function(discover){
-			if(!confirm('确定删除该条推荐吗?')){
-				return ;
-			}
-			DiscoverServer.discoverDelete(discover).then(function(result){
-				if(result.status == 0){
-					discover.hide = true;
-					alert('删除推荐成功.');
-				}else{
-					alert('删除推荐失败,请检查后重试.');
-				}
-			});
-		}
-
-		$scope.create = function(discover){
-			var url = $state.href('base.gameNewWithDiscover',{discoverId:discover.discoverId});
-			window.open(url);
-		}
-
-		$scope.search = function(e){
-			var keycode = window.event?e.keyCode:e.which;
-			if(keycode == 13){
-				$scope.refresh();
-			}
-		}
-
-		$scope.options = {
-			currentPage:1
-		}
-		if($state.params.gameId){
-			$scope.options.search_type = 'game';
-			$scope.options.keywords = $state.params.gameId;
-		}
-		$scope.refresh();
-	}]);
-app.controller('DiscoverGameCtrl',['$scope','$state','DiscoverServer',
-	function($scope,$state,DiscoverServer){
-		$scope.refresh = function(){
-			DiscoverServer.gameList($scope.options).then(function(result){
-				$scope.games = result;
-			});
-		}
-
-		$scope.nextPage = function(){
-			if($scope.games.length < 20){
-				alert('已经是最后一页了');
-			}else{
-				$scope.options.page++;
-				$scope.refresh();
-			}
-		}
-
-		$scope.prevPage = function(){
-			if($scope.options.page <= 1){
-				alert('已经是第一页了');
-			}else{
-				$scope.options.page--;
-				$scope.refresh();
-			}
-		}
-
-		$scope.save = function(game){
-			var _game = {
-				u77Id:game.u77Id,
-				objectId:game.objectId
-			}
-			DiscoverServer.gameUpdate(_game).then(function(result){
-				if(result.status == 0){
-					alert('修改游戏成功');
-				}else{
-					alert('修改游戏失败,请检查后重试');
-				}
-			});
-		}
-
-		$scope.checkDiscover = function(game){
-			var url = $state.href('base.discoverWithGameId',{gameId:game.objectId});
-			window.open(url);
-		}
-
-		$scope.delete = function(game){
-			DiscoverServer.gameDelete(game).then(function(result){
-				if(result.status == 0){
-					game.hide = true;
-					alert('删除游戏成功');
-				}else{
-					alert('删除游戏失败,请检查后重试');
-				}
-			});
-		}
-
-		$scope.search = function(e){
-			var keycode = window.event?e.keyCode:e.which;
-			if(keycode == 13){
-				$scope.refresh();
-			}
-		}
-
-		$scope.options = {
-			page:1
-		};
-		if($state.params.id){
-			$scope.options.searchType = "objectId";
-			$scope.options.keywords = $state.params.id;
-		}
-		$scope.refresh();
-	}]);
-app.service('DiscoverServer',['$q',
-	function($q){
-		return {
-			discoverList:function(options){
-				options.debug = true;
-				var deffered = $q.defer();
-				$.ajax({
-					url:DiscoverPath + 'discover/list',
-					data:options,
-					type:'get',
-					success:function(result){
-						deffered.resolve(result);
-					}
-				});
-				return deffered.promise
-			},
-			discoverDelete:function(discover){
-				var deffered = $q.defer();
-				$.ajax({
-					url:DiscoverPath+'discover/'+discover.objectId,
-					type:'delete',
-					success:function(result){
-						deffered.resolve(result);
-					}
-				});
-				return deffered.promise;
-			},
-			discoverGet:function(id){
-				var deffered = $q.defer();
-				$.ajax({
-					url:DiscoverPath+'discover/list?searchType=discoverId&keywords='+id,
-					type:'get',
-					success:function(result){
-						deffered.resolve(result);
-					}
-				});
-				return deffered.promise;
-			},
-			gameList:function(options){
-				var deffered = $q.defer();
-				$.ajax({
-					url:DiscoverPath + 'game/list',
-					data:options,
-					type:'get',
-					success:function(result){
-						deffered.resolve(result);
-					}
-				});
-				return deffered.promise;
-			},
-			gameDelete:function(game){
-				var deffered = $q.defer();
-				$.ajax({
-					url:DiscoverPath+'game/'+game.objectId,
-					type:'delete',
-					success:function(result){
-						deffered.resolve(result);
-					}
-				});
-				return deffered.promise;
-			},
-			gameUpdate:function(game){
-				var deffered = $q.defer();
-				$.ajax({
-					url:DiscoverPath+'game/'+game.objectId,
-					data:game,
-					type:'post',
-					success:function(result){
-						deffered.resolve(result);
-					}
-				})
-				return deffered.promise;
 			}
 		}
 	}]);

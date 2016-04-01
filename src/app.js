@@ -3,6 +3,20 @@
  * 
  */
 
+// 手动启动
+$(function(){
+	$.get('/api/user/profile',function(data){
+		if(data.username){
+			window.user = data;
+			window.user.clientId = encodeURIComponent(data.userId+"__"+data.nickname+"__"+data.avatar);
+			angular.bootstrap(document.getElementById('bootstrap'),['u77manage']);
+		}else{
+			window.location.href = '/login';
+		}
+	});
+	
+});
+
 var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch','infinite-scroll','ngFileUpload','textAngular','ui.bootstrap.datetimepicker']);
 // var BasePath = 'http://dev.u77.com/admin/';
 // var Path = 'http://dev.u77.com';
@@ -14,8 +28,20 @@ var BackEndPath = 'http://u77admin.leanapp.cn/api/';
 var ChargePath = 'http://u77pay.leanapp.cn/api/';
 var AnalysisPath = 'http://u77userrecord.leanapp.cn/api/';
 var DiscoverPath = 'http://u77discover.avosapps.com/api/';
+var MessagePath = 'http://dev.u77message_dev.leanapp.cn/api/'
+// var MessagePath = 'http://localhost:888/api/'
 // var FinancePath = 'http://192.168.1.102:3000/api/';
-// var ChargePath = 'http://192.168.1.102:3000/api/' 
+// var ChargePath = 'http://192.168.1.102:3000/api/' ;
+
+
+
+var sysMessageConvId = "56fba2ffdaeb3a63ca5affa3"; //系统消息转发的普通房间
+var recentConvId = "56fb44737db2a200509263b9"; //最近联系人房间
+var sysConvId = "56fb9bc5128fe10050cb25bc"; //系统对话房间
+
+
+
+
 app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 	function($stateProvider,$urlRouterProvider,$locationProvider){
 
@@ -335,6 +361,15 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 					}
 				}
 			})
+			.state('base.message',{
+				url:'/message',
+				views:{
+					'content':{
+						templateUrl:'/static/message/message.html',
+						controller:'MessageCtrl'
+					}
+				}
+			})
 		$locationProvider.html5Mode(true);
 
 		// $urlRouterProvider.when("", "/dashboard");
@@ -342,15 +377,18 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 
 		// 时间本地化
 		moment.locale('zh-cn');
+
+		
 	}]);
 
-app.run(['$rootScope','$state','UploadService',
-	function($rootScope,$state,UploadService){
+app.run(['$rootScope','$state','$q','UploadService','RealtimeService',
+	function($rootScope,$state,$q,UploadService,RealtimeService){
 		$rootScope.loading = true;
 		$rootScope.BasePath = BasePath;
 		$rootScope.Path = Path;
 		$rootScope.AvatarPath = AvatarPath;
 		$rootScope.ManagePath = ManagePath;
+		$rootScope.user = window.user;
 		UploadService.post().then(function(fn){
 			window.uploadPostImage = function($file){
 				fn($file,function(resp){
@@ -358,8 +396,14 @@ app.run(['$rootScope','$state','UploadService',
 				});
 			}
 		});
-		
-	}])
+
+
+
+		// 用户处理
+		// UserService().then(function(data){
+		// 	$rootScope.user = data;
+		// });
+	}]);
 
 
 // app.config(function($provide){

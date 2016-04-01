@@ -1,0 +1,110 @@
+<section class="content-header">
+	<h1>
+		消息
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+		<li class="active">消息</li>
+	</ol>
+</section>
+<section class="content" id="message">
+	<div class="row">
+		<div class="col-sm-3 hidden-xs">
+			<div class="box box-primary">
+            <div class="box-header with-border">
+				<h3 class="box-title">待处理消息</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" style="padding:0">
+				<ul class="products-list product-list-in-box">
+					<li class="item" ng-repeat="_user in sysConvLogs" style="cursor: pointer;padding:10px" ng-click="openDialog(_user)">
+						<div class="product-img">
+							<img src="{{AvatarPath + _user.avatar}}" alt="{{_user.nickname}}" style="border-radius: 50%">
+						</div>
+						<div class="product-info">
+							<a href="javascript:void(0)" class="product-title">{{_user.nickname}}
+								<span class="label label-warning pull-right" ng-bind="_user.messages.length" ng-if="_user.clientId != currentDialogUser.clientId"></span>
+							</a>
+							<span class="product-description" ng-bind="_user.messages[_user.messages.length-1].msg.text"></span>
+							<span class="product-description" ng-bind="_user.messages[_user.messages.length-1].timestamp | timeFromNow"></span>
+						</div>
+					</li>
+					<!-- /.item -->
+				</ul>
+            </div>
+            <!-- /.box-body -->
+            <!-- /.box-footer -->
+          </div>
+		</div>
+		<div class="col-xs-12 col-sm-9">
+			<div class="box box-primary direct-chat direct-chat-primary" ng-class="{true:'direct-chat-contacts-open'}[!currentDialogUser || openList]">
+				<div class="box-header with-border">
+					<h3 class="box-title" ng-if="!currentDialogUser">请选择一个用户开始对话.</h3>
+					<h3 class="box-title" ng-if="currentDialogUser" ng-bind="currentDialogUser.nickname" ng-click="test()"></h3>
+					<div class="box-tools pull-right">
+						<!-- <button type="button" title="3 New Messages" class="btn btn-default badge bg-light-blue" ng-click="openList = !openList">3</button> -->
+						<a class="btn bg-maroon" ng-click="openList = !openList" ng-disabled="!currentDialogUser">{{sysConvLogs.length}}未处理用户</a>
+						<button class="btn bg-olive" ng-disabled="!currentDialogUser" ng-click="mark()">标记为已处理</button>
+					</div>
+				</div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <!-- Conversations are loaded here -->
+			<div class="direct-chat-messages">
+			<!-- Message. Default to the left -->
+				<div class="direct-chat-msg" ng-repeat="msg in currentDialogUser.messages" ng-class="{true:'right'}[msg.from == user.clientId]">
+					<div class="direct-chat-info clearfix">
+						<span class="direct-chat-name" ng-if="msg.from == currentDialogUser.clientId" ng-bind="currentDialogUser.nickname" ng-class="{false:'pull-left',true:'pull-right'}[msg.from == user.clientId]"></span>
+						<span class="direct-chat-name" ng-if="msg.from == user.clientId" ng-bind="user.nickname" ng-class="{false:'pull-left',true:'pull-right'}[msg.from == user.clientId]"></span>
+						<span class="direct-chat-timestamp" ng-bind="msg.timestamp | cTime" ng-class="{true:'pull-left',false:'pull-right'}[msg.from == user.clientId]"></span>
+					</div>
+					<!-- /.direct-chat-info -->
+					<img class="direct-chat-img" ng-if="msg.from == currentDialogUser.clientId" src="{{AvatarPath + currentDialogUser.avatar}}" alt="{{currentDialogUser.nickname}}">
+					<!-- /.direct-chat-img -->
+					<img class="direct-chat-img" ng-if="msg.from == user.clientId" src="{{AvatarPath + user.avatar}}" alt="{{user.nickname}}">
+					<!-- /.direct-chat-img -->
+					<div class="direct-chat-text">
+						{{msg.msg.text}}
+					</div>
+				<!-- /.direct-chat-text -->
+				</div>
+			<!-- /.direct-chat-msg -->
+			</div>
+				<!--/.direct-chat-messages-->
+
+              <!-- Contacts are loaded here -->
+			<div class="direct-chat-contacts">
+				<ul class="contacts-list">
+					<li ng-repeat="_user in sysConvLogs">
+						<a href="" ng-click="openDialog(_user)">
+							<img class="contacts-list-img" src="{{AvatarPath + _user.avatar}}" alt="{{_user.nickname}}">
+							<div class="contacts-list-info">
+								<span class="contacts-list-name">
+									{{_user.nickname}}
+									<small class="contacts-list-date pull-right" ng-bind="_user.messages[0].timestamp | cTime"></small>
+								</span>
+								<span class="contacts-list-msg" ng-bind="_user.messages[0].msg.text"></span>
+							</div>
+							<!-- /.contacts-list-info -->
+						</a>
+					</li>
+					<!-- End Contact Item -->
+				</ul>
+				<!-- /.contatcts-list -->
+			</div>
+              <!-- /.direct-chat-pane -->
+            </div>
+            <!-- /.box-body -->
+            <div class="box-footer">
+				<div class="input-group">
+					<input type="text" name="message" placeholder="Type Message ..." class="form-control" ng-model="msgText">
+					<span class="input-group-btn">
+						<button type="submit" class="btn btn-primary btn-flat" ng-click="sendMessage()">发送</button>
+					</span>
+				</div>
+            </div>
+            <!-- /.box-footer-->
+          </div>
+		</div>
+	</div>
+</section>

@@ -54,21 +54,21 @@ app.use('/static',express.static(__dirname + '/dest'));
 app.use('/api',api);
 
 // 登陆请求
-app.post('/login',function(req,res,next) {
-	geetest.validate({
-		challenge: req.body.geetest_challenge,
-		validate: req.body.geetest_validate,
-		seccode: req.body.geetest_seccode
-	}, function (err, result) {
+// app.post('/login',function(req,res,next) {
+// 	geetest.validate({
+// 		challenge: req.body.geetest_challenge,
+// 		validate: req.body.geetest_validate,
+// 		seccode: req.body.geetest_seccode
+// 	}, function (err, result) {
 
-		if(config["users"][req.body.username] && config["users"][req.body.username] === req.body.password){
-			req.session.user = {
-				name:req.body.username
-			}
-		}
-		res.redirect('/dashboard');
-	});
-});
+// 		if(config["users"][req.body.username] && config["users"][req.body.username] === req.body.password){
+// 			req.session.user = {
+// 				name:req.body.username
+// 			}
+// 		}
+// 		res.redirect('/dashboard');
+// 	});
+// });
 
 // 极验注册
 app.get('/geetest',function(req,res,next){
@@ -90,7 +90,7 @@ app.get('/geetest',function(req,res,next){
 
 // 前端路由
 app.all('/*', function(req, res, next) {
-	if(req.session.user){
+	if(req.AV.user){
 		res.sendFile('dest/index.html', { root: __dirname });	
 	}else{
 		res.sendFile('login.html',{ root:__dirname });

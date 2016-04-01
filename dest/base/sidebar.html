@@ -4,10 +4,10 @@
 		<!-- Sidebar user panel -->
 		<div class="user-panel">
 			<div class="pull-left image">
-				<img src="http://img.u77.com/avatar/3d/6b/1.jpg!avatar" class="img-circle" alt="User Image">
+				<img src="{{AvatarPath + user.avatar}}" class="img-circle" alt="User Image">
 			</div>
 			<div class="pull-left info">
-				<p>U77店长</p>
+				<p ng-bind="user.nickname"></p>
 				<a href="#"><i class="fa fa-circle text-success"></i> Online</a>
 			</div>
 		</div>
@@ -32,13 +32,19 @@
 				<a>
 					<i class="fa fa-files-o"></i>
 					<span>日常</span>
-					<span class="label bg-yellow pull-right">4</span>
 				</a>
 				<ul class="treeview-menu">
 					<li><a ui-sref="base.dailyBigEye"><i class="fa fa-circle-o"></i>大眼睛位</a></li>
 					<li><a ui-sref="base.dailyGameExamine"><i class="fa fa-circle-o"></i>游戏审核</a></li>
 					<li><a ui-sref="base.dailyReportExamine"><i class="fa fa-circle-o"></i>举报审核</a></li>
 				</ul>
+			</li>
+			<li>
+				<a ui-sref="base.message">
+					<i class="fa fa-envelope"></i>
+					<span>消息</span>
+					<span class="label bg-yellow pull-right" ng-bind="msgCount"></span>
+				</a>
 			</li>
 			<li class="treeview">
 				<a href="">

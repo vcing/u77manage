@@ -42,14 +42,14 @@
 				<!-- User Account: style can be found in dropdown.less -->
 				<li class="dropdown user user-menu">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-						<img src="http://img.u77.com/avatar/3d/6b/1.jpg!avatar" class="user-image" alt="User Image">
-						<span class="hidden-xs">U77店长</span>
+						<img src="{{AvatarPath + user.avatar}}" class="user-image" alt="User Image">
+						<span class="hidden-xs" ng-bind="user.nickname"></span>
 					</a>
 					<ul class="dropdown-menu">
 						<li class="user-header">
-							<img src="http://img.u77.com/avatar/3d/6b/1.jpg" class="img-circle" alt="User Image">
+							<img src="{{AvatarPath + user.avatar}}" class="img-circle" alt="User Image">
 							<p>
-								U77店长
+								{{user.nickname}}
 								<small>呵呵呵呵呵</small>
 							</p>
 						</li>
@@ -69,7 +69,7 @@
 								<a href="#" class="btn btn-default btn-flat">Profile</a>
 							</div>
 							<div class="pull-right">
-								<a href="#" class="btn btn-default btn-flat">Sign out</a>
+								<a href="#" class="btn btn-default btn-flat" ng-click="logout()">登出</a>
 							</div>
 						</li>
 					</ul>	

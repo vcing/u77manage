@@ -32,6 +32,12 @@ app.filter('time',[function(){
 	}
 }])
 
+app.filter('cTime',[function(){
+  return function(str){
+    return moment(str).format("YY年MM月DD日 H:mm"); 
+  }
+}])
+
 app.filter('dateTime',[function(){
   return function(unix){
     return moment.unix(parseInt(unix)).format("YYYY/MM/DD H:mm:ss");

@@ -12,9 +12,11 @@
 	<link rel="stylesheet" type="text/css" href="/static/plugins/datetimepicker/datetimepicker.css">
 	<base href="/">
 </head>
-<body ng-app='u77manage' class="skin-blue sidebar-mini">
+<body class="skin-blue sidebar-mini" id="bootstrap">
 	<div id='u77manage'>
-		<div class="wrapper" ui-view='main'></div>
+		<div class="wrapper" ui-view='main' style="background: #fafafa;">
+			<img src="/static/img/base-loading.gif" alt="" style="display: block;margin: 0 auto;">
+		</div>
 	</div>
 	<a id="upload-btn" style="display:none"></a>
 	<script src="/static/lib/jquery.min.js"></script>
@@ -23,6 +25,7 @@
 	<script src="/static/lib/angular-touch.min.js"></script>
 	<script src="/static/lib/angular-animate.min.js"></script>
 	<script src="/static/lib/angular-ui-router.min.js"></script>
+	<script src="/static/lib/AV.realtime.min.js"></script>
 	<script src="/static/lib/bootstrap.min.js"></script>
 	<script src="/static/lib/lodash.min.js"></script>
 	<script src="/static/lib/ui-bootstrap-tpls-0.14.3.min.js"></script>

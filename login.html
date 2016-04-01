@@ -24,7 +24,7 @@
 	  <div class="login-box-body">
 	    <p class="login-box-msg">请先登录</p>
 
-	    <form method="post" action="/login">
+	    <form id="login" method="post">
 	      <div class="form-group has-feedback">
 	        <input id="username" type="text" class="form-control" name="username" placeholder="用户名">
 	        <span class="glyphicon glyphicon-user form-control-feedback"></span>
@@ -63,7 +63,7 @@
 	    <!-- /.social-auth-links -->
 
 	    <a href="#">忘记密码</a><br>
-	    <a href="register.html" class="text-center">注册成为管理员</a>
+	    <a href="register.html" class="text-center">注册成为管理员(呵呵)</a>
 
 	  </div>
 	  <!-- /.login-box-body -->
@@ -126,6 +126,20 @@ function handler(_captchaObj){
 
 	});
 }
+
+$('#login').submit(function() {
+	$.post('/api/user/login',{
+		username:$('#username').val(),
+		password:$('#password').val()
+	},function(data){
+		if(data.status == 100){
+			window.location.href = '/dashboard';
+		}else{
+			alert(data.msg);
+		}
+	});
+	return false;
+});
 </script>
 </body>
 </html>

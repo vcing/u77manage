@@ -1,5 +1,5 @@
-app.controller('BaseCtrl',['$scope','$rootScope','$state','AnalysisPageService',
-	function($scope,$rootScope,$state,AnalysisPageService){
+app.controller('BaseCtrl',['$scope','$rootScope','$state','AnalysisPageService','UserService','RealtimeService','$q',
+	function($scope,$rootScope,$state,AnalysisPageService,UserService,RealtimeService,$q){
 		// 主导航搜索
 		$scope.search = function(){
 			$state.go('base.gameEdit',{id:$scope.gameId});
@@ -16,6 +16,124 @@ app.controller('BaseCtrl',['$scope','$rootScope','$state','AnalysisPageService',
 		AnalysisPageService.list().then(function(result){
 			$scope.financePages = result;
 		});
+
+		$scope.logout = function() {
+			UserService.logout().then(function(data){
+				window.location.href = '/login';
+			});
+		}
+
+		// 消息系统初始化连接
+		RealtimeService.init().then(function(realtime){
+			$rootScope.realtime = realtime;
+			var deffered = $q.defer();
+			realtime.conv(sysMessageConvId,function(conv){
+				if(conv){
+					deffered.resolve(conv);
+				}else{
+					deffered.reject({
+						status:101,
+						msg:'查询房间出错'
+					});
+				}
+			});
+			var _deffered = $q.defer();
+			realtime.conv(recentConvId,function(conv){
+				if(conv){
+					_deffered.resolve(conv);
+				}else{
+					_deffered.reject({
+						status:101,
+						msg:'查询房间出错'
+					});
+				}
+			});
+			var promises = [deffered.promise,_deffered.promise];
+			return $q.all(promises);
+		})
+		// 加入房间
+		.then(function(convs){
+			$rootScope.sysConv = convs[0];
+			$rootScope.recentConv = convs[1];
+			var deffered = $q.defer();
+			// 加入系统对话转发房间
+			$rootScope.sysConv.join(function() {
+				deffered.resolve($rootScope.sysConv);
+			});
+
+			// 加入最近联系人房间
+			var _deffered = $q.defer();
+			$rootScope.recentConv.join(function() {
+				_deffered.resolve($rootScope.recentConv);
+			});
+
+			return $q.all([deffered.promise,_deffered.promise]);
+		})
+		// 同步消息
+		.then(asyncSysLogs)
+		// 消息系统事件初始化注册
+		.then(function(){
+			$rootScope.sysConv.receive(function(msg){
+				receiveMessage(msg);
+			});
+			$rootScope.recentConv.receive(function(msg){
+				asyncSysLogs();
+			});
+		},function(err){
+			alert('实时通讯,消息系统出错,请刷新重试');
+		});
+
+		function asyncSysLogs() {
+			var deffered = $q.defer();
+			$rootScope.sysConv.log({limit:100},function(msgs){
+				console.log(msgs);
+				$rootScope.$apply(function(){
+					$rootScope.sysConvLogs = [];	
+				});
+				_.map(msgs,function(msg){
+					receiveMessage(msg);
+				});
+				deffered.resolve();
+			});
+
+			return deffered.promise;
+		}
+
+		$rootScope.asyncSysLogs = asyncSysLogs;
+
+		function receiveMessage(msg){
+			var _isFirst = true;
+			var _msgs = $rootScope.sysConvLogs || [];
+			_.map(_msgs,function(user,index){
+				if(user.clientId == msg.fromPeerId){
+					user.messages.push(msg);
+					var _user = _.clone(user);
+					_msgs.splice(index,1);
+					_msgs.unshift(user);
+					_isFirst = false;
+				}
+			});	
+			if(_isFirst){
+				var clientId = msg.fromPeerId;
+				msg.fromPeerId = decodeURIComponent(msg.fromPeerId);
+				var _infos = msg.fromPeerId.split('__');
+				_msgs.unshift({
+					clientId:clientId,
+					userId:_infos[0],
+					nickname:_infos[1],
+					avatar:_infos[2],
+					messages:[msg]
+				});
+			}
+			$rootScope.$apply(function(){
+				$rootScope.sysConvLogs = _msgs;	
+			})
+			if($rootScope.msgCount){
+				$rootScope.msgCount++
+			}else{
+				$rootScope.msgCount = 1;
+			}
+		}
 	}]);
 
 app.controller('SingleReportCtrl',['$scope','$rootScope','ReportService','MessageService',
