@@ -8,7 +8,7 @@ $(function(){
 	$.get('/api/user/profile',function(data){
 		if(data.username){
 			window.user = data;
-			window.user.clientId = encodeURIComponent(data.userId+"__"+data.nickname+"__"+data.avatar);
+			// window.user.clientId = encodeURIComponent(data.userId+"__"+data.nickname+"__"+data.avatar);
 			angular.bootstrap(document.getElementById('bootstrap'),['u77manage']);
 		}else{
 			window.location.href = '/login';
@@ -21,7 +21,7 @@ var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch','infi
 // var BasePath = 'http://dev.u77.com/admin/';
 // var Path = 'http://dev.u77.com';
 var BasePath = 'http://www.u77.com/admin/';
-var Path = 'http://www.u77.com/';
+var Path = 'http://dev.u77.com/';
 var AvatarPath = 'http://img.u77.com/avatar/';
 var ManagePath = 'http://manage.u77.com/';
 var BackEndPath = 'http://u77admin.leanapp.cn/api/';
@@ -366,7 +366,7 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 				views:{
 					'content':{
 						templateUrl:'/static/message/message.html',
-						controller:'MessageCtrl'
+						controller:'RealtimeMessageCtrl'
 					}
 				}
 			})

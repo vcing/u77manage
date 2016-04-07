@@ -1,7 +1,8 @@
-app.controller('MessageCtrl',['$scope','$rootScope','RealtimeService',
-	function($scope,$rootScope,RealtimeService){
+app.controller('RealtimeMessageCtrl',['$q','$scope','$rootScope','RealtimeService',
+	function($q,$scope,$rootScope,RealtimeService){
 		$scope.openList = true;
 		$scope.openDialog = function(user){
+			user.msgCount = 0;
 			RealtimeService.getDialog(user).then(function(msgs){
 				$scope.currentDialogUser = user;
 				$scope.currentDialogUser.messages = msgs;
@@ -9,43 +10,50 @@ app.controller('MessageCtrl',['$scope','$rootScope','RealtimeService',
 			});
 		}
 
-		var convId = sysConvId;
+		// 发送消息
 		$scope.sendMessage = function(){
 			if(!$scope.currentDialogUser)alert('请先选择用户.');
 			if($scope.msgText.trim() == '' || !$scope.msgText)alert('请输入内容');
-			RealtimeService.sendMessage({
-				convId:convId,
-				from:$rootScope.user.clientId,
-				to:$scope.currentDialogUser.clientId,
-				type:1,
-				msg:$scope.msgText
-			}).then(function(result){
+			var data = {
+				convId:sysConvId,
+				from:$rootScope.user.userId,
+				to:$scope.currentDialogUser.userId,
+				type:400,
+				text:$scope.msgText
+			};
+			RealtimeService.sendMessage(data).then(function(result){
 				if(result.status == 100){
-					return RealtimeService.getDialog($scope.currentDialogUser);
+					data.msg = {
+						type:data.type,
+						text:data.text
+					}
+					// 加入消息到列表
+					$scope.currentDialogUser.messages.push(data);	
 				}else{
 					alert(result.msg);
-					var deffered = $q.defer();
-					deffered.reject();
-					return deffered.promise;
 				}
-			}).then(function(msgs){
-				if(!msgs)return;
-				$scope.currentDialogUser.messages = msgs;
-			})
+				$scope.msgText = "";
+			});
 		}
 
+		// 标记处理
 		$scope.mark = function() {
 			var _result;
+			// 打开dialog
 			RealtimeService.markDialog($scope.currentDialogUser)
 			.then(function(result){
 				_result = result;
-				return RealtimeService.deleteUserMessages($scope.currentDialogUser.clientId,sysMessageConvId);
+				// 删除系统消息转发房间
+				return RealtimeService.deleteUserMessages($scope.currentDialogUser.userId,sysMessageConvId);
 			})
 			.then(function(result){
 				if(result.status == 100){
-					// $rootScope.recentConv.send(_result,function() {
-					// 	$rootScope.asyncSysLogs();
-					// });
+					// 最近聊天记录房间发送记录
+					$rootScope.recentConv.send(_result,function() {
+						// 同步消息
+						$rootScope.asyncSysLogs();
+						$scope.currentDialogUser = null;
+					});
 				}else{
 					alert(result.msg);
 				}
@@ -60,19 +68,42 @@ app.controller('MessageCtrl',['$scope','$rootScope','RealtimeService',
 app.controller('MarkDialogCtrl',['$scope','$rootScope','$uibModalInstance','currentDialogUser',
 	function($scope,$rootScope,$uibModalInstance,currentDialogUser){
 		$scope.types = [{
-			key:1,
-			name:'游戏举报'
+			key:201,
+			name:'精华举报'
 		},{
-			key:2,
+			key:202,
 			name:'评论举报'
+		},{
+			key:203,
+			name:'视频举报'
+		},{
+			key:204,
+			name:'发现举报'
+		},{
+			key:205,
+			name:'推荐举报'
+		},{
+			key:206,
+			name:'游戏反馈'
+		},{
+			key:400,
+			name:'普通对话'
 		}];
 
 		$scope.submit = function() {
 			var result = {
-				from:currentDialogUser.clientId,
-				dealer:user.clientId,
+				from:{
+					userId:currentDialogUser.userId,
+					avatar:currentDialogUser.avatar,
+					nickname:currentDialogUser.nickname
+				},
+				dealer:{
+					userId:user.userId,
+					avatar:user.avatar,
+					nickname:user.nickname
+				},
 				type:$scope.type,
-				result:$scope.result				
+				result:$scope.result			
 			};
 			$uibModalInstance.close(result);
 		}

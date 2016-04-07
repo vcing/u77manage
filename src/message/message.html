@@ -17,15 +17,16 @@
             <!-- /.box-header -->
             <div class="box-body" style="padding:0">
 				<ul class="products-list product-list-in-box">
-					<li class="item" ng-repeat="_user in sysConvLogs" style="cursor: pointer;padding:10px" ng-click="openDialog(_user)">
+					<li class="item" ng-repeat="_user in sysConvLogs" style="cursor: pointer;padding:10px;{{currentDialogUser.userId == _user.userId ? 'background:#eee' : ''}}" ng-click="openDialog(_user)">
 						<div class="product-img">
 							<img src="{{AvatarPath + _user.avatar}}" alt="{{_user.nickname}}" style="border-radius: 50%">
 						</div>
 						<div class="product-info">
 							<a href="javascript:void(0)" class="product-title">{{_user.nickname}}
-								<span class="label label-warning pull-right" ng-bind="_user.messages.length" ng-if="_user.clientId != currentDialogUser.clientId"></span>
+								<span class="label label-warning pull-right" ng-bind="_user.msgCount" ng-if="_user.userId != currentDialogUser.userId && _user.msgCount != 0"></span>
 							</a>
-							<span class="product-description" ng-bind="_user.messages[_user.messages.length-1].msg.text"></span>
+							<span class="product-description" ng-if="_user.messages[_user.messages.length-1].msg.type != 400" ng-bind-html="_user.messages[_user.messages.length-1].msg.text | trusted"></span>
+							<span class="product-description" ng-if="_user.messages[_user.messages.length-1].msg.type == 400" ng-bind="_user.messages[_user.messages.length-1].msg.text"></span>
 							<span class="product-description" ng-bind="_user.messages[_user.messages.length-1].timestamp | timeFromNow"></span>
 						</div>
 					</li>
@@ -42,7 +43,6 @@
 					<h3 class="box-title" ng-if="!currentDialogUser">请选择一个用户开始对话.</h3>
 					<h3 class="box-title" ng-if="currentDialogUser" ng-bind="currentDialogUser.nickname" ng-click="test()"></h3>
 					<div class="box-tools pull-right">
-						<!-- <button type="button" title="3 New Messages" class="btn btn-default badge bg-light-blue" ng-click="openList = !openList">3</button> -->
 						<a class="btn bg-maroon" ng-click="openList = !openList" ng-disabled="!currentDialogUser">{{sysConvLogs.length}}未处理用户</a>
 						<button class="btn bg-olive" ng-disabled="!currentDialogUser" ng-click="mark()">标记为已处理</button>
 					</div>
@@ -50,22 +50,21 @@
             <!-- /.box-header -->
             <div class="box-body">
               <!-- Conversations are loaded here -->
-			<div class="direct-chat-messages">
+			<div class="direct-chat-messages" auto-scroll="currentDialogUser">
 			<!-- Message. Default to the left -->
-				<div class="direct-chat-msg" ng-repeat="msg in currentDialogUser.messages" ng-class="{true:'right'}[msg.from == user.clientId]">
+				<div class="direct-chat-msg" ng-repeat="msg in currentDialogUser.messages" ng-class="{true:'right'}[msg.from == user.userId]">
 					<div class="direct-chat-info clearfix">
-						<span class="direct-chat-name" ng-if="msg.from == currentDialogUser.clientId" ng-bind="currentDialogUser.nickname" ng-class="{false:'pull-left',true:'pull-right'}[msg.from == user.clientId]"></span>
-						<span class="direct-chat-name" ng-if="msg.from == user.clientId" ng-bind="user.nickname" ng-class="{false:'pull-left',true:'pull-right'}[msg.from == user.clientId]"></span>
-						<span class="direct-chat-timestamp" ng-bind="msg.timestamp | cTime" ng-class="{true:'pull-left',false:'pull-right'}[msg.from == user.clientId]"></span>
+						<span class="direct-chat-name" ng-if="msg.from == currentDialogUser.userId" ng-bind="currentDialogUser.nickname" ng-class="{false:'pull-left',true:'pull-right'}[msg.from == user.userId]"></span>
+						<span class="direct-chat-name" ng-if="msg.from == user.userId" ng-bind="user.nickname" ng-class="{false:'pull-left',true:'pull-right'}[msg.from == user.userId]"></span>
+						<span class="direct-chat-timestamp" ng-bind="msg.timestamp | cTime" ng-class="{true:'pull-left',false:'pull-right'}[msg.from == user.userId]"></span>
 					</div>
 					<!-- /.direct-chat-info -->
-					<img class="direct-chat-img" ng-if="msg.from == currentDialogUser.clientId" src="{{AvatarPath + currentDialogUser.avatar}}" alt="{{currentDialogUser.nickname}}">
+					<img class="direct-chat-img" ng-if="msg.from == currentDialogUser.userId" src="{{AvatarPath + currentDialogUser.avatar}}" alt="{{currentDialogUser.nickname}}">
 					<!-- /.direct-chat-img -->
-					<img class="direct-chat-img" ng-if="msg.from == user.clientId" src="{{AvatarPath + user.avatar}}" alt="{{user.nickname}}">
+					<img class="direct-chat-img" ng-if="msg.from == user.userId" src="{{AvatarPath + user.avatar}}" alt="{{user.nickname}}">
 					<!-- /.direct-chat-img -->
-					<div class="direct-chat-text">
-						{{msg.msg.text}}
-					</div>
+					<div class="direct-chat-text" ng-if="msg.msg.type == 400" ng-bind="msg.msg.text"></div>
+					<div class="direct-chat-text" ng-if="msg.msg.type != 400" ng-bind-html="msg.msg.text | trusted"></div>
 				<!-- /.direct-chat-text -->
 				</div>
 			<!-- /.direct-chat-msg -->
@@ -81,9 +80,10 @@
 							<div class="contacts-list-info">
 								<span class="contacts-list-name">
 									{{_user.nickname}}
-									<small class="contacts-list-date pull-right" ng-bind="_user.messages[0].timestamp | cTime"></small>
+									<small class="contacts-list-date pull-right" ng-bind="_user.messages[_user.messages.length-1].timestamp | cTime"></small>
 								</span>
-								<span class="contacts-list-msg" ng-bind="_user.messages[0].msg.text"></span>
+								<span class="contacts-list-msg" ng-if="_user.messages[_user.messages.length-1].msg.type == 400" ng-bind="_user.messages[_user.messages.length-1].msg.text"></span>
+								<span class="contacts-list-msg" ng-if="_user.messages[_user.messages.length-1].msg.type != 400" ng-bind-html="_user.messages[_user.messages.length-1].msg.text | trusted"></span>
 							</div>
 							<!-- /.contacts-list-info -->
 						</a>
@@ -105,6 +105,29 @@
             </div>
             <!-- /.box-footer-->
           </div>
+
+          <!-- timeline -->
+          <ul class="timeline">
+          	<li class="time-label">
+          		<span class="bg-red"  ng-bind="recentConvLogs[0].timestamp | cTime"></span>
+          	</li>
+          	<li ng-repeat="log in recentConvLogs">
+          		<i class="fa fa-envelope bg-blue"></i>
+          		<div class="timeline-item">
+          			<span class="time" ng-bind="log.timestamp | cTime"></span>
+          			<h3 class="timeline-header">
+          				<a href="{{log.msg.dealer.userId | userLink}}" ng-bind="log.msg.dealer.nickname"></a>
+          				处理了
+          				<a href="{{log.msg.from.userId | userLink}}" ng-bind="log.msg.from.nickname"></a>
+          				的消息
+          			</h3>
+          			<div class="timeline-body" ng-bind="log.msg.result"></div>
+          			<div class="timeline-footer">
+						<a class="btn btn-primary btn-xs" ng-click="openDialog({userId:log.msg.from.userId})">查看对话</a>
+          			</div>
+          		</div>
+          	</li>
+          </ul>
 		</div>
 	</div>
 </section>

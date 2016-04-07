@@ -68,6 +68,33 @@ app.filter('onlyTime',[function(){
 	}
 }])
 
+app.filter('userLink',[function(){
+  return function(userId) {
+    return Path + 'user/' + userId;
+  }
+}]);
+
+// app.filter('nickname',[function(){
+//   return function(clientId) {
+//     clientId = decodeURIComponent(clientId);
+//     return clientId.split('__')[1].split('__')[0];
+//   }
+// }]);
+
+// app.filter('userId',[function(){
+//   return function(clientId){
+//     clientId = decodeURIComponent(clientId);
+//     return clientId.split('__')[0];
+//   }
+// }]);
+
+// app.filter('avatar',[function(){
+//   return function(clientId){
+//     clientId = decodeURIComponent(clientId);
+//     return clientId.split('__')[2];
+//   }
+// }])
+
 function html_encode(str)  
 {  
   vars ="";  
