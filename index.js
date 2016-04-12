@@ -88,6 +88,10 @@ app.get('/geetest',function(req,res,next){
 	});
 });
 
+// app.get('/register',function(req,res){
+// 	res.sendFile('register.html',{root:__dirname});
+// })
+
 // 前端路由
 app.all('/*', function(req, res, next) {
 	if(req.AV.user){

@@ -6,9 +6,9 @@ var config = {
 	"LC_APP_MASTER_KEY":"6f6zoQQg8xQkvpIXGzYppl4d",
 
 	"realtime":{
-		"appId" : 'miBNAt0bIsYelizPvxkjgBFW-gzGzoHsz',
-		"appKey" : 'aaKFq8QIg26ED1yOjkO903P2',
-		"appMasterKey" : 'rnxopmMcgIn0GQpARAYxzbcj'
+		"appId" : '5IGHyxfKiCk2rsy4AN298TvE-gzGzoHsz',
+		"appKey" : 'ri9AtTROQEhkn2LHeNhbmwC8',
+		"appMasterKey" : 'AikJkwLxlB8c3UVkeCWAYChM'
 	}
 
 }

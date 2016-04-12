@@ -350,7 +350,7 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 					$scope.chart.y = 'money';
 					return false;
 				}
-				$scope.chart.x        = 'time';z
+				$scope.chart.x        = 'time';
 				$scope.chart.platform = null;
 				$scope.chart.server   = null;
 				$scope.xDisable       = true;

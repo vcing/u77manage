@@ -23,6 +23,10 @@ app.controller('BaseCtrl',['$scope','$rootScope','$state','AnalysisPageService',
 			});
 		}
 
+		$(window).on('keyup',function(event){
+			if($rootScope.keyUpEvent)$rootScope.keyUpEvent(event);
+		});
+
 		// 消息系统初始化连接
 		RealtimeService.init().then(function(realtime){
 			$rootScope.realtime = realtime;
@@ -48,13 +52,27 @@ app.controller('BaseCtrl',['$scope','$rootScope','$state','AnalysisPageService',
 					});
 				}
 			});
-			var promises = [deffered.promise,_deffered.promise];
+
+			var __deffered = $q.defer();
+			realtime.conv(adminInnerConvId,function(conv){
+				if(conv){
+					__deffered.resolve(conv);
+				}else{
+					_deffered.reject({
+						status:101,
+						msg:'查询房间出错'
+					});
+				}
+			});
+
+			var promises = [deffered.promise,_deffered.promise,__deffered.promise];
 			return $q.all(promises);
 		})
 		// 加入房间
 		.then(function(convs){
-			$rootScope.sysConv = convs[0];
+			$rootScope.sysConv    = convs[0];
 			$rootScope.recentConv = convs[1];
+			$rootScope.innerConv  = convs[2];
 			var deffered = $q.defer();
 			// 加入系统对话转发房间
 			$rootScope.sysConv.join(function() {
@@ -67,20 +85,42 @@ app.controller('BaseCtrl',['$scope','$rootScope','$state','AnalysisPageService',
 				_deffered.resolve($rootScope.recentConv);
 			});
 
-			return $q.all([deffered.promise,_deffered.promise]);
+			// 加入内部同步房间
+			var __deffered = $q.defer();
+			$rootScope.innerConv.join(function() {
+				__deffered.resolve($rootScope.innerConv);
+			});
+
+			return $q.all([deffered.promise,_deffered.promise,__deffered.promise]);
 		})
 		// 同步消息
 		.then(asyncSysLogs)
 		// 消息系统事件初始化注册
 		.then(function(){
+			// 系统消息转发房间
 			$rootScope.sysConv.receive(function(msg){
 				receiveMessage(msg);
 				RealtimeService.getUserInfos($rootScope.sysConvLogs);
+				RealtimeService.getUserInfoFromMsgs($rootScope.sysMsgList);
 			});
+			// 最近联系人房间
 			$rootScope.recentConv.receive(function(msg){
 				asyncSysLogs();
 			});
+			// 内部房间
+			$rootScope.innerConv.receive(function(msg){
+				var _done = false;
+				_.map($rootScope.sysConvLogs,function(user){
+					if(user.userId == msg.msg.to){
+						$rootScope.$apply(function(){
+							user.msgCount = 0;
+							user.messages.push(msg.msg);
+						});
+					}
+				});
+			});
 		},function(err){
+			console.log(err);
 			alert('实时通讯,消息系统出错,请刷新重试');
 		});
 
@@ -89,18 +129,25 @@ app.controller('BaseCtrl',['$scope','$rootScope','$state','AnalysisPageService',
 			var deffered = $q.defer();
 			$rootScope.sysConv.log({limit:100},function(msgs){
 				$rootScope.$apply(function(){
+					// 初始化数值
 					$rootScope.sysConvLogs = [];
+					$rootScope.sysMsgList = [];
+					$rootScope.msgCount = 0;
+					$rootScope.normalMsgCount = 0;
+					$rootScope.reportMsgCount = 0;
+					$rootScope.payMsgCount = 0;
 				});
 				_.map(msgs,function(msg){
 					receiveMessage(msg);
-					deffered.resolve();	
 				});
 				// 获取用户信息
 				RealtimeService.getUserInfos($rootScope.sysConvLogs);
+				RealtimeService.getUserInfoFromMsgs($rootScope.sysMsgList);
+				deffered.resolve();
 			});
 
 			var _deffered = $q.defer();
-			$rootScope.recentConv.log({limit:20},function(msgs){
+			$rootScope.recentConv.log(function(msgs){
 				$rootScope.$apply(function(){
 					$rootScope.recentConvLogs = msgs.reverse();
 					_deffered.resolve();
@@ -117,16 +164,29 @@ app.controller('BaseCtrl',['$scope','$rootScope','$state','AnalysisPageService',
 			msg.from = msg.fromPeerId;
 			var _isFirst = true;
 			var _msgs = $rootScope.sysConvLogs || [];
+
 			_.map(_msgs,function(user,index){
 				if(user.userId == msg.fromPeerId){
 					user.messages.push(msg);
-					user.msgCount++;
+					if(user.userId != $rootScope.currentSystemDialogUserId)user.msgCount++;
 					var _user = _.clone(user);
 					_msgs.splice(index,1);
 					_msgs.unshift(user);
 					_isFirst = false;
 				}
 			});
+
+			// 消息分类提醒
+			if(msg.msg.type == 400){
+				$rootScope.normalMsgCount = $rootScope.normalMsgCount ? ++$rootScope.normalMsgCount : 1;
+			}else if(msg.msg.type == 207){
+				$rootScope.payMsgCount = $rootScope.payMsgCount ? ++$rootScope.payMsgCount : 1;
+			}else {
+				$rootScope.reportMsgCount = $rootScope.reportMsgCount ? ++$rootScope.reportMsgCount : 1;
+			}
+
+			$rootScope.sysMsgList.push(msg);
+			
 
 			if($rootScope.msgCount){
 				$rootScope.msgCount++
@@ -152,6 +212,7 @@ app.controller('BaseCtrl',['$scope','$rootScope','$state','AnalysisPageService',
 
 app.controller('SingleReportCtrl',['$scope','$rootScope','ReportService','MessageService',
 	function($scope,$rootScope,ReportService,MessageService){
+
 		$scope.ignore = function(report){
 			ReportService.ignore(report.id).then(function(done){
 				if(done){
@@ -227,8 +288,8 @@ app.controller('ListReportCtrl',['$scope','$rootScope','ReportService',
 // const N_REPORT          = 108;		// report
 
 // const FLAG_MAX          = 200;
-app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options','RealtimeService','$filter',
-	function($scope,$rootScope,$uibModalInstance,options,RealtimeService,$filter){
+app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options','RealtimeService','$filter','ReportService',
+	function($scope,$rootScope,$uibModalInstance,options,RealtimeService,$filter,ReportService){
 		switch(options.type){
 			case 105:
 				options.type = 101;
@@ -256,8 +317,11 @@ app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options
 			label:'视频审核通知',
 			id:105
 		},{
-			label:'评论删除通知',
+			label:'举报删除通知',
 			id:107
+		},{
+			label:'游戏收录通知',
+			id:109
 		}];
 
 		var userid;
@@ -272,7 +336,10 @@ app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options
 				userid = $scope.options.content.userid;
 				break;
 			case 107:
-				userid = $scope.options.content.content.sender;
+				userid = $scope.options.content.sender;
+				break;
+			case 109:
+				userid = $scope.options.content.userid;
 				break;
 		}
 
@@ -309,31 +376,69 @@ app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options
 					content += "你在 <a href='"+"/game/"+$scope.options.content.game.id+"' target='_blank'>"+$scope.options.content.game.title+"</a>";
 					content += "投稿的视频 <a href='/video/"+$scope.options.content.id+"' target='_blank'>"+$scope.options.content.title+"</a>";
 					content += "审核"+($scope.options.status ? "通过" : "未通过");
+					content += $scope.options.status ? '' : " 原因:"+$scope.options.cause;
 					_options.type = !$scope.options.status ? $scope.options.type+ 1 : $scope.options.type;
 					break;
 				case 107:
-					content += "您发表的"+($scope.options.content.content.type == 1 ? '游戏评论' : $scope.options.content.content.type == 2 ? '文章评论' : '精华评论');
-					content += $scope.options.content.content.content.content;
-					content += "被管理员删除";
+					typeText = "";
+					switch($scope.options.content.reportType){
+						case 201:
+							typeText = "评论";
+							break;
+						case 202:
+							typeText = "精华";
+							break;
+						case 203:
+							typeText = "视频";
+							break;
+						case 204:
+							typeText = "游戏推荐";
+							break;
+						case 205:
+							typeText = "发现";
+							break;
+					}
+					content += "您发表的"+typeText+":__&&__ 因涉及 ";
+					content += $scope.options.content.reason;
+					content += " 被管理员删除";
+					break;
 			}
 
 			_options.text = content;
-			
-			
-			var data = {
-				convId:sysConvId,
-				type:_options.type,
-				text:_options.text,
-				to:"",
-				from:$rootScope.user.userId
+			if(content.indexOf("__&&__") > 0) {
+				ReportService.deletequery($scope.options.content.reportType,$scope.options.content.reportId)
+				.then(function(title){
+					_options.text = content.replace('__&&__',title);
+					var data = {
+						convId:sysConvId,
+						type:_options.type,
+						text:_options.text,
+						to:userid,
+						from:$rootScope.user.userId
+					}
+					RealtimeService.sendMessage(data)
+					.then(function(){
+						$uibModalInstance.close($scope.options);
+						// 发送到内部房间同步
+						$rootScope.innerConv.send(data);
+					});
+				})
+			}else{
+				var data = {
+					convId:sysConvId,
+					type:_options.type,
+					text:_options.text,
+					to:userid,
+					from:$rootScope.user.userId
+				}
+				RealtimeService.sendMessage(data)
+				.then(function(){
+					$rootScope.asyncSysLogs();
+					$uibModalInstance.close($scope.options);
+					// 发送到内部房间同步
+					$rootScope.innerConv.send(data);
+				});
 			}
-			RealtimeService.getClientId(912288)
-			.then(function(userId){
-				data.to = userId;
-				return RealtimeService.sendMessage(data);
-			}).then(function(){
-				$uibModalInstance.close($scope.options);
-			});
 		}
 
 		$scope.submitWithoutMessage = function(){

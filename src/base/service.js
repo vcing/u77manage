@@ -22,15 +22,43 @@ app.service('ReportService',['$q',
 				});
 				return deffered.promise;
 			},
-			accept:function(id){
+			delete:function(type,id){
 				var deffered = $q.defer();
-				$.get(ManagePath+'report/delete/'+id,function(data){
-					if(data != 1){
-						deffered.resolve(false);
-					}else{
-						deffered.resolve(true);
-					}
-				});
+				if(type == 205){
+					$.ajax({
+						url:DiscoverPath+'discover/discoverid/'+id,
+						type:'delete',
+						success:function(result){
+							if(result.status == 0){
+								deffered.resolve(true);
+							}else{
+								deffered.resolve(false);
+							}
+						}
+					});
+				}else{
+					$.get(ManagePath+'report/delete/'+type+'/'+id,function(data){
+						if(data == "true"){
+							deffered.resolve(true);
+						}else{
+							deffered.resolve(false);
+						}
+					});
+				}
+				return deffered.promise;
+			},
+			deletequery:function(type,id){
+				var deffered = $q.defer();
+				if(type == 205){
+					$.get(DiscoverPath + 'discover/deletequery/'+id,function(data){
+						deffered.resolve(data);
+					});
+				}else{
+					$.get(ManagePath+'report/deletequery/'+type+'/'+id,function(data){
+						deffered.resolve(data);
+					});
+				}
+				
 				return deffered.promise;
 			}
 		}

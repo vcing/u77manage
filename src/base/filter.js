@@ -95,6 +95,22 @@ app.filter('userLink',[function(){
 //   }
 // }])
 
+app.filter('adminNickname',['RealtimeService',
+	function(RealtimeService){
+		var _cache = RealtimeService.getUserCache();
+		return function(userId){
+			return _cache[userId].nickname;
+		}
+  	}]);
+
+app.filter('adminAvatar',['RealtimeService',
+	function(RealtimeService){
+		var _cache = RealtimeService.getUserCache();
+		return function(userId){
+			return AvatarPath + _cache[userId].avatar;
+		}
+	}]);
+
 function html_encode(str)  
 {  
   vars ="";  

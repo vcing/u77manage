@@ -18,26 +18,32 @@ $(function(){
 });
 
 var app = angular.module('u77manage',['ui.router','ui.bootstrap','ngTouch','infinite-scroll','ngFileUpload','textAngular','ui.bootstrap.datetimepicker']);
-// var BasePath = 'http://dev.u77.com/admin/';
-// var Path = 'http://dev.u77.com';
-var BasePath = 'http://www.u77.com/admin/';
-var Path = 'http://dev.u77.com/';
-var AvatarPath = 'http://img.u77.com/avatar/';
-var ManagePath = 'http://manage.u77.com/';
-var BackEndPath = 'http://u77admin.leanapp.cn/api/';
-var ChargePath = 'http://u77pay.leanapp.cn/api/';
-var AnalysisPath = 'http://u77userrecord.leanapp.cn/api/';
-var DiscoverPath = 'http://u77discover.avosapps.com/api/';
-var MessagePath = 'http://dev.u77message_dev.leanapp.cn/api/'
+// var BasePath    = 'http://dev.u77.com/admin/';
+// var Path        = 'http://dev.u77.com';
+var BasePath       = 'http://www.u77.com/admin/';
+var Path           = 'http://www.u77.com/';
+var AvatarPath     = 'http://img.u77.com/avatar/';
+var ManagePath     = 'http://manage.u77.com/';
+var BackEndPath    = 'http://u77admin.leanapp.cn/api/';
+var ChargePath     = 'http://u77pay.leanapp.cn/api/';
+var AnalysisPath   = 'http://u77userrecord.leanapp.cn/api/';
+var DiscoverPath   = 'http://u77discoverd.avosapps.com/api/';
+var MessagePath    = 'http://u77message.leanapp.cn/api/'
 // var MessagePath = 'http://localhost:888/api/'
 // var FinancePath = 'http://192.168.1.102:3000/api/';
-// var ChargePath = 'http://192.168.1.102:3000/api/' ;
+// var ChargePath  = 'http://192.168.1.102:3000/api/' ;
 
 
 
-var sysMessageConvId = "56fba2ffdaeb3a63ca5affa3"; //系统消息转发的普通房间
-var recentConvId = "56fb44737db2a200509263b9"; //最近联系人房间
-var sysConvId = "56fb9bc5128fe10050cb25bc"; //系统对话房间
+// var sysMessageConvId = "56fba2ffdaeb3a63ca5affa3"; //系统消息转发的普通房间
+// var recentConvId     = "56fb44737db2a200509263b9"; //最近联系人房间
+// var sysConvId        = "56fb9bc5128fe10050cb25bc"; //系统对话房间
+// var adminInnerConvId = "570b7adc71cfe4005fa5da11"; //管理员内部同步房间
+
+var sysMessageConvId = "570ca59e71cfe40067339a14"; //系统消息转发的普通房间
+var recentConvId     = "570ca5f71ea4930068df1cd8"; //最近联系人房间
+var sysConvId        = "570ca51bdf0eea00644fa951"; //系统对话房间
+var adminInnerConvId = "570ca60371cfe40067339db9"; //管理员内部同步房间
 
 
 
@@ -363,6 +369,15 @@ app.config(['$stateProvider','$urlRouterProvider','$locationProvider',
 			})
 			.state('base.message',{
 				url:'/message',
+				views:{
+					'content':{
+						templateUrl:'/static/message/message.html',
+						controller:'RealtimeMessageCtrl'
+					}
+				}
+			})
+			.state('base.messageWithUserId',{
+				url:'/message/:userId',
 				views:{
 					'content':{
 						templateUrl:'/static/message/message.html',

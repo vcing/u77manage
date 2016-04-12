@@ -15,7 +15,7 @@
 		}
 	</style>
 </head>
-<body ng-app='u77manage' class="hold-transition login-page">
+<body class="hold-transition login-page">
 	<div class="login-box">
 	  <div class="login-logo">
 	    <a href="/"><b>U77</b>Admin</a>
@@ -77,24 +77,6 @@
 	<script src='/static/lib/moment-with-locales.min.js'></script>
 	<script src="/static/plugins/fastclick/fastclick.min.js"></script>
 <script>
-
-// $.ajax({
-//     url: "/geetest?t=" + (new Date()).getTime(),
-//     type: "get",
-//     dataType: "json",
-//     success: function (data) {
-
-//         // 使用initGeetest接口
-//         // 参数1：配置参数，与创建Geetest实例时接受的参数一致
-//         // 参数2：回调，回调的第一个参数验证码对象，之后可以使用它做appendTo之类的事件
-//         initGeetest({
-//             gt: data.gt,
-//             challenge: data.challenge,
-//             product: "embed", // 产品形式
-//             offline: !data.success
-//         }, handler);
-//     }
-// });
 
 function init(){
 	$.get("/geetest",function(data){

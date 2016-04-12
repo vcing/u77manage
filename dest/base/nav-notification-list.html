@@ -1,33 +1,20 @@
 <ul class="dropdown-menu">
-	<li class="header">你有5条信息</li>
+	<li class="header">有{{reportMsgCount}}条举报消息</li>
 	<li>
 		<!-- inner menu: contains the actual data -->
 		<ul class="menu">
-			<li>
-				<a href="#">
-					<i class="fa fa-users text-aqua"></i> 5 new members joined today
+			<li ng-repeat="msg in sysMsgList" ng-if="msg.msg.type < 207"><!-- start message -->
+				<a ui-sref="base.messageWithUserId({userId:msg.from})">
+					<div class="pull-left">
+						<img src="{{AvatarPath + msg.avatar}}" class="img-circle" alt="User Image">
+					</div>
+					<h4>
+						{{msg.nickname}}
+						<small><i class="fa fa-clock-o"></i>{{msg.timestamp | timeFromNow}}</small>
+					</h4>
+					<div ng-bind-html="msg.msg.text | trusted"></div>
 				</a>
-			</li>
-			<li>
-				<a href="#">
-					<i class="fa fa-warning text-yellow"></i> Very long description here that may not fit into the page and may cause design problems
-				</a>
-			</li>
-			<li>
-				<a href="#">
-					<i class="fa fa-users text-red"></i> 5 new members joined
-				</a>
-			</li>
-			<li>
-				<a href="#">
-					<i class="fa fa-shopping-cart text-green"></i> 25 sales made
-				</a>
-			</li>
-			<li>
-				<a href="#">
-					<i class="fa fa-user text-red"></i> You changed your username
-				</a>
-			</li>
+			</li><!-- end message -->
 		</ul>
 	</li>
 	<li class="footer"><a href="">查看所有消息</a></li>

@@ -247,4 +247,4 @@ app.directive('tableChart',function(){
 			});
 		}
 	}
-})
+});

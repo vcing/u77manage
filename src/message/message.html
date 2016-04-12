@@ -9,62 +9,41 @@
 </section>
 <section class="content" id="message">
 	<div class="row">
-		<div class="col-sm-3 hidden-xs">
-			<div class="box box-primary">
-            <div class="box-header with-border">
-				<h3 class="box-title">待处理消息</h3>
-            </div>
-            <!-- /.box-header -->
-            <div class="box-body" style="padding:0">
-				<ul class="products-list product-list-in-box">
-					<li class="item" ng-repeat="_user in sysConvLogs" style="cursor: pointer;padding:10px;{{currentDialogUser.userId == _user.userId ? 'background:#eee' : ''}}" ng-click="openDialog(_user)">
-						<div class="product-img">
-							<img src="{{AvatarPath + _user.avatar}}" alt="{{_user.nickname}}" style="border-radius: 50%">
-						</div>
-						<div class="product-info">
-							<a href="javascript:void(0)" class="product-title">{{_user.nickname}}
-								<span class="label label-warning pull-right" ng-bind="_user.msgCount" ng-if="_user.userId != currentDialogUser.userId && _user.msgCount != 0"></span>
-							</a>
-							<span class="product-description" ng-if="_user.messages[_user.messages.length-1].msg.type != 400" ng-bind-html="_user.messages[_user.messages.length-1].msg.text | trusted"></span>
-							<span class="product-description" ng-if="_user.messages[_user.messages.length-1].msg.type == 400" ng-bind="_user.messages[_user.messages.length-1].msg.text"></span>
-							<span class="product-description" ng-bind="_user.messages[_user.messages.length-1].timestamp | timeFromNow"></span>
-						</div>
-					</li>
-					<!-- /.item -->
-				</ul>
-            </div>
-            <!-- /.box-body -->
-            <!-- /.box-footer -->
-          </div>
-		</div>
-		<div class="col-xs-12 col-sm-9">
+		<div class="col-xs-12 col-sm-7 col-sm-push-5">
 			<div class="box box-primary direct-chat direct-chat-primary" ng-class="{true:'direct-chat-contacts-open'}[!currentDialogUser || openList]">
 				<div class="box-header with-border">
 					<h3 class="box-title" ng-if="!currentDialogUser">请选择一个用户开始对话.</h3>
 					<h3 class="box-title" ng-if="currentDialogUser" ng-bind="currentDialogUser.nickname" ng-click="test()"></h3>
 					<div class="box-tools pull-right">
-						<a class="btn bg-maroon" ng-click="openList = !openList" ng-disabled="!currentDialogUser">{{sysConvLogs.length}}未处理用户</a>
+						<a class="btn bg-yellow" ng-click="openList = !openList" ng-disabled="!currentDialogUser">{{sysConvLogs.length}}未处理用户</a>
 						<button class="btn bg-olive" ng-disabled="!currentDialogUser" ng-click="mark()">标记为已处理</button>
 					</div>
 				</div>
             <!-- /.box-header -->
             <div class="box-body">
               <!-- Conversations are loaded here -->
-			<div class="direct-chat-messages" auto-scroll="currentDialogUser">
+			<div class="direct-chat-messages" message-box-auto-scroll style="height: {{messageBoxHeight}}px">
 			<!-- Message. Default to the left -->
-				<div class="direct-chat-msg" ng-repeat="msg in currentDialogUser.messages" ng-class="{true:'right'}[msg.from == user.userId]">
+				<div class="direct-chat-msg t-{{msg.timestamp}}" ng-repeat="msg in currentDialogUser.messages" ng-class="{true:'right'}[msg.from != currentDialogUser.userId]">
 					<div class="direct-chat-info clearfix">
-						<span class="direct-chat-name" ng-if="msg.from == currentDialogUser.userId" ng-bind="currentDialogUser.nickname" ng-class="{false:'pull-left',true:'pull-right'}[msg.from == user.userId]"></span>
-						<span class="direct-chat-name" ng-if="msg.from == user.userId" ng-bind="user.nickname" ng-class="{false:'pull-left',true:'pull-right'}[msg.from == user.userId]"></span>
-						<span class="direct-chat-timestamp" ng-bind="msg.timestamp | cTime" ng-class="{true:'pull-left',false:'pull-right'}[msg.from == user.userId]"></span>
+						<span class="direct-chat-name" ng-if="msg.from == currentDialogUser.userId" ng-bind="currentDialogUser.nickname" ng-class="{false:'pull-left',true:'pull-right'}[msg.from != currentDialogUser.userId]"></span>
+						<span class="direct-chat-name" ng-if="msg.from != currentDialogUser.userId" ng-bind="msg.from | adminNickname" ng-class="{false:'pull-left',true:'pull-right'}[msg.from != currentDialogUser.userId]"></span>
+						<span class="direct-chat-timestamp" ng-bind="msg.timestamp | cTime" ng-class="{true:'pull-left',false:'pull-right'}[msg.from != currentDialogUser.userId]"></span>
 					</div>
 					<!-- /.direct-chat-info -->
 					<img class="direct-chat-img" ng-if="msg.from == currentDialogUser.userId" src="{{AvatarPath + currentDialogUser.avatar}}" alt="{{currentDialogUser.nickname}}">
 					<!-- /.direct-chat-img -->
-					<img class="direct-chat-img" ng-if="msg.from == user.userId" src="{{AvatarPath + user.avatar}}" alt="{{user.nickname}}">
+					<img class="direct-chat-img" ng-if="msg.from != currentDialogUser.userId" src="{{msg.from | adminAvatar}}" alt="{{msg.from | adminNickname}}">
 					<!-- /.direct-chat-img -->
 					<div class="direct-chat-text" ng-if="msg.msg.type == 400" ng-bind="msg.msg.text"></div>
 					<div class="direct-chat-text" ng-if="msg.msg.type != 400" ng-bind-html="msg.msg.text | trusted"></div>
+					<div style="text-align: right;margin-top:-6px">
+						<a class="btn btn-warning" ng-click="delete(msg)" ng-if="msg.msg.type == 201">删除该评论</a>
+						<a class="btn btn-warning" ng-click="delete(msg)" ng-if="msg.msg.type == 202">删除该精华</a>
+						<a class="btn btn-warning" ng-click="delete(msg)" ng-if="msg.msg.type == 203">删除该视频</a>
+						<a class="btn btn-warning" ng-click="delete(msg)" ng-if="msg.msg.type == 204">删除该推荐</a>
+						<a class="btn btn-warning" ng-click="delete(msg)" ng-if="msg.msg.type == 205">删除该发现</a>
+					</div>
 				<!-- /.direct-chat-text -->
 				</div>
 			<!-- /.direct-chat-msg -->
@@ -72,7 +51,7 @@
 				<!--/.direct-chat-messages-->
 
               <!-- Contacts are loaded here -->
-			<div class="direct-chat-contacts">
+			<div class="direct-chat-contacts" style="height: {{messageBoxHeight}}px">
 				<ul class="contacts-list">
 					<li ng-repeat="_user in sysConvLogs">
 						<a href="" ng-click="openDialog(_user)">
@@ -105,29 +84,73 @@
             </div>
             <!-- /.box-footer-->
           </div>
-
-          <!-- timeline -->
-          <ul class="timeline">
-          	<li class="time-label">
-          		<span class="bg-red"  ng-bind="recentConvLogs[0].timestamp | cTime"></span>
-          	</li>
-          	<li ng-repeat="log in recentConvLogs">
-          		<i class="fa fa-envelope bg-blue"></i>
-          		<div class="timeline-item">
-          			<span class="time" ng-bind="log.timestamp | cTime"></span>
-          			<h3 class="timeline-header">
-          				<a href="{{log.msg.dealer.userId | userLink}}" ng-bind="log.msg.dealer.nickname"></a>
-          				处理了
-          				<a href="{{log.msg.from.userId | userLink}}" ng-bind="log.msg.from.nickname"></a>
-          				的消息
-          			</h3>
-          			<div class="timeline-body" ng-bind="log.msg.result"></div>
-          			<div class="timeline-footer">
-						<a class="btn btn-primary btn-xs" ng-click="openDialog({userId:log.msg.from.userId})">查看对话</a>
-          			</div>
-          		</div>
-          	</li>
-          </ul>
+		</div>
+		<div class="col-sm-5 col-xs-12 col-sm-pull-7">
+			<div class="box box-primary">
+            <div class="box-header with-border">
+				<h3 class="box-title">{{isHistory ? "处理记录" : "待处理消息"}}</h3>
+				<div class="box-tolls pull-right">
+					<span class="badge bg-yellow" ng-click="isHistory = !isHistory" style="cursor: pointer">切换</span>
+				</div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" style="padding:0">
+				<ul class="products-list product-list-in-box" ng-show="!isHistory" style="overflow-y: scroll;height: {{messageBoxHeight}}px">
+					<li class="item" ng-repeat="_user in sysConvLogs" style="cursor: pointer;padding:10px;{{currentDialogUser.userId == _user.userId ? 'background:#eee' : ''}}" ng-click="openDialog(_user)">
+						<div class="product-img">
+							<img src="{{AvatarPath + _user.avatar}}" alt="{{_user.nickname}}" style="border-radius: 50%">
+						</div>
+						<div class="product-info">
+							<a href="javascript:void(0)" class="product-title">{{_user.nickname}}
+								<span class="label label-warning pull-right" ng-bind="_user.msgCount" ng-if="_user.userId != currentDialogUser.userId && _user.msgCount != 0"></span>
+							</a>
+							<span class="product-description" ng-if="_user.messages[_user.messages.length-1].msg.type != 400" ng-bind-html="_user.messages[_user.messages.length-1].msg.text | trusted"></span>
+							<span class="product-description" ng-if="_user.messages[_user.messages.length-1].msg.type == 400" ng-bind="_user.messages[_user.messages.length-1].msg.text"></span>
+							<span class="product-description" ng-bind="_user.messages[_user.messages.length-1].timestamp | timeFromNow"></span>
+						</div>
+					</li>
+					<!-- /.item -->
+				</ul>
+				          <!-- timeline -->
+				<ul class="timeline" ng-show="isHistory" style="overflow-y: scroll;height: {{messageBoxHeight}}px" recent-message-load-more>
+					<li class="time-label">
+						<span class="bg-yellow"  ng-bind="recentConvLogs[0].timestamp | cTime"></span>
+					</li>
+					<li class="rt-{{log.timestamp}}" ng-repeat="log in recentConvLogs">
+						<i ng-if="log.msg.type == 201" class="fa fa-file-text bg-red"></i>
+						<i ng-if="log.msg.type == 202" class="fa fa-comment bg-yellow"></i>
+						<i ng-if="log.msg.type == 203" class="fa fa-video-camera bg-purple"></i>
+						<i ng-if="log.msg.type == 204" class="fa fa-rss bg-navy"></i>
+						<i ng-if="log.msg.type == 205" class="fa fa-thumbs-up bg-orange"></i>
+						<i ng-if="log.msg.type == 206" class="fa fa-gamepad bg-olive"></i>
+						<i ng-if="log.msg.type == 400" class="fa fa-envelope bg-blue"></i>
+						<div class="timeline-item">
+							<span class="time" ng-bind="log.timestamp | cTime"></span>
+							<h3 class="timeline-header">
+								<a href="{{log.msg.dealer.userId | userLink}}" ng-bind="log.msg.dealer.nickname"></a>
+								处理了
+								<a href="{{log.msg.from.userId | userLink}}" ng-bind="log.msg.from.nickname"></a>
+								的
+								<span ng-if="log.msg.type == 201">精华举报</span>
+								<span ng-if="log.msg.type == 202">评论举报</span>
+								<span ng-if="log.msg.type == 203">视频举报</span>
+								<span ng-if="log.msg.type == 204">发现举报</span>
+								<span ng-if="log.msg.type == 205">推荐举报</span>
+								<span ng-if="log.msg.type == 206">游戏反馈</span>
+								<span ng-if="log.msg.type == 400">普通对话</span>
+								消息
+							</h3>
+							<div class="timeline-body" ng-bind-html="log.msg.result | trusted"></div>
+							<div class="timeline-footer">
+							<a class="btn btn-primary btn-xs" ng-click="openDialog({userId:log.msg.from.userId})">查看对话</a>
+							</div>
+						</div>
+					</li>
+				</ul>
+            </div>
+            <!-- /.box-body -->
+            <!-- /.box-footer -->
+          </div>
 		</div>
 	</div>
 </section>

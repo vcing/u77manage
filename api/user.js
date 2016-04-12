@@ -3,25 +3,28 @@ var AV       = require('./config/av.js');
 var realtime = require('./config/config.js').realtime;
 
 // 注册
-router.get('/register',function(req,res){
-	if(req.AV.user){
-		res.send({
-			status:103,
-			msg:'已经登录'
-		});
-		return;
-	}
-	var user = new AV.User(req.query);
-	user.signUp().then(function(user){
-		res.send(user);
-	},function(err){
-		res.send({
-			status:101,
-			msg:'注册失败,请稍后重试.',
-			err:err
-		});
-	});
-});
+// router.get('/register',function(req,res){
+// 	if(req.AV.user){
+// 		res.send({
+// 			status:103,
+// 			msg:'已经登录'
+// 		});
+// 		return;
+// 	}
+// 	var user = new AV.User(req.query);
+// 	user.signUp().then(function(user){
+// 		res.send({
+// 			status:100,
+// 			msg:'注册成功'
+// 		});
+// 	},function(err){
+// 		res.send({
+// 			status:101,
+// 			msg:'注册失败,请稍后重试.',
+// 			err:err
+// 		});
+// 	});
+// });
 
 // 登录
 router.post('/login',function(req,res){
