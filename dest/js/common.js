@@ -27,7 +27,7 @@ var ManagePath     = 'http://manage.u77.com/';
 var BackEndPath    = 'http://u77admin.leanapp.cn/api/';
 var ChargePath     = 'http://u77pay.leanapp.cn/api/';
 var AnalysisPath   = 'http://u77userrecord.leanapp.cn/api/';
-var DiscoverPath   = 'http://u77discoverd.avosapps.com/api/';
+var DiscoverPath   = 'http://u77discover.avosapps.com/api/';
 var MessagePath    = 'http://u77message.leanapp.cn/api/'
 // var MessagePath = 'http://localhost:888/api/'
 // var FinancePath = 'http://192.168.1.102:3000/api/';
@@ -1189,7 +1189,11 @@ app.controller('BaseCtrl',['$scope','$rootScope','$state','AnalysisPageService',
 			$rootScope.sysConv.receive(function(msg){
 				receiveMessage(msg);
 				RealtimeService.getUserInfos($rootScope.sysConvLogs);
-				RealtimeService.getUserInfoFromMsgs($rootScope.sysMsgList);
+				RealtimeService.getUserInfoFromMsgs($rootScope.sysMsgList)
+				.then(function(){
+					var _msg = $rootScope.sysMsgList[$rootScope.sysMsgList.length - 1];
+					browserNotify(_msg.nickname,_msg.msg.text,AvatarPath + _msg.avatar);
+				});
 			});
 			// 最近联系人房间
 			$rootScope.recentConv.receive(function(msg){
@@ -1294,7 +1298,56 @@ app.controller('BaseCtrl',['$scope','$rootScope','$state','AnalysisPageService',
 			$rootScope.$apply(function(){
 				$rootScope.sysConvLogs = _msgs;	
 			});
-				
+		}
+
+		function browserNotify(title, content, img) {
+		        
+		    if(!title && !content){
+		        title = "桌面提醒";
+		        content = "您看到此条信息桌面提醒设置成功";
+		    }
+		    var iconUrl = img;
+		    
+		    if (window.webkitNotifications) {
+		        //chrome老版本
+		        if (window.webkitNotifications.checkPermission() == 0) {
+		            var notif = window.webkitNotifications.createNotification(iconUrl, title, content);
+		            notif.display = function() {}
+		            notif.onerror = function() {}
+		            notif.onclose = function() {}
+		            notif.onclick = function() {this.cancel();}
+		            notif.replaceId = 'Meteoric';
+		            notif.show();
+		        } else {
+		            window.webkitNotifications.requestPermission($jy.notify);
+		        }
+		    }
+		    else if("Notification" in window){
+		        // 判断是否有权限
+		        if (Notification.permission === "granted") {
+		            var notification = new Notification(title, {
+		                "icon": iconUrl,
+		                "body": content,
+		            });
+		        }
+		        //如果没权限，则请求权限
+		        else if (Notification.permission !== 'denied') {
+		            Notification.requestPermission(function(permission) {
+		                // Whatever the user answers, we make sure we store the
+		                // information
+		                if (!('permission' in Notification)) {
+		                    Notification.permission = permission;
+		                }
+		                //如果接受请求
+		                if (permission === "granted") {
+		                    var notification = new Notification(title, {
+		                        "icon": iconUrl,
+		                        "body": content,
+		                    });
+		                }
+		            });
+		        }
+		    }
 		}
 	}]);
 
