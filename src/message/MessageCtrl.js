@@ -206,25 +206,24 @@ app.controller('MarkDialogCtrl',['$scope','$rootScope','$uibModalInstance','curr
 	function($scope,$rootScope,$uibModalInstance,currentDialogUser){
 		$scope.types = [{
 			key:201,
-			name:'精华举报'
-		},{
-			key:202,
-			name:'评论举报'
-		},{
-			key:203,
-			name:'视频举报'
-		},{
-			key:204,
-			name:'发现举报'
-		},{
-			key:205,
-			name:'推荐举报'
+			name:'举报处理',
+			class:'danger'
 		},{
 			key:206,
-			name:'游戏反馈'
+			name:'游戏反馈',
+			class:'info'
+		},{
+			key:207,
+			name:'网站反馈',
+			class:'success'
 		},{
 			key:400,
-			name:'普通对话'
+			name:'普通对话',
+			class:'primary'
+		},{
+			key:401,
+			name:'充值反馈',
+			class:'warning'
 		}];
 
 		$scope.submit = function() {
@@ -243,6 +242,10 @@ app.controller('MarkDialogCtrl',['$scope','$rootScope','$uibModalInstance','curr
 				result:$scope.result			
 			};
 			$uibModalInstance.close(result);
+		}
+
+		$scope.active = function(key) {
+			$scope.type = key;
 		}
 
 		$scope.cancel = function() {

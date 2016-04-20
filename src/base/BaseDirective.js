@@ -248,3 +248,22 @@ app.directive('tableChart',function(){
 		}
 	}
 });
+
+app.directive('doughnutChart',function(){
+	return {
+		restrict:'A',
+		scope:{
+			data:'=doughnutChart'
+		},
+		link:function($scope,element,attrs){
+			var _chart;
+			$scope.$watch('data',function(){
+				if($scope.data){
+					_chart ? _chart.destroy() : false;
+					var ctx = $(element).get(0).getContext('2d');
+					_chart = new Chart(ctx).Doughnut($scope.data);
+				}
+			});
+		}
+	}
+})

@@ -16,6 +16,11 @@ app.service('RealtimeService',['$q','$uibModal',
 				nickname:"U77弋戈",
 				userId:"76976"
 			},
+			144038:{
+				avatar:"ef/51/144038.png",
+				nickname:"U77匠人",
+				userId:"144038"
+			},
 			923297:{
 				avatar:"69/7e/923297.jpg",
 				nickname:"U77俗家弟子",

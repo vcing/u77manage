@@ -118,12 +118,10 @@
 					</li>
 					<li class="rt-{{log.timestamp}}" ng-repeat="log in recentConvLogs">
 						<i ng-if="log.msg.type == 201" class="fa fa-file-text bg-red"></i>
-						<i ng-if="log.msg.type == 202" class="fa fa-comment bg-yellow"></i>
-						<i ng-if="log.msg.type == 203" class="fa fa-video-camera bg-purple"></i>
-						<i ng-if="log.msg.type == 204" class="fa fa-rss bg-navy"></i>
-						<i ng-if="log.msg.type == 205" class="fa fa-thumbs-up bg-orange"></i>
-						<i ng-if="log.msg.type == 206" class="fa fa-gamepad bg-olive"></i>
+						<i ng-if="log.msg.type == 206" class="fa fa-gamepad bg-navy"></i>
+						<i ng-if="log.msg.type == 207" class="fa fa-globe bg-olive"></i>
 						<i ng-if="log.msg.type == 400" class="fa fa-envelope bg-blue"></i>
+						<i ng-if="log.msg.type == 401" class="fa fa-rmb bg-orange"></i>
 						<div class="timeline-item">
 							<span class="time" ng-bind="log.timestamp | cTime"></span>
 							<h3 class="timeline-header">
@@ -132,12 +130,10 @@
 								<a href="{{log.msg.from.userId | userLink}}" ng-bind="log.msg.from.nickname"></a>
 								的
 								<span ng-if="log.msg.type == 201">精华举报</span>
-								<span ng-if="log.msg.type == 202">评论举报</span>
-								<span ng-if="log.msg.type == 203">视频举报</span>
-								<span ng-if="log.msg.type == 204">发现举报</span>
-								<span ng-if="log.msg.type == 205">推荐举报</span>
 								<span ng-if="log.msg.type == 206">游戏反馈</span>
+								<span ng-if="log.msg.type == 207">网站反馈</span>
 								<span ng-if="log.msg.type == 400">普通对话</span>
+								<span ng-if="log.msg.type == 401">充值反馈</span>
 								消息
 							</h3>
 							<div class="timeline-body" ng-bind-html="log.msg.result | trusted"></div>

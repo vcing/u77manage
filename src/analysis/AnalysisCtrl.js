@@ -155,13 +155,19 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 				"servers":[1,2,3,4,5,6,7,8,9]
 			},
 			"czdtx":{
-				"name":"村长打天下"
+				"name":"村长打天下",
+				servers:[1,2]
 			},
 			"czdtx800ux":{
-				"name":"村长打天下800ux"
+				"name":"村长打天下800ux",
+				servers:[1,2]
 			},
 			"kzlr800ux":{
-				"name":"空之利刃800ux"
+				"name":"空之利刃800ux",
+				servers:[1,2]
+			},
+			"zqsd800ux":{
+				"name":"战旗时代800ux"
 			},
 			"kpgs":{
 				"name":"卡片怪兽"
