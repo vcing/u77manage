@@ -3,6 +3,8 @@ app.controller('GiftEditController',['$scope','$rootScope','$state','GiftService
 
 		if($state.params.id){
 			GiftService.get($state.params.id).then(function(gift){
+				gift.start = moment.unix(gift.start).format('YYYY-MM-DD');
+				gift.end = moment.unix(gift.end).format('YYYY-MM-DD');
 				$scope.gift = gift;
 			});
 		}else{
@@ -12,7 +14,9 @@ app.controller('GiftEditController',['$scope','$rootScope','$state','GiftService
 			$scope.games = [];
 			$scope.objectGames = games;
 			_.map(games,function(game,key){
-				$scope.games.push(game);
+				if(game.objectId != "56a8387a2e958a00597da3b2"){
+					$scope.games.push(game);	
+				}
 			});
 		});
 
@@ -46,11 +50,18 @@ app.controller('GiftEditController',['$scope','$rootScope','$state','GiftService
 			_gift.server = $scope.gift.server;
 			_gift.game = $scope.gift.game;
 			_gift.desc = $scope.gift.desc.replace(/\n/g,'<br/>');
-			_gift.codes = $scope.gift.code.split('\n');
-			console.log(_gift);
+			if($state.params.id){
+				_gift.objectId = $state.params.id;
+			}else{
+				_gift.codes = $scope.gift.code.split('\n');
+			}
 
 			GiftService.create(_gift).then(function(result){
-				console.log(result);
+				if(result.status == 100){
+					$state.go("base.giftList");
+				}else{
+					alert('添加失败,请稍后再试.');
+				}
 			});
 		}
 	}]);
@@ -60,6 +71,7 @@ app.controller('GiftListController',['$scope','$rootScope','GiftService',
 		function init(){
 			GiftService.getList().then(function(list){
 				_.map(list,function(gift){
+					console.log(gift);
 					gift.chartData = [
 						{
 							value:gift.count - gift.remain,
@@ -79,14 +91,16 @@ app.controller('GiftListController',['$scope','$rootScope','GiftService',
 		
 
 		$scope.remove = function(objectId){
-			GiftService.remove(objectId).then(function(result){
-				if(result.status == 100){
-					alert('删除成功');
-					init();
-				}else{
-					alert('删除失败');
-				}
-			});
+			if(confirm('确定删除该礼包？')){
+				GiftService.remove(objectId).then(function(result){
+					if(result.status == 100){
+						alert('删除成功');
+						init();
+					}else{
+						alert('删除失败');
+					}
+				});	
+			}
 		}
 
 		init();

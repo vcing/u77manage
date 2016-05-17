@@ -111,6 +111,7 @@ app.service('DashboardService',['$q',
 									highlight:"#8d4bbb",
 									label:key
 								});
+								break;
 							case '村长打天下':
 								result.push({
 									value:value,
@@ -118,6 +119,15 @@ app.service('DashboardService',['$q',
 									highlight:'#d96a5c',
 									label:key
 								});
+								break;
+							case '猎魔传说':
+								result.push({
+									value:value,
+									color:'#da434a',
+									highlight:'#db6c5f',
+									label:key
+								});
+								break;
 						}
 					});
 					deffered.resolve(result);

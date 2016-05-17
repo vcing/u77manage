@@ -186,6 +186,9 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 			},
 			"yzh":{
 				"name":"玉之魂"
+			},
+			"lmcs":{
+				"name":"猎魔传说"
 			}
 		}
 		// 初始化选项

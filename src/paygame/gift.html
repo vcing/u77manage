@@ -11,14 +11,15 @@
 </section>
 <section class="content">
 	<div class="row">
-		<div class="col-md-3 col-sm-4">
-			<div class="box box-primary" ng-repeat="gift in gifts">
+		<div class="col-md-3 col-sm-4" ng-repeat="gift in gifts">
+			<div class="box box-primary">
 				<div class="box-header with-border">
 					<h3 class="box-title" ng-bind="gift.name"></h3>
 				</div>
 				<div class="box-body" style="text-align: right">
 					<div class="chart"><canvas doughnut-chart="gift.chartData"></canvas></div>
 					<p style="font-size: 12px;text-align: center">{{gift.start | onlyDate}}至{{gift.end | onlyDate}}</p>
+					<p style="font-size: 12px;text-align: center">{{gift.game.name}}</p>
 					<a class="btn btn-warning" ui-sref="base.editGift({id:gift.objectId})">修改</a>
 					<a class="btn btn-danger" ng-click="remove(gift.objectId)">删除</a>
 				</div>
