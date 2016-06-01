@@ -189,6 +189,9 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 			},
 			"lmcs":{
 				"name":"猎魔传说"
+			},
+			"kosg":{
+				"name":"KO三国"
 			}
 		}
 		// 初始化选项

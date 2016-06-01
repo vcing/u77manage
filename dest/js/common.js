@@ -661,6 +661,9 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 			},
 			"lmcs":{
 				"name":"猎魔传说"
+			},
+			"kosg":{
+				"name":"KO三国"
 			}
 		}
 		// 初始化选项
@@ -2982,6 +2985,13 @@ app.service('DashboardService',['$q',
 									label:key
 								});
 								break;
+							case 'KO三国':
+								result.push({
+									value:value,
+									color:'#abcdef',
+									highlight:'#bcdef0',
+									label:key
+								})
 						}
 					});
 					deffered.resolve(result);

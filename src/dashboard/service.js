@@ -128,6 +128,13 @@ app.service('DashboardService',['$q',
 									label:key
 								});
 								break;
+							case 'KO三国':
+								result.push({
+									value:value,
+									color:'#abcdef',
+									highlight:'#bcdef0',
+									label:key
+								})
 						}
 					});
 					deffered.resolve(result);
