@@ -1,6 +1,6 @@
 app.controller('GiftEditController',['$scope','$rootScope','$state','GiftService',
 	function($scope,$rootScope,$state,GiftService){
-
+		$scope.loading = false;
 		if($state.params.id){
 			GiftService.get($state.params.id).then(function(gift){
 				gift.start = moment.unix(gift.start).format('YYYY-MM-DD');
@@ -21,7 +21,7 @@ app.controller('GiftEditController',['$scope','$rootScope','$state','GiftService
 		});
 
 		$scope.submit = function() {
-			console.log($scope.gift);
+			$scope.loading = true;
 			var _gift = {};
 
 			if(!$scope.gift.start || !moment($scope.gift.start).unix() > 0){
@@ -49,11 +49,10 @@ app.controller('GiftEditController',['$scope','$rootScope','$state','GiftService
 			_gift.end = moment($scope.gift.end).unix();
 			_gift.server = $scope.gift.server;
 			_gift.game = $scope.gift.game;
+			_gift.url = $scope.gift.url;
 			_gift.desc = $scope.gift.desc.replace(/\n/g,'<br/>');
 			if($state.params.id){
 				_gift.objectId = $state.params.id;
-			}else{
-				_gift.codes = $scope.gift.code.split('\n');
 			}
 
 			GiftService.create(_gift).then(function(result){
@@ -61,6 +60,7 @@ app.controller('GiftEditController',['$scope','$rootScope','$state','GiftService
 					$state.go("base.giftList");
 				}else{
 					alert('添加失败,请稍后再试.');
+					$scope.loading = false;
 				}
 			});
 		}
@@ -71,7 +71,7 @@ app.controller('GiftListController',['$scope','$rootScope','GiftService',
 		function init(){
 			GiftService.getList().then(function(list){
 				_.map(list,function(gift){
-					console.log(gift);
+					gift.removing = false;
 					gift.chartData = [
 						{
 							value:gift.count - gift.remain,
@@ -90,13 +90,16 @@ app.controller('GiftListController',['$scope','$rootScope','GiftService',
 		}
 		
 
-		$scope.remove = function(objectId){
+		$scope.remove = function(gift){
 			if(confirm('确定删除该礼包？')){
-				GiftService.remove(objectId).then(function(result){
+				gift.removing = true;
+				GiftService.remove(gift.objectId).then(function(result){
 					if(result.status == 100){
 						alert('删除成功');
+						gift.removing = false;
 						init();
 					}else{
+						gift.removing = false;
 						alert('删除失败');
 					}
 				});	

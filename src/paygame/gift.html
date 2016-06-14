@@ -21,7 +21,7 @@
 					<p style="font-size: 12px;text-align: center">{{gift.start | onlyDate}}至{{gift.end | onlyDate}}</p>
 					<p style="font-size: 12px;text-align: center">{{gift.game.name}}</p>
 					<a class="btn btn-warning" ui-sref="base.editGift({id:gift.objectId})">修改</a>
-					<a class="btn btn-danger" ng-click="remove(gift.objectId)">删除</a>
+					<a class="btn btn-danger" ng-click="remove(gift)" ng-disabled="gift.removing"><span ng-if="!gift.removing">删除</span><span ng-if="gift.removing"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></span></a>
 				</div>
 			</div>
 		</div>

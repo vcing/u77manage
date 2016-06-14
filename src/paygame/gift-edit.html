@@ -38,12 +38,12 @@
 						<textarea id="gift-desc" cols="30" rows="10" class="form-control" ng-model="gift.desc"></textarea>
 					</div>
 					<div class="form-group" ng-if="!gift.objectId">
-						<label for="gift-code">礼包代码</label>
-						<textarea id="gift-code" cols="50" rows="10" class="form-control" ng-model="gift.code"></textarea>
+						<label for="gift-url">礼包代码文件链接</label>
+						<textarea id="gift-url" cols="10" rows="10" class="form-control" ng-model="gift.url"></textarea>
 					</div>
 				</div>
 				<div class="box-footer">
-					<button class="btn btn-primary" ng-click="submit()">提交</button>
+					<button class="btn btn-primary" ng-click="submit()" ng-disabled="loading"><span ng-if="!loading">提交</span><span ng-if="loading"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></span></button>
 				</div>
 			</div>
 		</div>

@@ -25,13 +25,13 @@ var Path           = 'http://www.u77.com/';
 var AvatarPath     = 'http://img.u77.com/avatar/';
 var ManagePath     = 'http://manage.u77.com/';
 var BackEndPath    = 'http://u77admin.leanapp.cn/api/';
-var ChargePath     = 'http://u77pay.leanapp.cn/api/';
+// var ChargePath     = 'http://u77pay.leanapp.cn/api/';
 var AnalysisPath   = 'http://u77userrecord.leanapp.cn/api/';
 var DiscoverPath   = 'http://u77discover.avosapps.com/api/';
 var MessagePath    = 'http://u77message.leanapp.cn/api/'
 // var MessagePath = 'http://localhost:888/api/'
 // var FinancePath = 'http://192.168.1.102:3000/api/';
-// var ChargePath  = 'http://localhost:888/api/' ;
+var ChargePath  = 'http://localhost:888/api/' ;
 
 
 
