@@ -192,6 +192,9 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 			},
 			"kosg":{
 				"name":"KO三国"
+			},
+			"ademx":{
+				"name":"艾德尔冒险"
 			}
 		}
 		// 初始化选项

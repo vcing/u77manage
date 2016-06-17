@@ -135,6 +135,15 @@ app.service('DashboardService',['$q',
 									highlight:'#bcdef0',
 									label:key
 								})
+								break;
+							case '艾德尔冒险':
+								result.push({
+									value:value,
+									color:'#1bddef',
+									highlight:'#bdeef0',
+									label:key
+								})
+								break;
 						}
 					});
 					deffered.resolve(result);

@@ -25,13 +25,13 @@ var Path           = 'http://www.u77.com/';
 var AvatarPath     = 'http://img.u77.com/avatar/';
 var ManagePath     = 'http://manage.u77.com/';
 var BackEndPath    = 'http://u77admin.leanapp.cn/api/';
-// var ChargePath     = 'http://u77pay.leanapp.cn/api/';
+var ChargePath     = 'http://u77pay.leanapp.cn/api/';
 var AnalysisPath   = 'http://u77userrecord.leanapp.cn/api/';
 var DiscoverPath   = 'http://u77discover.avosapps.com/api/';
 var MessagePath    = 'http://u77message.leanapp.cn/api/'
 // var MessagePath = 'http://localhost:888/api/'
 // var FinancePath = 'http://192.168.1.102:3000/api/';
-var ChargePath  = 'http://localhost:888/api/' ;
+// var ChargePath  = 'http://localhost:888/api/' ;
 
 
 
@@ -664,6 +664,9 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 			},
 			"kosg":{
 				"name":"KO三国"
+			},
+			"ademx":{
+				"name":"艾德尔冒险"
 			}
 		}
 		// 初始化选项
@@ -2434,6 +2437,115 @@ app.service('UserService',['$q',
 			}
 		}
 	}]);
+app.controller('BigEyeCtrl',['$scope','$rootScope','UploadService',
+	function($scope,$rootScope,UploadService){
+		$scope.list = [];
+
+		$.get(ManagePath+'sliders',function(data){
+			$scope.list = JSON.parse(data);
+		});
+
+		$scope.up = function(index){
+			if(index <= 0){
+				return;
+			}
+			var _temp = $scope.list[index-1];
+			$scope.list[index-1] = $scope.list[index];
+			$scope.list[index] = _temp;
+		}
+
+		$scope.down = function(index){
+			if(index >= $scope.list.length - 1){
+				return;
+			}
+			var _temp = $scope.list[index + 1];
+			$scope.list[index + 1] = $scope.list[index];
+			$scope.list[index] = _temp;
+		}
+
+		$scope.left = function(){
+			$scope.slideControl = $scope.slideControl <= 0 ? $scope.list.length - 1 : $scope.slideControl - 1;
+		}
+
+		$scope.right = function(){
+			$scope.slideControl = $scope.slideControl >= $scope.list.length - 1 ? 0 : $scope.slideControl + 1;
+		}
+
+		$scope.submit = function(){
+			$.post(ManagePath+'sliders',{sliders:$scope.list},function(data){
+				if(data != 0){
+					alert('保存成功');
+				}
+			});
+		}
+
+		UploadService.image().then(function(fn){
+			$scope.upload = function($file,slide){
+				fn($file,function(resp){
+					if(resp.status == 200 && resp.statusText == 'OK'){
+						slide.image = resp.data.url;
+					}else{
+						alert('上传失败,请重试');
+					}
+					slide.percentage = null
+				},function(evt){
+					slide.percentage = evt.percentage;
+				});
+			}
+		});
+
+		$scope.slideControl = 0;
+		setInterval(function(){
+			$scope.$apply(function(){
+				if($scope.slideControl < $scope.list.length -1){
+					$scope.slideControl++	
+				}else{
+					$scope.slideControl = 0;
+				}	
+			});
+			
+		},3000)
+	}]);
+
+app.controller('GameExamineCtrl',['$scope','$rootScope','GameService',
+	function($scope,$rootScope,GameService){
+		$scope.options = {
+			status:0
+		}
+		GameService.list($scope.options).then(function(data){
+			$scope.gameList = data;
+		});
+	}]);
+
+app.controller('ReportExamineCtrl',['$scope','$rootScope','ReportService',
+	function($scope,$rootScope,ReportService){
+		ReportService.list().then(function(data){
+			$scope.reportList = data.data;
+		});
+
+	}]);
+// const T_TYPE_COMMENT = 1;			// comment
+// const T_TYPE_POST = 2;				// post
+// const T_TYPE_VIDEO = 3;				// video
+// const T_TYPE_GAMEREC = 4;			// game rec
+
+app.service('DailyGameVilidService',['$http','$q','GameService',
+	function($http,$q,GameService){
+		return {
+			promise:function(){
+				var deffered = $q.defer();
+				var options = {
+					status:0
+				}
+				GameService.list(options).then(function(data){
+					deffered.resolve(data);
+				});
+				return deffered.promise;
+			}
+		}
+	}]);
+
+
 app.controller('DashboardCtrl',['$scope','$rootScope','DashboardService',
 	function($scope,$rootScope,DashboardService){
 		// 昨日数据
@@ -2650,6 +2762,15 @@ app.service('DashboardService',['$q',
 									highlight:'#bcdef0',
 									label:key
 								})
+								break;
+							case '艾德尔冒险':
+								result.push({
+									value:value,
+									color:'#1bddef',
+									highlight:'#bdeef0',
+									label:key
+								})
+								break;
 						}
 					});
 					deffered.resolve(result);
@@ -2658,115 +2779,6 @@ app.service('DashboardService',['$q',
 			}
 		}
 	}]);
-app.controller('BigEyeCtrl',['$scope','$rootScope','UploadService',
-	function($scope,$rootScope,UploadService){
-		$scope.list = [];
-
-		$.get(ManagePath+'sliders',function(data){
-			$scope.list = JSON.parse(data);
-		});
-
-		$scope.up = function(index){
-			if(index <= 0){
-				return;
-			}
-			var _temp = $scope.list[index-1];
-			$scope.list[index-1] = $scope.list[index];
-			$scope.list[index] = _temp;
-		}
-
-		$scope.down = function(index){
-			if(index >= $scope.list.length - 1){
-				return;
-			}
-			var _temp = $scope.list[index + 1];
-			$scope.list[index + 1] = $scope.list[index];
-			$scope.list[index] = _temp;
-		}
-
-		$scope.left = function(){
-			$scope.slideControl = $scope.slideControl <= 0 ? $scope.list.length - 1 : $scope.slideControl - 1;
-		}
-
-		$scope.right = function(){
-			$scope.slideControl = $scope.slideControl >= $scope.list.length - 1 ? 0 : $scope.slideControl + 1;
-		}
-
-		$scope.submit = function(){
-			$.post(ManagePath+'sliders',{sliders:$scope.list},function(data){
-				if(data != 0){
-					alert('保存成功');
-				}
-			});
-		}
-
-		UploadService.image().then(function(fn){
-			$scope.upload = function($file,slide){
-				fn($file,function(resp){
-					if(resp.status == 200 && resp.statusText == 'OK'){
-						slide.image = resp.data.url;
-					}else{
-						alert('上传失败,请重试');
-					}
-					slide.percentage = null
-				},function(evt){
-					slide.percentage = evt.percentage;
-				});
-			}
-		});
-
-		$scope.slideControl = 0;
-		setInterval(function(){
-			$scope.$apply(function(){
-				if($scope.slideControl < $scope.list.length -1){
-					$scope.slideControl++	
-				}else{
-					$scope.slideControl = 0;
-				}	
-			});
-			
-		},3000)
-	}]);
-
-app.controller('GameExamineCtrl',['$scope','$rootScope','GameService',
-	function($scope,$rootScope,GameService){
-		$scope.options = {
-			status:0
-		}
-		GameService.list($scope.options).then(function(data){
-			$scope.gameList = data;
-		});
-	}]);
-
-app.controller('ReportExamineCtrl',['$scope','$rootScope','ReportService',
-	function($scope,$rootScope,ReportService){
-		ReportService.list().then(function(data){
-			$scope.reportList = data.data;
-		});
-
-	}]);
-// const T_TYPE_COMMENT = 1;			// comment
-// const T_TYPE_POST = 2;				// post
-// const T_TYPE_VIDEO = 3;				// video
-// const T_TYPE_GAMEREC = 4;			// game rec
-
-app.service('DailyGameVilidService',['$http','$q','GameService',
-	function($http,$q,GameService){
-		return {
-			promise:function(){
-				var deffered = $q.defer();
-				var options = {
-					status:0
-				}
-				GameService.list(options).then(function(data){
-					deffered.resolve(data);
-				});
-				return deffered.promise;
-			}
-		}
-	}]);
-
-
 app.controller('DiscoverCtrl',['$rootScope','$scope','$state','DiscoverServer',
 	function($rootScope,$scope,$state,DiscoverServer){
 		
