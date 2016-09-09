@@ -50,6 +50,7 @@ app.controller('ListGameCtrl',['$scope','$rootScope','GameService',
 					$scope.gameList = data;
 				});	
 			}else{
+				console.log($scope.options);
 				GameService.list($scope.options).then(function(data){
 					$scope.gameList = data;
 				});	

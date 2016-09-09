@@ -31,7 +31,7 @@ var DiscoverPath   = 'http://u77discover.avosapps.com/api/';
 var MessagePath    = 'http://u77message.leanapp.cn/api/'
 // var MessagePath = 'http://localhost:888/api/'
 // var FinancePath = 'http://192.168.1.102:3000/api/';
-// var ChargePath  = 'http://localhost:888/api/' ;
+// var ChargePath  = 'http://localhost:3000/api/' ;
 
 
 

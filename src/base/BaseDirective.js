@@ -3,6 +3,10 @@ app.directive('mainSidebar',function(){
 		restrict:'A',
 		templateUrl:'/static/base/sidebar.html',
 		replace:true,
+		link: function($scope,element,attrs) {
+			$(".main-sidebar .sidebar").slimScroll({ height: $(window).height() - 50, alwaysVisible: true, });
+			$.AdminLTE.pushMenu.expandOnHover();
+		}
 	};
 });
 

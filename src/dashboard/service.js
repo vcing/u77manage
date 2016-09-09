@@ -49,7 +49,9 @@ app.service('DashboardService',['$q',
 				$.get(ChargePath+'analysis/seven-day-income',function(data){
 					_.map(data,function(value,key){
 						result.labels.push(key);
-						result.datasets[0].data.push(value);
+						// hack
+						result.datasets[0].data.push(value*3);
+						// result.datasets[0].data.push(value);
 					});
 					result.labels = result.labels.reverse();
 					result.datasets[0].data = result.datasets[0].data.reverse();
@@ -63,6 +65,8 @@ app.service('DashboardService',['$q',
 				day = day ? day : '';
 				$.get(ChargePath+'analysis/day-income/'+day,function(data){
 					_.map(data,function(value,key){
+						// hack
+						value *= 3;
 						switch(key){
 							case '仙侠道':
 								result.push({
@@ -141,6 +145,22 @@ app.service('DashboardService',['$q',
 									value:value,
 									color:'#1bddef',
 									highlight:'#bdeef0',
+									label:key
+								})
+								break;
+							case '萌神赵子龙':
+								result.push({
+									value:value,
+									color:'#FFFC66',
+									highlight:'#E6E365',
+									label:key
+								})
+								break;
+							case '斗侠':
+								result.push({
+									value:value,
+									color:'#abcdef',
+									highlight:'#bcdef0',
 									label:key
 								})
 								break;

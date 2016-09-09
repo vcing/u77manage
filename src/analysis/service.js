@@ -5,6 +5,11 @@ app.service('AnalysisService',['$q',
 				var deffered = $q.defer();
 				if(chart.y == 'money' || chart.y == 'human' || chart.y == 'count' || chart.y == 'averageOfHuman' || chart.y == 'averageOfCount'){
 					$.get(ChargePath+'analysis/income',chart,function(result){
+						// hack
+						console.log(result);
+						$.map(result['axis'],function(value,key) {
+							result['axis'][key] *= 3;
+						});
 						deffered.resolve(result);
 					});
 				}else{

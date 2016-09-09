@@ -75,6 +75,16 @@ app.controller('DiscoverCtrl',['$rootScope','$scope','$state','DiscoverServer',
 			}
 		}
 
+		$scope.changeIsLast = function(discover) {
+			DiscoverServer.toggleIsLast(discover.discoverId).then(function(result) {
+				if(result.status == 100){
+					discover.isLast = !discover.isLast
+				}else{
+					alert(result.msg);
+				}
+			})
+		}
+
 		$scope.options = {
 			currentPage:1
 		}

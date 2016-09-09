@@ -70,6 +70,17 @@ app.service('DiscoverServer',['$q',
 					}
 				})
 				return deffered.promise;
+			},
+			toggleIsLast:function(id) {
+				var deffered = $q.defer();
+				$.ajax({
+					url:DiscoverPath+'discover/toggle/'+id,
+					type:'get',
+					success:function(result) {
+						deffered.resolve(result);
+					}
+				});
+				return deffered.promise;
 			}
 		}
 	}]);

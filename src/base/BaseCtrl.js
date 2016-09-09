@@ -410,7 +410,7 @@ app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options
 			
 			switch($scope.options.type){
 				case 101:
-					content += "你投稿的游戏 <a href='"+($scope.options.status ? "/game/"+$scope.options.content.id : "javascript:;")+"' target='_blank'>";
+					content += "你投稿的游戏 <a href='"+($scope.options.status ? "/game/"+$scope.options.content.id : "")+"' target='_blank'>";
 					content += $scope.options.content.title+"</a>";
 					content += " 审核"+($scope.options.status ? "通过" : "未通过");
 					content += $scope.options.status ? '' : " 原因:"+$scope.options.cause;
@@ -418,7 +418,7 @@ app.controller('MessageCtrl',['$scope','$rootScope','$uibModalInstance','options
 					_options.type = !$scope.options.status ? $scope.options.type+ 1 : $scope.options.type;
 					break;
 				case 103:
-					content += "你投稿的游戏精华 <a href='"+($scope.options.status ? "/post/"+$scope.options.content.id : "javascript:;")+"' target='_blank'>";
+					content += "你投稿的游戏精华 <a href='"+($scope.options.status ? "/post/"+$scope.options.content.id : "")+"' target='_blank'>";
 					content += $scope.options.content.title+"</a>";
 					content += " 审核"+($scope.options.status ? "通过" : "未通过");
 					content += $scope.options.status ? '' : " 原因:"+$scope.options.cause;

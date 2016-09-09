@@ -68,16 +68,16 @@
 	  </div>
 	  <!-- /.login-box-body -->
 	</div>
-	<script async=true src="http://api.geetest.com/get.php?callback=init"></script>
 	<script src="/static/lib/jquery.min.js"></script>
-	<script src="/static/js/gt.js"></script>
+	<!-- <script src="/static/js/gt.js"></script> -->
 	<!-- 更新到1.46版本 -->
 	<script src="/static/lib/bootstrap.min.js"></script>
 	<script src="/static/lib/lodash.min.js"></script>
 	<script src='/static/lib/moment-with-locales.min.js'></script>
 	<script src="/static/plugins/fastclick/fastclick.min.js"></script>
+	<script src="http://js.touclick.com/js.touclick?b=4f567951-f0f8-4816-a37f-796a2c591f03" ></script>
+	<!-- <script async=true src="http://api.geetest.com/get.php?callback=init"></script> -->
 <script>
-
 function init(){
 	$.get("/geetest",function(data){
 		initGeetest({
@@ -110,6 +110,9 @@ function handler(_captchaObj){
 }
 
 $('#login').submit(function() {
+
+
+
 	$.post('/api/user/login',{
 		username:$('#username').val(),
 		password:$('#password').val()

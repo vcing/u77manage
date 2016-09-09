@@ -195,6 +195,15 @@ app.controller('ChartEditCtrl',['$scope','AnalysisService',
 			},
 			"ademx":{
 				"name":"艾德尔冒险"
+			},
+			"mszzl":{
+				"name":"萌神赵子龙"
+			},
+			"dx":{
+				"name":"斗侠"
+			},
+			"jxj":{
+				"name":"将心诀"
 			}
 		}
 		// 初始化选项

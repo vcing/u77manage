@@ -73,7 +73,7 @@
 							</a>
 						</li>
 						<li>
-							<a href="{{Path+'discover/'+discover.discoverId}}" target="_blank" style="font-size:16px;text-align:center">
+							<a ng-click="changeIsLast(discover)" style="font-size:16px;text-align:center">
 								<span class="label label-success" ng-if="discover.isLast">展示中</span>
 								<span class="label label-warning" ng-if="!discover.isLast">已隐藏</span>
 							</a>
